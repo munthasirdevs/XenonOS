@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Session extends Model
 {
+    protected $table = 'sessions';
+
+    public $timestamps = false;
+
     protected $fillable = [
+        'id',
         'user_id',
         'ip_address',
         'user_agent',
@@ -18,7 +23,7 @@ class Session extends Model
     protected function casts(): array
     {
         return [
-            'last_activity' => 'datetime',
+            'last_activity' => 'integer',
         ];
     }
 

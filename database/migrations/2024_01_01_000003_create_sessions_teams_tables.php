@@ -9,15 +9,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sessions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->text('payload')->nullable();
+            $table->integer('last_activity')->nullable();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->string('device_type')->nullable();
-            $table->timestamp('last_activity')->nullable();
             $table->timestamps();
             
             $table->index('user_id');
+            $table->index('last_activity');
         });
 
         Schema::create('teams', function (Blueprint $table) {
