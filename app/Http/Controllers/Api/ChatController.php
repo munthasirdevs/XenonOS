@@ -85,4 +85,65 @@ class ChatController extends Controller
 
         return $this->success($message->load('sender:id,name'), 'Message sent successfully', 201);
     }
+
+    public function deleteMessage(Request $request, Message $message)
+    {
+        if ($message->chat->created_by !== $request->user()->id && !$request->user()->hasRole('admin')) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 403);
+        }
+
+        $message->delete();
+        return $this->success(null, 'Message deleted successfully');
+    }
+
+    public function flagMessage(Request $request, Message $message)
+    {
+        $message->update(['is_flagged' => true]);
+        
+        \App\Models\ActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'message_flagged',
+            'description' => 'Message flagged in chat ' . $message->chat_id,
+        ]);
+
+        return $this->success(null, 'Message flagged successfully');
+    }
+
+    public function muteUser(Request $request, User $user)
+    {
+        $request->validate([
+            'chat_id' => 'required|exists:chats,id',
+            'duration' => 'nullable|integer|min:1',
+        ]);
+
+        $chat = Chat::findOrFail($request->chat_id);
+        
+        $chat->mutedUsers()->syncWithoutDetaching([
+            $user->id => [
+                'muted_by' => $request->user()->id,
+                'muted_at' => now(),
+                'expires_at' => now()->addDays($request->duration ?? 7),
+            ]
+        ]);
+
+        return $this->success(null, 'User muted successfully');
+    }
+
+    public function unmuteUser(Request $request, User $user)
+    {
+        $request->validate([
+            'chat_id' => 'required|exists:chats,id',
+        ]);
+
+        $chat = Chat::findOrFail($request->chat_id);
+        $chat->mutedUsers()->detach($user->id);
+
+        return $this->success(null, 'User unmuted successfully');
+    }
+
+    public function mutedUsers(Request $request, Chat $chat)
+    {
+        $muted = $chat->mutedUsers()->get();
+        return $this->success($muted);
+    }
 }

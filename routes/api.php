@@ -124,6 +124,11 @@ Route::prefix('chats')->group(function () {
     Route::delete('/{chat}', [ChatController::class, 'destroy']);
     Route::get('/{chat}/messages', [ChatController::class, 'messages']);
     Route::post('/{chat}/messages', [ChatController::class, 'sendMessage']);
+    Route::delete('/{chat}/messages/{message}', [ChatController::class, 'deleteMessage']);
+    Route::post('/{chat}/messages/{message}/flag', [ChatController::class, 'flagMessage']);
+    Route::post('/{chat}/mute/{user}', [ChatController::class, 'muteUser']);
+    Route::delete('/{chat}/mute/{user}', [ChatController::class, 'unmuteUser']);
+    Route::get('/{chat}/muted', [ChatController::class, 'mutedUsers']);
 });
 
 // Announcement routes
