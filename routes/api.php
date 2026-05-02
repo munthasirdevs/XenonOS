@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\RolePermissionController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\NoteController;
+use App\Http\Controllers\Api\FileController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -147,4 +148,13 @@ Route::prefix('notes')->group(function () {
     Route::get('/{note}', [NoteController::class, 'show']);
     Route::put('/{note}', [NoteController::class, 'update']);
     Route::delete('/{note}', [NoteController::class, 'destroy']);
+});
+
+// File routes
+Route::prefix('files')->group(function () {
+    Route::get('/', [FileController::class, 'index']);
+    Route::post('/', [FileController::class, 'store'])->middleware('permission:file.upload');
+    Route::get('/{file}', [FileController::class, 'show']);
+    Route::delete('/{file}', [FileController::class, 'destroy'])->middleware('permission:file.delete');
+    Route::get('/{file}/download', [FileController::class, 'download']);
 });
