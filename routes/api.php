@@ -3,6 +3,10 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SessionController;
+use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\UserRoleController;
+use App\Http\Controllers\Api\RolePermissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -22,4 +26,38 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::get('/sessions', [SessionController::class, 'index']);
     Route::delete('/sessions/{session}', [SessionController::class, 'destroy']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('roles')->group(function () {
+        Route::get('/', [RoleController::class, 'index']);
+        Route::post('/', [RoleController::class, 'store'])->middleware('permission:role.create');
+        Route::get('/{role}', [RoleController::class, 'show']);
+        Route::put('/{role}', [RoleController::class, 'update'])->middleware('permission:role.update');
+        Route::delete('/{role}', [RoleController::class, 'destroy'])->middleware('permission:role.delete');
+        
+        Route::get('/{role}/permissions', [RolePermissionController::class, 'index']);
+        Route::post('/{role}/permissions', [RolePermissionController::class, 'assignPermission'])
+            ->middleware('permission:role.update');
+        Route::put('/{role}/permissions', [RolePermissionController::class, 'syncPermissions'])
+            ->middleware('permission:role.update');
+        Route::delete('/{role}/permissions/{permission}', [RolePermissionController::class, 'removePermission'])
+            ->middleware('permission:role.update');
+    });
+
+    Route::prefix('permissions')->group(function () {
+        Route::get('/', [PermissionController::class, 'index']);
+        Route::get('/{permission}', [PermissionController::class, 'show']);
+        Route::get('/module/list', [PermissionController::class, 'getByModule']);
+    });
+
+    Route::prefix('users')->group(function () {
+        Route::get('/{user}/roles', [UserRoleController::class, 'index']);
+        Route::post('/{user}/roles', [UserRoleController::class, 'assignRole'])
+            ->middleware('permission:role.update');
+        Route::delete('/{user}/roles/{role}', [UserRoleController::class, 'removeRole'])
+            ->middleware('permission:role.update');
+        Route::put('/{user}/roles', [UserRoleController::class, 'syncRoles'])
+            ->middleware('permission:role.update');
+    });
 });

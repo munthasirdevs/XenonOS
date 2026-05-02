@@ -32,4 +32,26 @@ class Role extends Model
     {
         return $this->permissions()->where('slug', $permission)->exists();
     }
+
+    public function givePermissionTo($permissionSlug): void
+    {
+        $permission = Permission::where('slug', $permissionSlug)->first();
+        if ($permission && !$this->hasPermission($permissionSlug)) {
+            $this->permissions()->attach($permission->id);
+        }
+    }
+
+    public function revokePermission($permissionSlug): void
+    {
+        $permission = Permission::where('slug', $permissionSlug)->first();
+        if ($permission) {
+            $this->permissions()->detach($permission->id);
+        }
+    }
+
+    public function syncPermissions(array $permissionSlugs): void
+    {
+        $permissionIds = Permission::whereIn('slug', $permissionSlugs)->pluck('id');
+        $this->permissions()->sync($permissionIds);
+    }
 }
