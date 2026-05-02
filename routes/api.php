@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\NoteController;
 use App\Http\Controllers\Api\FileController;
+use App\Http\Controllers\Api\InvoiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -165,4 +166,15 @@ Route::prefix('files')->group(function () {
     Route::post('/{file}/tags', [FileController::class, 'addTag']);
     Route::delete('/{file}/tags', [FileController::class, 'removeTag']);
     Route::get('/search', [FileController::class, 'search']);
+});
+
+// Invoice routes
+Route::prefix('invoices')->group(function () {
+    Route::get('/', [InvoiceController::class, 'index']);
+    Route::post('/', [InvoiceController::class, 'store']);
+    Route::get('/{invoice}', [InvoiceController::class, 'show']);
+    Route::put('/{invoice}', [InvoiceController::class, 'update']);
+    Route::post('/{invoice}/send', [InvoiceController::class, 'send']);
+    Route::post('/{invoice}/paid', [InvoiceController::class, 'markPaid']);
+    Route::post('/{invoice}/cancel', [InvoiceController::class, 'cancel']);
 });

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Invoice extends Model
 {
@@ -13,19 +14,41 @@ class Invoice extends Model
 
     protected $fillable = [
         'client_id',
-        'amount',
+        'invoice_number',
+        'subtotal',
+        'tax',
+        'discount',
+        'total',
         'status',
         'due_date',
-        'description',
+        'sent_at',
+        'paid_at',
+        'notes',
         'created_by',
     ];
 
     protected function casts(): array
     {
         return [
-            'amount' => 'decimal:2',
+            'subtotal' => 'decimal:2',
+            'tax' => 'decimal:2',
+            'discount' => 'decimal:2',
+            'total' => 'decimal:2',
             'due_date' => 'date',
+            'sent_at' => 'datetime',
+            'paid_at' => 'datetime',
         ];
+    }
+
+    public static function generateNumber(): string
+    {
+        $year = date('Y');
+        $lastInvoice = self::where('invoice_number', 'like', "INV-{$year}%")
+            ->orderBy('invoice_number', 'desc')
+            ->first();
+
+        $sequence = $lastInvoice ? (int) substr($lastInvoice->invoice_number, -4) + 1 : 1;
+        return sprintf('INV-%s-%04d', $year, $sequence);
     }
 
     public function client(): BelongsTo
@@ -33,14 +56,19 @@ class Invoice extends Model
         return $this->belongsTo(Client::class);
     }
 
-    public function creator(): BelongsTo
+    public function items(): HasMany
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->hasMany(InvoiceItem::class);
     }
 
-    public function transactions(): HasMany
+    public function payments(): HasMany
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(Payment::class);
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function isPaid(): bool
@@ -50,7 +78,7 @@ class Invoice extends Model
 
     public function isOverdue(): bool
     {
-        return $this->status === 'overdue' || 
-               ($this->due_date && $this->due_date->isPast() && $this->status !== 'paid');
+        return in_array($this->status, ['sent', 'overdue']) && 
+               $this->due_date && $this->due_date->isPast();
     }
 }
