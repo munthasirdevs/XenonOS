@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -221,3 +222,15 @@ Route::get('/reports/tasks', [ReportController::class, 'taskStats']);
 Route::get('/reports/projects', [ReportController::class, 'projectStats']);
 Route::get('/reports/clients', [ReportController::class, 'clientStats']);
 Route::get('/reports/export', [ReportController::class, 'export']);
+
+// Settings routes
+Route::prefix('settings')->group(function () {
+    Route::get('/', [SettingsController::class, 'index']);
+    Route::get('/{setting}', [SettingsController::class, 'show']);
+    Route::post('/', [SettingsController::class, 'store']);
+    Route::put('/{setting}', [SettingsController::class, 'update']);
+    Route::delete('/{setting}', [SettingsController::class, 'destroy']);
+    Route::get('/group/{group}', [SettingsController::class, 'byGroup']);
+    Route::get('/value', [SettingsController::class, 'getValue']);
+    Route::post('/value', [SettingsController::class, 'setValue']);
+});
