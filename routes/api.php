@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SessionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\UserRoleController;
 use App\Http\Controllers\Api\RolePermissionController;
 use Illuminate\Support\Facades\Route;
@@ -73,4 +74,23 @@ Route::prefix('clients')->group(function () {
     Route::get('/{client}/activities', [ClientController::class, 'activities']);
     Route::get('/{client}/documents', [ClientController::class, 'documents']);
     Route::get('/{client}/sessions', [ClientController::class, 'sessions']);
+});
+
+// Project routes
+Route::prefix('projects')->group(function () {
+    Route::get('/', [ProjectController::class, 'index']);
+    Route::post('/', [ProjectController::class, 'store'])->middleware('permission:project.create');
+    Route::get('/{project}', [ProjectController::class, 'show']);
+    Route::put('/{project}', [ProjectController::class, 'update'])->middleware('permission:project.update');
+    Route::delete('/{project}', [ProjectController::class, 'destroy'])->middleware('permission:project.delete');
+    
+    Route::get('/{project}/users', [ProjectController::class, 'users']);
+    Route::post('/{project}/users', [ProjectController::class, 'assignUsers'])->middleware('permission:project.assign');
+    Route::delete('/{project}/users/{user}', [ProjectController::class, 'removeUser'])->middleware('permission:project.assign');
+    
+    Route::get('/{project}/timeline', [ProjectController::class, 'timeline']);
+    Route::post('/{project}/timeline', [ProjectController::class, 'addTimeline']);
+    
+    Route::get('/{project}/files', [ProjectController::class, 'files']);
+    Route::post('/{project}/files', [ProjectController::class, 'linkFile']);
 });
