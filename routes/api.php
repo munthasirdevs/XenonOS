@@ -22,12 +22,16 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\ApiKeyController;
 use App\Http\Controllers\Api\SystemController;
+use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\AlertRuleController;
+use App\Http\Controllers\Api\AuditLogController;
+use App\Http\Controllers\Api\IntegrationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
-    
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
@@ -38,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
-    
+
     Route::get('/sessions', [SessionController::class, 'index']);
     Route::delete('/sessions/{session}', [SessionController::class, 'destroy']);
 });
@@ -50,7 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{role}', [RoleController::class, 'show']);
         Route::put('/{role}', [RoleController::class, 'update'])->middleware('permission:role.update');
         Route::delete('/{role}', [RoleController::class, 'destroy'])->middleware('permission:role.delete');
-        
+
         Route::get('/{role}/permissions', [RolePermissionController::class, 'index']);
         Route::post('/{role}/permissions', [RolePermissionController::class, 'assignPermission'])
             ->middleware('permission:role.update');
@@ -83,7 +87,7 @@ Route::prefix('clients')->group(function () {
     Route::get('/{client}', [ClientController::class, 'show']);
     Route::put('/{client}', [ClientController::class, 'update'])->middleware('permission:client.update');
     Route::delete('/{client}', [ClientController::class, 'destroy'])->middleware('permission:client.delete');
-    
+
     Route::get('/{client}/activities', [ClientController::class, 'activities']);
     Route::get('/{client}/documents', [ClientController::class, 'documents']);
     Route::get('/{client}/sessions', [ClientController::class, 'sessions']);
@@ -96,14 +100,14 @@ Route::prefix('projects')->group(function () {
     Route::get('/{project}', [ProjectController::class, 'show']);
     Route::put('/{project}', [ProjectController::class, 'update'])->middleware('permission:project.update');
     Route::delete('/{project}', [ProjectController::class, 'destroy'])->middleware('permission:project.delete');
-    
+
     Route::get('/{project}/users', [ProjectController::class, 'users']);
     Route::post('/{project}/users', [ProjectController::class, 'assignUsers'])->middleware('permission:project.assign');
     Route::delete('/{project}/users/{user}', [ProjectController::class, 'removeUser'])->middleware('permission:project.assign');
-    
+
     Route::get('/{project}/timeline', [ProjectController::class, 'timeline']);
     Route::post('/{project}/timeline', [ProjectController::class, 'addTimeline']);
-    
+
     Route::get('/{project}/files', [ProjectController::class, 'files']);
     Route::post('/{project}/files', [ProjectController::class, 'linkFile']);
     Route::get('/{project}/workspace', [ProjectController::class, 'workspace']);
@@ -116,7 +120,7 @@ Route::prefix('tasks')->group(function () {
     Route::get('/{task}', [TaskController::class, 'show']);
     Route::put('/{task}', [TaskController::class, 'update'])->middleware('permission:task.update');
     Route::delete('/{task}', [TaskController::class, 'destroy'])->middleware('permission:task.delete');
-    
+
     Route::post('/{task}/status', [TaskController::class, 'updateStatus']);
     Route::post('/{task}/assign', [TaskController::class, 'assign']);
     Route::get('/{task}/logs', [TaskController::class, 'logs']);
@@ -253,3 +257,46 @@ Route::get('/system/stats', [SystemController::class, 'stats']);
 Route::get('/system/info', [SystemController::class, 'info']);
 Route::get('/system/routes', [SystemController::class, 'routes']);
 Route::get('/system/services', [SystemController::class, 'services']);
+
+// Subscription routes
+Route::prefix('subscriptions')->group(function () {
+    Route::get('/', [SubscriptionController::class, 'index']);
+    Route::post('/', [SubscriptionController::class, 'store']);
+    Route::get('/{subscription}', [SubscriptionController::class, 'show']);
+    Route::put('/{subscription}', [SubscriptionController::class, 'update']);
+    Route::post('/{subscription}/cancel', [SubscriptionController::class, 'cancel']);
+    Route::post('/{subscription}/renew', [SubscriptionController::class, 'renew']);
+});
+Route::post('/subscriptions/check-expired', [SubscriptionController::class, 'checkExpired']);
+
+// Alert Rules routes
+Route::prefix('alert-rules')->group(function () {
+    Route::get('/', [AlertRuleController::class, 'index']);
+    Route::post('/', [AlertRuleController::class, 'store']);
+    Route::get('/options', [AlertRuleController::class, 'triggerOptions']);
+    Route::get('/{alertRule}', [AlertRuleController::class, 'show']);
+    Route::put('/{alertRule}', [AlertRuleController::class, 'update']);
+    Route::delete('/{alertRule}', [AlertRuleController::class, 'destroy']);
+    Route::post('/{alertRule}/toggle', [AlertRuleController::class, 'toggle']);
+});
+Route::post('/alert-rules/execute', [AlertRuleController::class, 'execute']);
+
+// Audit Logs routes
+Route::prefix('audit-logs')->group(function () {
+    Route::get('/', [AuditLogController::class, 'index']);
+    Route::get('/{auditLog}', [AuditLogController::class, 'show']);
+    Route::get('/entity/history', [AuditLogController::class, 'entityHistory']);
+    Route::get('/user/history', [AuditLogController::class, 'userHistory']);
+    Route::get('/export', [AuditLogController::class, 'export']);
+});
+
+// Integrations routes
+Route::prefix('integrations')->group(function () {
+    Route::get('/', [IntegrationController::class, 'index']);
+    Route::get('/types', [IntegrationController::class, 'types']);
+    Route::post('/', [IntegrationController::class, 'store']);
+    Route::get('/{integration}', [IntegrationController::class, 'show']);
+    Route::put('/{integration}', [IntegrationController::class, 'update']);
+    Route::delete('/{integration}', [IntegrationController::class, 'destroy']);
+    Route::post('/{integration}/test', [IntegrationController::class, 'test']);
+});

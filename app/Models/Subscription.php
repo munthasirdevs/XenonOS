@@ -11,9 +11,12 @@ class Subscription extends Model
         'client_id',
         'plan_name',
         'price',
+        'billing_cycle',
         'status',
         'start_date',
         'end_date',
+        'auto_renew',
+        'created_by',
     ];
 
     protected function casts(): array
@@ -22,12 +25,18 @@ class Subscription extends Model
             'price' => 'decimal:2',
             'start_date' => 'date',
             'end_date' => 'date',
+            'auto_renew' => 'boolean',
         ];
     }
 
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function isActive(): bool
