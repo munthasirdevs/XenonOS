@@ -10,6 +10,9 @@ use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\UserRoleController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\RolePermissionController;
+use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\AnnouncementController;
+use App\Http\Controllers\Api\NoteController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -111,4 +114,32 @@ Route::prefix('tasks')->group(function () {
     Route::get('/analytics', [TaskController::class, 'analytics']);
     Route::get('/calendar', [TaskController::class, 'calendar']);
     Route::post('/{task}/reschedule', [TaskController::class, 'reschedule']);
+});
+
+// Chat routes
+Route::prefix('chats')->group(function () {
+    Route::get('/', [ChatController::class, 'index']);
+    Route::post('/', [ChatController::class, 'store']);
+    Route::get('/{chat}', [ChatController::class, 'show']);
+    Route::delete('/{chat}', [ChatController::class, 'destroy']);
+    Route::get('/{chat}/messages', [ChatController::class, 'messages']);
+    Route::post('/{chat}/messages', [ChatController::class, 'sendMessage']);
+});
+
+// Announcement routes
+Route::prefix('announcements')->group(function () {
+    Route::get('/', [AnnouncementController::class, 'index']);
+    Route::post('/', [AnnouncementController::class, 'store'])->middleware('permission:announcement.create');
+    Route::get('/{announcement}', [AnnouncementController::class, 'show']);
+    Route::put('/{announcement}', [AnnouncementController::class, 'update'])->middleware('permission:announcement.create');
+    Route::delete('/{announcement}', [AnnouncementController::class, 'destroy']);
+});
+
+// Note routes
+Route::prefix('notes')->group(function () {
+    Route::get('/', [NoteController::class, 'index']);
+    Route::post('/', [NoteController::class, 'store']);
+    Route::get('/{note}', [NoteController::class, 'show']);
+    Route::put('/{note}', [NoteController::class, 'update']);
+    Route::delete('/{note}', [NoteController::class, 'destroy']);
 });
