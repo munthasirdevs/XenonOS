@@ -157,4 +157,12 @@ Route::prefix('files')->group(function () {
     Route::get('/{file}', [FileController::class, 'show']);
     Route::delete('/{file}', [FileController::class, 'destroy'])->middleware('permission:file.delete');
     Route::get('/{file}/download', [FileController::class, 'download']);
+
+    // File advanced routes
+    Route::get('/categories', [FileController::class, 'categories']);
+    Route::post('/categories', [FileController::class, 'storeCategory']);
+    Route::post('/{file}/category', [FileController::class, 'assignCategory']);
+    Route::post('/{file}/tags', [FileController::class, 'addTag']);
+    Route::delete('/{file}/tags', [FileController::class, 'removeTag']);
+    Route::get('/search', [FileController::class, 'search']);
 });
