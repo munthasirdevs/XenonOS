@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\NoteController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\BillingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -188,3 +189,12 @@ Route::prefix('payments')->group(function () {
     Route::post('/{payment}/refund', [PaymentController::class, 'refund']);
 });
 Route::get('/payments/stats', [PaymentController::class, 'methodStats']);
+
+// Billing reports routes
+Route::get('/billing/dashboard', [BillingController::class, 'dashboard']);
+Route::get('/billing/revenue', [BillingController::class, 'revenueChart']);
+Route::get('/billing/invoices/status', [BillingController::class, 'invoiceStatus']);
+Route::get('/billing/clients/revenue', [BillingController::class, 'clientRevenue']);
+Route::get('/billing/invoices/overdue', [BillingController::class, 'overdueInvoices']);
+Route::get('/billing/aging', [BillingController::class, 'agingReport']);
+Route::get('/billing/export', [BillingController::class, 'export']);
