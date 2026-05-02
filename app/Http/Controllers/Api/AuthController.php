@@ -97,4 +97,57 @@ class AuthController extends Controller
     {
         return $this->success($request->user()->load('profile', 'roles', 'permissions'));
     }
+
+    // Web Login (Session-based)
+    public function loginWeb(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return back()->withErrors(['email' => 'The provided credentials are incorrect.'])->withInput();
+        }
+
+        if ($user->status === 'banned') {
+            return back()->withErrors(['email' => 'Your account has been banned.'])->withInput();
+        }
+
+        auth()->login($user, $request->boolean('remember'));
+
+        $user->update(['last_login_at' => now()]);
+
+        \App\Models\SecurityLog::create([
+            'user_id' => $user->id,
+            'event' => 'web_login',
+            'ip_address' => $request->ip(),
+        ]);
+
+        event(new UserLoggedIn($user, $request->ip(), $request->userAgent()));
+
+        return redirect()->intended('/dashboard')->with('success', 'Welcome back!');
+    }
+
+    // Web Logout (Session-based)
+    public function logoutWeb(Request $request)
+    {
+        $user = auth()->user();
+        
+        if ($user) {
+            event(new UserLoggedOut($user));
+            
+            \App\Models\SecurityLog::create([
+                'user_id' => $user->id,
+                'event' => 'web_logout',
+                'ip_address' => $request->ip(),
+            ]);
+        }
+
+        auth()->logout();
+        
+        return redirect('/login')->with('success', 'Logged out successfully');
+    }
 }
