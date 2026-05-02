@@ -275,4 +275,13 @@ class ProjectController extends Controller
             'event_date' => now(),
         ]);
     }
+
+    public function workspace(Request $request, Project $project)
+    {
+        $workspaceService = new \App\Services\ProjectWorkspaceService();
+        
+        $workspace = $workspaceService->getWorkspace($project);
+        
+        return $this->success($workspace);
+    }
 }

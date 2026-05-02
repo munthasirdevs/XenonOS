@@ -93,4 +93,5 @@ Route::prefix('projects')->group(function () {
     
     Route::get('/{project}/files', [ProjectController::class, 'files']);
     Route::post('/{project}/files', [ProjectController::class, 'linkFile']);
+    Route::get('/{project}/workspace', [ProjectController::class, 'workspace']);
 });
