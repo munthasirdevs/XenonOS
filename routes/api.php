@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SessionController;
@@ -60,4 +61,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{user}/roles', [UserRoleController::class, 'syncRoles'])
             ->middleware('permission:role.update');
     });
+});
+
+Route::prefix('clients')->group(function () {
+    Route::get('/', [ClientController::class, 'index']);
+    Route::post('/', [ClientController::class, 'store'])->middleware('permission:client.create');
+    Route::get('/{client}', [ClientController::class, 'show']);
+    Route::put('/{client}', [ClientController::class, 'update'])->middleware('permission:client.update');
+    Route::delete('/{client}', [ClientController::class, 'destroy'])->middleware('permission:client.delete');
+    
+    Route::get('/{client}/activities', [ClientController::class, 'activities']);
+    Route::get('/{client}/documents', [ClientController::class, 'documents']);
+    Route::get('/{client}/sessions', [ClientController::class, 'sessions']);
 });
