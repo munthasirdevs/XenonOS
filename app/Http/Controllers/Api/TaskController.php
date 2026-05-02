@@ -160,6 +160,111 @@ class TaskController extends Controller
         return $this->success($logs);
     }
 
+    public function analytics(Request $request)
+    {
+        $query = Task::query()->with('project');
+
+        if ($request->has('project_id')) {
+            $query->where('project_id', $request->project_id);
+        }
+
+        if ($request->has('user_id')) {
+            $query->where('assigned_to', $request->user_id);
+        }
+
+        $tasks = $query->get();
+
+        $total = $tasks->count();
+        $completed = $tasks->where('status', 'done')->count();
+        $todo = $tasks->where('status', 'todo')->count();
+        $inProgress = $tasks->where('status', 'in_progress')->count();
+        $review = $tasks->where('status', 'review')->count();
+
+        $overdue = $tasks->filter(function ($task) {
+            return $task->due_date && $task->due_date->isPast() && $task->status !== 'done';
+        })->count();
+
+        $onTime = $tasks->filter(function ($task) {
+            return $task->status === 'done' && $task->due_date && $task->due_date->isAfter($task->updated_at);
+        })->count();
+
+        $analytics = [
+            'total' => $total,
+            'completed' => $completed,
+            'todo' => $todo,
+            'in_progress' => $inProgress,
+            'review' => $review,
+            'overdue' => $overdue,
+            'completion_rate' => $total > 0 ? round(($completed / $total) * 100) : 0,
+            'on_time_completion' => $completed > 0 ? round(($onTime / $completed) * 100) : 0,
+            'high_priority' => $tasks->where('priority', 'high')->count(),
+            'urgent' => $tasks->where('priority', 'urgent')->count(),
+        ];
+
+        return $this->success($analytics);
+    }
+
+    public function calendar(Request $request)
+    {
+        $request->validate([
+            'start' => 'required|date',
+            'end' => 'required|date|after:start',
+        ]);
+
+        $tasks = Task::whereNotNull('due_date')
+            ->whereBetween('due_date', [$request->start, $request->end])
+            ->with(['project', 'assignee'])
+            ->get()
+            ->map(function ($task) {
+                $colors = [
+                    'todo' => '#6b7280',
+                    'in_progress' => '#3b82f6',
+                    'review' => '#f59e0b',
+                    'done' => '#10b981',
+                ];
+                return [
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'start' => $task->start_date ?? $task->due_date,
+                    'end' => $task->due_date,
+                    'status' => $task->status,
+                    'priority' => $task->priority,
+                    'color' => $colors[$task->status] ?? '#6b7280',
+                    'project' => $task->project->name,
+                    'assignee' => $task->assignee?->name,
+                ];
+            });
+
+        return $this->success($tasks);
+    }
+
+    public function reschedule(Request $request, Task $task)
+    {
+        $request->validate([
+            'start_date' => 'nullable|date',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $oldStart = $task->start_date;
+        $oldDue = $task->due_date;
+
+        $task->update($request->only(['start_date', 'due_date']));
+
+        $changes = [];
+        if ($oldStart !== $task->start_date) {
+            $changes[] = 'Start date changed';
+        }
+        if ($oldDue !== $task->due_date) {
+            $changes[] = 'Due date changed';
+        }
+
+        if (!empty($changes)) {
+            $this->logActivity($task, 'rescheduled', implode(', ', $changes), $request->user()->id);
+        }
+
+        return $this->success($task, 'Task rescheduled successfully');
+    }
+
     private function logActivity(Task $task, string $type, string $description, int $userId): void
     {
         TaskLog::create([

@@ -108,4 +108,7 @@ Route::prefix('tasks')->group(function () {
     Route::post('/{task}/status', [TaskController::class, 'updateStatus']);
     Route::post('/{task}/assign', [TaskController::class, 'assign']);
     Route::get('/{task}/logs', [TaskController::class, 'logs']);
+    Route::get('/analytics', [TaskController::class, 'analytics']);
+    Route::get('/calendar', [TaskController::class, 'calendar']);
+    Route::post('/{task}/reschedule', [TaskController::class, 'reschedule']);
 });

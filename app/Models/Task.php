@@ -72,4 +72,24 @@ class Task extends Model
     {
         return $this->status === 'done';
     }
+
+    public function scopeFilter($query, $filters)
+    {
+        return $query
+            ->when($filters['status'] ?? null, fn($q, $s) => $q->where('status', $s))
+            ->when($filters['priority'] ?? null, fn($q, $p) => $q->where('priority', $p))
+            ->when($filters['project_id'] ?? null, fn($q, $p) => $q->where('project_id', $p))
+            ->when($filters['assigned_to'] ?? null, fn($q, $u) => $q->where('assigned_to', $u))
+            ->when($filters['overdue'] ?? null, fn($q) => $q->where('status', '!=', 'done')
+                ->whereNotNull('due_date')
+                ->where('due_date', '<', now()));
+    }
+
+    public function scopeSearch($query, $term)
+    {
+        return $query->where(function($q) use ($term) {
+            $q->where('title', 'like', '%' . $term . '%')
+              ->orWhere('description', 'like', '%' . $term . '%');
+        });
+    }
 }
