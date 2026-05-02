@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\NoteController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -178,3 +179,12 @@ Route::prefix('invoices')->group(function () {
     Route::post('/{invoice}/paid', [InvoiceController::class, 'markPaid']);
     Route::post('/{invoice}/cancel', [InvoiceController::class, 'cancel']);
 });
+
+// Payment routes
+Route::prefix('payments')->group(function () {
+    Route::get('/', [PaymentController::class, 'index']);
+    Route::post('/', [PaymentController::class, 'store']);
+    Route::get('/{payment}', [PaymentController::class, 'show']);
+    Route::post('/{payment}/refund', [PaymentController::class, 'refund']);
+});
+Route::get('/payments/stats', [PaymentController::class, 'methodStats']);
