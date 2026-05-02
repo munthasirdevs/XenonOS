@@ -18,6 +18,7 @@ class File extends Model
         'size',
         'mime_type',
         'uploaded_by',
+        'category_id',
     ];
 
     protected function casts(): array
@@ -42,5 +43,10 @@ class File extends Model
     public function logs(): HasMany
     {
         return $this->hasMany(FileLog::class);
+    }
+
+    public function shares(): HasMany
+    {
+        return $this->hasMany(FileShare::class);
     }
 }

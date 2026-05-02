@@ -177,6 +177,9 @@ Route::prefix('files')->group(function () {
     Route::post('/{file}/tags', [FileController::class, 'addTag']);
     Route::delete('/{file}/tags', [FileController::class, 'removeTag']);
     Route::get('/search', [FileController::class, 'search']);
+    Route::post('/{file}/share', [FileController::class, 'share']);
+    Route::delete('/{file}/share', [FileController::class, 'unshare']);
+    Route::get('/{file}/shared', [FileController::class, 'sharedWith']);
 });
 
 // Invoice routes

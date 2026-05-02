@@ -7,6 +7,7 @@ use App\Models\File;
 use App\Models\FileCategory;
 use App\Models\FileLog;
 use App\Models\Tag;
+use App\Models\FileShare;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -162,5 +163,36 @@ class FileController extends Controller
 
         $files = $query->orderBy('created_at', 'desc')->paginate(20);
         return $this->success($files);
+    }
+
+    public function share(Request $request, File $file)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'permission' => 'nullable|in:view,edit,download',
+        ]);
+
+        $share = FileShare::updateOrCreate(
+            ['file_id' => $file->id, 'user_id' => $request->user_id],
+            ['permission' => $request->permission ?? 'view']
+        );
+
+        return $this->success($share, 'File shared successfully');
+    }
+
+    public function unshare(Request $request, File $file)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $file->shares()->where('user_id', $request->user_id)->delete();
+        return $this->success(null, 'File unshared');
+    }
+
+    public function sharedWith(Request $request, File $file)
+    {
+        $shares = $file->shares()->with('user:id,name')->get();
+        return $this->success($shares);
     }
 }
