@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SettingsController;
+use App\Http\Controllers\Api\ApiKeyController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -233,4 +234,14 @@ Route::prefix('settings')->group(function () {
     Route::get('/group/{group}', [SettingsController::class, 'byGroup']);
     Route::get('/value', [SettingsController::class, 'getValue']);
     Route::post('/value', [SettingsController::class, 'setValue']);
+});
+
+// API Keys routes
+Route::prefix('api-keys')->group(function () {
+    Route::get('/', [ApiKeyController::class, 'index']);
+    Route::post('/', [ApiKeyController::class, 'store']);
+    Route::get('/{apiKey}', [ApiKeyController::class, 'show']);
+    Route::put('/{apiKey}', [ApiKeyController::class, 'update']);
+    Route::delete('/{apiKey}', [ApiKeyController::class, 'destroy']);
+    Route::post('/{apiKey}/regenerate', [ApiKeyController::class, 'regenerate']);
 });
