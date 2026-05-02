@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -211,3 +212,12 @@ Route::prefix('notifications')->group(function () {
     Route::delete('/', [NotificationController::class, 'clear']);
 });
 Route::post('/notifications/send', [NotificationController::class, 'send']);
+
+// Report routes
+Route::get('/reports/dashboard', [ReportController::class, 'dashboard']);
+Route::get('/reports/activities', [ReportController::class, 'activities']);
+Route::get('/reports/user/activity', [ReportController::class, 'userActivity']);
+Route::get('/reports/tasks', [ReportController::class, 'taskStats']);
+Route::get('/reports/projects', [ReportController::class, 'projectStats']);
+Route::get('/reports/clients', [ReportController::class, 'clientStats']);
+Route::get('/reports/export', [ReportController::class, 'export']);
