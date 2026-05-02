@@ -59,6 +59,16 @@ class User extends Authenticatable
         return $this->hasMany(Session::class);
     }
 
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(UserNotification::class, 'user_id');
+    }
+
+    public function unreadNotifications(): HasMany
+    {
+        return $this->hasMany(UserNotification::class, 'user_id')->whereNull('read_at');
+    }
+
     public function teams(): HasMany
     {
         return $this->hasMany(Team::class, 'owner_id');

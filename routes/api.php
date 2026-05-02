@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\BillingController;
+use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -198,3 +199,15 @@ Route::get('/billing/clients/revenue', [BillingController::class, 'clientRevenue
 Route::get('/billing/invoices/overdue', [BillingController::class, 'overdueInvoices']);
 Route::get('/billing/aging', [BillingController::class, 'agingReport']);
 Route::get('/billing/export', [BillingController::class, 'export']);
+
+// Notification routes
+Route::prefix('notifications')->group(function () {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::get('/unread', [NotificationController::class, 'unread']);
+    Route::get('/unread/count', [NotificationController::class, 'unreadCount']);
+    Route::post('/{notification}/read', [NotificationController::class, 'markRead']);
+    Route::post('/read-all', [NotificationController::class, 'markAllRead']);
+    Route::delete('/{notification}', [NotificationController::class, 'destroy']);
+    Route::delete('/', [NotificationController::class, 'clear']);
+});
+Route::post('/notifications/send', [NotificationController::class, 'send']);
