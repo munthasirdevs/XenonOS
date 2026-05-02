@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\UserRoleController;
+use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\RolePermissionController;
 use Illuminate\Support\Facades\Route;
 
@@ -94,4 +95,17 @@ Route::prefix('projects')->group(function () {
     Route::get('/{project}/files', [ProjectController::class, 'files']);
     Route::post('/{project}/files', [ProjectController::class, 'linkFile']);
     Route::get('/{project}/workspace', [ProjectController::class, 'workspace']);
+});
+
+// Task routes
+Route::prefix('tasks')->group(function () {
+    Route::get('/', [TaskController::class, 'index']);
+    Route::post('/', [TaskController::class, 'store'])->middleware('permission:task.create');
+    Route::get('/{task}', [TaskController::class, 'show']);
+    Route::put('/{task}', [TaskController::class, 'update'])->middleware('permission:task.update');
+    Route::delete('/{task}', [TaskController::class, 'destroy'])->middleware('permission:task.delete');
+    
+    Route::post('/{task}/status', [TaskController::class, 'updateStatus']);
+    Route::post('/{task}/assign', [TaskController::class, 'assign']);
+    Route::get('/{task}/logs', [TaskController::class, 'logs']);
 });
