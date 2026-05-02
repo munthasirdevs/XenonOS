@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\ApiKeyController;
+use App\Http\Controllers\Api\SystemController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -245,3 +246,10 @@ Route::prefix('api-keys')->group(function () {
     Route::delete('/{apiKey}', [ApiKeyController::class, 'destroy']);
     Route::post('/{apiKey}/regenerate', [ApiKeyController::class, 'regenerate']);
 });
+
+// System routes
+Route::get('/system/health', [SystemController::class, 'health']);
+Route::get('/system/stats', [SystemController::class, 'stats']);
+Route::get('/system/info', [SystemController::class, 'info']);
+Route::get('/system/routes', [SystemController::class, 'routes']);
+Route::get('/system/services', [SystemController::class, 'services']);
