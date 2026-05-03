@@ -45,7 +45,8 @@ class User extends Authenticatable
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user')
-                    ->withTimestamps();
+                    ->withTimestamps()
+                    ->withPivot('user_id');
     }
 
     public function permissions(): BelongsToMany
@@ -130,6 +131,11 @@ class User extends Authenticatable
     public function hasAnyRole(array $roles): bool
     {
         return $this->roles()->whereIn('slug', $roles)->exists();
+    }
+
+    public function getRoleAttribute(): string
+    {
+        return $this->roles()->first()?->name ?? 'User';
     }
 
     public function hasPermission(string $permission): bool

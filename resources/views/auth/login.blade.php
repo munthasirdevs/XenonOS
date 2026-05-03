@@ -1,133 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In | Xenon Studios</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700&family=Ubuntu:wght@300;400;500;700&display=swap');
-        
-        .font-headline { font-family: 'Space Grotesk', sans-serif; }
-        .font-outfit { font-family: 'Outfit', sans-serif; }
-        .font-ubuntu { font-family: 'Ubuntu', sans-serif; }
-        .space-font { font-family: 'Space Grotesk', sans-serif; }
-        
-        .bg-gradient-to-r { background: linear-gradient(to right, #6366F1, #10B981); }
-        .text-gradient {
-            background: linear-gradient(to right, #6366F1, #10B981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+    <title>Sign In | XenonOS Command Center</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366F1',
+                        secondary: '#8B5CF6',
+                        tertiary: '#EC4899',
+                        surface: '#0F172A',
+                        'surface-dim': '#0B0F19',
+                        'surface-container-low': '#131C2E',
+                        'surface-container': '#1E293B',
+                        'surface-container-high': '#334155',
+                        'surface-container-highest': '#475569',
+                        'on-surface': '#F8FAFC',
+                        'on-surface-variant': '#94A3B8',
+                        'on-surface-muted': '#64748B',
+                        'outline-variant': '#334155',
+                        error: '#EF4444',
+                        success: '#10B981',
+                    },
+                    fontFamily: {
+                        headline: ['Syne', 'sans-serif'],
+                        body: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
         }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Syne:wght@400..800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .font-headline { font-family: 'Syne', sans-serif; }
         
-        /* Grid pattern */
         .bg-grid {
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-        
-        /* Glow effects */
-        .glow-indigo {
-            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-        }
-        .glow-emerald {
-            background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #1F2937; }
-        ::-webkit-scrollbar-thumb { background: #4B5563; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6B7280; }
-        
-        /* Input styling */
-        input[type="email"],
-        input[type="password"] {
-            letter-spacing: 0.05em;
-        }
-        input::placeholder {
-            color: #475569;
-        }
-        
-        /* Focus states */
-        input:focus {
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3), 0 0 20px rgba(99, 102, 241, 0.1);
-        }
-        
-        /* Checkbox custom */
-        .checkbox-custom:checked {
-            background-color: #6366F1;
-            border-color: #6366F1;
-        }
-        .checkbox-custom:checked::after {
-            content: '✓';
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 10px;
         }
         
         @keyframes pulse-glow {
             0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
             50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
         }
-        .status-glow {
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
+        .status-glow { animation: pulse-glow 2s ease-in-out infinite; }
     </style>
 </head>
 
-<body class="bg-[#0B0F19] text-white font-sans antialiased overflow-x-hidden min-h-screen flex">
+<body class="flex min-h-screen bg-surface text-on-surface antialiased overflow-x-hidden">
 
-    <!-- Left Split: Visual Showcase -->
-    <div class="hidden lg:flex lg:w-1/2 relative bg-[#111827] flex-col justify-between p-8 border-r border-white/5 overflow-hidden">
-        <!-- Abstract glowing elements -->
-        <div class="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full pointer-events-none glow-indigo blur-[120px]"></div>
-        <div class="absolute bottom-[-10%] right-[-20%] w-[60%] h-[60%] rounded-full pointer-events-none glow-emerald blur-[100px]"></div>
-
-        <!-- Grid pattern overlay -->
+    <!-- Left Split: Visual -->
+    <div class="hidden lg:flex lg:w-1/2 relative bg-surface-container-low flex-col justify-between p-8 border-r border-white/5 overflow-hidden">
+        <div class="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-[-10%] right-[-20%] w-[60%] h-[60%] bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none"></div>
         <div class="absolute inset-0 bg-grid opacity-50 pointer-events-none mix-blend-overlay"></div>
 
         <div class="relative z-10 flex items-center gap-4">
-            <div class="w-12 h-12 bg-[#6366F1] rounded-xl flex items-center justify-center shadow-lg shadow-[#6366F1]/30">
-                <span class="text-white font-black text-2xl space-font">X</span>
+            <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+                <span class="material-symbols-outlined text-white text-2xl">bolt</span>
             </div>
-            <h1 class="text-2xl font-bold text-white tracking-tight font-headline">Xenon OS</h1>
+            <h1 class="text-2xl font-bold text-white tracking-tight font-headline">XenonOS</h1>
         </div>
 
         <div class="relative z-10 space-y-4">
             <h2 class="text-5xl font-bold text-white font-headline leading-tight">
-                Secure access to your <br>
-                <span class="text-gradient">digital command center.</span>
+                Command center for<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">system administration.</span>
             </h2>
-            <p class="text-slate-400 text-lg max-w-xl font-outfit leading-relaxed">
-                Log in to coordinate projects, deploy high-end creative solutions, and manage your agency deliverables in real-time.
+            <p class="text-on-surface-variant text-lg max-w-xl leading-relaxed">
+                Manage users, monitor systems, and control all operations from a unified command interface.
             </p>
-
+            
             <div class="flex items-center gap-4 pt-4">
                 <div class="flex items-center -space-x-3">
-                    <img src="https://i.pravatar.cc/100?img=1" class="w-10 h-10 rounded-full border-2 border-[#111827]">
-                    <img src="https://i.pravatar.cc/100?img=2" class="w-10 h-10 rounded-full border-2 border-[#111827]">
-                    <img src="https://i.pravatar.cc/100?img=3" class="w-10 h-10 rounded-full border-2 border-[#111827]">
+                    <img src="https://i.pravatar.cc/100?img=1" class="w-10 h-10 rounded-full border-2 border-surface-container">
+                    <img src="https://i.pravatar.cc/100?img=2" class="w-10 h-10 rounded-full border-2 border-surface-container">
+                    <img src="https://i.pravatar.cc/100?img=3" class="w-10 h-10 rounded-full border-2 border-surface-container">
                 </div>
                 <div class="space-y-1">
                     <div class="flex gap-1">
-                        <i class="fas fa-star text-amber-500"></i>
-                        <i class="fas fa-star text-amber-500"></i>
-                        <i class="fas fa-star text-amber-500"></i>
-                        <i class="fas fa-star text-amber-500"></i>
-                        <i class="fas fa-star text-amber-500"></i>
+                        <span class="material-symbols-outlined text-amber-500 text-sm">star</span>
+                        <span class="material-symbols-outlined text-amber-500 text-sm">star</span>
+                        <span class="material-symbols-outlined text-amber-500 text-sm">star</span>
+                        <span class="material-symbols-outlined text-amber-500 text-sm">star</span>
+                        <span class="material-symbols-outlined text-amber-500 text-sm">star</span>
                     </div>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold font-ubuntu">Trusted by top agencies</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Trusted by admins</p>
                 </div>
             </div>
         </div>
 
-        <div class="relative z-10 flex items-center justify-between text-[10px] text-slate-500 uppercase tracking-widest font-bold font-ubuntu">
+        <div class="relative z-10 flex items-center justify-between text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">
             <div class="flex items-center gap-2">
                 <div class="w-2 h-2 rounded-full bg-emerald-500 status-glow"></div>
                 Systems Operational
@@ -138,107 +108,95 @@
 
     <!-- Right Split: Auth Form -->
     <div class="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-12 lg:p-24 relative">
-        <div class="w-full max-w-md space-y-4">
+        <div class="w-full max-w-md space-y-6">
 
-            <!-- Mobile Header Logo -->
+            <!-- Mobile Logo -->
             <div class="flex lg:hidden items-center justify-center gap-3 mb-10">
-                <div class="w-10 h-10 bg-[#6366F1] rounded-xl flex items-center justify-center shadow-lg shadow-[#6366F1]/30">
-                    <span class="text-white font-black text-xl space-font">X</span>
+                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+                    <span class="material-symbols-outlined text-white text-xl">bolt</span>
                 </div>
-                <h1 class="text-xl font-bold text-white tracking-tight font-headline">Xenon OS</h1>
+                <h1 class="text-xl font-bold text-white tracking-tight font-headline">XenonOS</h1>
             </div>
 
-            <div class="space-y-3 text-center sm:text-left">
+            <div class="space-y-2">
                 <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white font-headline">Welcome back</h2>
-                <p class="text-slate-400 text-sm font-outfit">Enter your credentials to access your workspace.</p>
+                <p class="text-on-surface-variant text-sm">Enter your credentials to access the command center.</p>
             </div>
 
-            <!-- Session Error Message -->
+            <!-- Session Error -->
             @if(session('error'))
-            <div class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm font-outfit">
+            <div class="bg-error/10 border border-error/30 text-error px-4 py-3 rounded-xl text-sm">
                 {{ session('error') }}
             </div>
             @endif
 
             <!-- Validation Errors -->
             @if($errors->any())
-            <div class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm font-outfit">
+            <div class="bg-error/10 border border-error/30 text-error px-4 py-3 rounded-xl text-sm">
                 @foreach($errors->all() as $error)
-                    <p>{{ $error }}</p>
+                <p>{{ $error }}</p>
                 @endforeach
             </div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}" class="space-y-6">
+            <form method="POST" action="{{ route('login.submit') }}" class="space-y-5">
                 @csrf
 
                 <div class="space-y-2">
-                    <label class="text-[10px] uppercase tracking-widest text-[#6366F1] font-bold ml-1 font-ubuntu">Email Address</label>
+                    <label class="text-[10px] uppercase tracking-widest text-primary font-bold ml-1">Email Address</label>
                     <div class="relative group">
-                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-[#6366F1] transition-colors"></i>
-                        <input type="email" name="email" placeholder="alex@agency.com" required
-                            class="w-full bg-[#1F2937]/50 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/50 focus:bg-[#1F2937] transition-all font-mono text-sm shadow-inner">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">mail</span>
+                        <input type="email" name="email" placeholder="admin@xenonos.com" required
+                            class="w-full bg-surface-container border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-on-surface-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-surface-container-high transition-all font-mono text-sm">
                     </div>
                 </div>
 
                 <div class="space-y-2">
                     <div class="flex items-center justify-between ml-1">
-                        <label class="text-[10px] uppercase tracking-widest text-[#6366F1] font-bold font-ubuntu">Password</label>
-                        <a href="{{ route('password.request') }}"
-                            class="text-[10px] uppercase tracking-widest text-slate-500 hover:text-white font-bold font-ubuntu transition-colors">Forgot?</a>
+                        <label class="text-[10px] uppercase tracking-widest text-primary font-bold">Password</label>
                     </div>
                     <div class="relative group">
-                        <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-[#6366F1] transition-colors"></i>
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">lock</span>
                         <input type="password" name="password" placeholder="••••••••••••" required
-                            class="w-full bg-[#1F2937]/50 border border-white/5 rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/50 focus:bg-[#1F2937] transition-all font-mono text-sm shadow-inner tracking-[0.2em]">
+                            class="w-full bg-surface-container border border-white/5 rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-on-surface-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-surface-container-high transition-all font-mono text-sm tracking-[0.2em]">
                         <button type="button" onclick="togglePassword(this)"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
-                            <i class="fas fa-eye w-4 h-4"></i>
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-white transition-colors">
+                            <span class="material-symbols-outlined text-base">visibility</span>
                         </button>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3 pt-2">
                     <input type="checkbox" name="remember" id="remember" 
-                        class="checkbox-custom w-4 h-4 rounded border border-white/10 bg-[#1F2937] flex items-center justify-center cursor-pointer hover:border-[#6366F1] transition-colors appearance-none">
-                    <label for="remember" class="text-xs text-slate-400 cursor-pointer font-outfit">Remember this device for 30 days</label>
+                        class="w-4 h-4 rounded border border-white/10 bg-surface-container flex items-center justify-center cursor-pointer hover:border-primary transition-colors appearance-none">
+                    <label for="remember" class="text-xs text-on-surface-variant cursor-pointer">Remember this device for 30 days</label>
                 </div>
 
                 <button type="submit"
-                    class="w-full flex items-center justify-center gap-2 bg-[#6366F1] hover:bg-[#5355e1] text-white py-4 rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] hover:-translate-y-0.5 mt-4 group font-ubuntu">
+                    class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white py-4 rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 mt-4 group">
                     Authenticate Session
-                    <i class="fas fa-arrow-right w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </button>
             </form>
 
-            <div class="relative py-2">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-white/5"></div>
-                </div>
-            </div>
-
-            <p class="text-center text-xs text-slate-500 font-outfit">
-                Don't have an agency account yet?
-                <a href="{{ route('register') }}" class="text-white hover:text-[#6366F1] font-bold transition-colors ml-1">Request Access</a>
+            <p class="text-center text-xs text-on-surface-variant">
+                Don't have admin access?
+                <a href="#" class="text-white hover:text-primary font-bold transition-colors ml-1">Request Access</a>
             </p>
         </div>
     </div>
 
     <script>
-        lucide.createIcons();
-
         function togglePassword(button) {
             const input = button.parentElement.querySelector('input[type="password"]');
-            const icon = button.querySelector('i');
+            const icon = button.querySelector('span');
             
             if (input.type === 'password') {
                 input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+                icon.textContent = 'visibility_off';
             } else {
                 input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                icon.textContent = 'visibility';
             }
         }
     </script>

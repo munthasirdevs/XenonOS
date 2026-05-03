@@ -11,7 +11,16 @@ use App\Models\Session;
 
 class LogAuthActivity
 {
-    public function handleUserLoggedIn(UserLoggedIn $event): void
+    public function __invoke(UserLoggedIn|UserRegistered|UserLoggedOut $event): void
+    {
+        match (true) {
+            $event instanceof UserLoggedIn => $this->handleLogin($event),
+            $event instanceof UserLoggedOut => $this->handleLogout($event),
+            $event instanceof UserRegistered => $this->handleRegister($event),
+        };
+    }
+
+    private function handleLogin(UserLoggedIn $event): void
     {
         ActivityLog::create([
             'user_id' => $event->user->id,
@@ -26,17 +35,9 @@ class LogAuthActivity
             'ip_address' => $event->ipAddress,
             'details' => 'Successful login from ' . ($event->userAgent ?? 'unknown device'),
         ]);
-
-        Session::create([
-            'user_id' => $event->user->id,
-            'ip_address' => $event->ipAddress,
-            'user_agent' => $event->userAgent,
-            'device_type' => $this->getDeviceType($event->userAgent),
-            'last_activity' => now(),
-        ]);
     }
 
-    public function handleUserRegistered(UserRegistered $event): void
+    private function handleRegister(UserRegistered $event): void
     {
         ActivityLog::create([
             'user_id' => $event->user->id,
@@ -45,7 +46,7 @@ class LogAuthActivity
         ]);
     }
 
-    public function handleUserLoggedOut(UserLoggedOut $event): void
+    private function handleLogout(UserLoggedOut $event): void
     {
         ActivityLog::create([
             'user_id' => $event->user->id,
@@ -71,12 +72,5 @@ class LogAuthActivity
         }
 
         return 'desktop';
-    }
-
-    public function subscribe($eventDispatcher): void
-    {
-        $eventDispatcher->listen(UserLoggedIn::class, [$this, 'handleUserLoggedIn']);
-        $eventDispatcher->listen(UserRegistered::class, [$this, 'handleUserRegistered']);
-        $eventDispatcher->listen(UserLoggedOut::class, [$this, 'handleUserLoggedOut']);
     }
 }

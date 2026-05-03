@@ -9,20 +9,17 @@ class UserNotification extends Model
 {
     protected $table = 'user_notifications';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'user_id',
-        'type',
-        'title',
-        'message',
-        'data',
+        'notification_id',
         'read_at',
-        'read_by',
     ];
 
     protected function casts(): array
     {
         return [
-            'data' => 'array',
             'read_at' => 'datetime',
         ];
     }
@@ -32,16 +29,8 @@ class UserNotification extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function readBy(): BelongsTo
+    public function notification(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'read_by');
-    }
-
-    public function markAsRead(int $userId): void
-    {
-        $this->update([
-            'read_at' => now(),
-            'read_by' => $userId,
-        ]);
+        return $this->belongsTo(Notification::class);
     }
 }

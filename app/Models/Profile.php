@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Profile extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -19,6 +18,15 @@ class Profile extends Model
         'bio',
         'timezone',
         'preferences',
+        'title',
+        'company',
+        'address1',
+        'address2',
+        'city',
+        'state',
+        'zip',
+        'country',
+        'payment_method',
     ];
 
     protected function casts(): array

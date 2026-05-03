@@ -8,6 +8,7 @@ use App\Events\UserRegistered;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Models\LoginAttempt;
 use App\Models\Profile;
 use App\Models\Role;
 use App\Models\User;
@@ -22,20 +23,46 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
+        $ip = $request->ip();
+        
+        // Check if IP is locked
+        if (LoginAttempt::isLocked($ip)) {
+            $remaining = LoginAttempt::getLockRemaining($ip);
+            
+            // Log suspicious activity
+            LoginAttempt::logSuspicious($ip, LoginAttempt::where('ip_address', $ip)->first()->attempts ?? 5);
+            
+            return $this->error('Too many failed login attempts. IP temporarily locked. Try again in ' . ceil($remaining / 60) . ' minute(s).', 429);
+        }
+
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            // Record failed attempt
+            LoginAttempt::recordFailedAttempt($ip, $request->email);
+            
+            $attempt = LoginAttempt::where('ip_address', $ip)->first();
+            $attempts = $attempt?->attempts ?? 1;
+            
             \App\Models\SecurityLog::create([
                 'user_id' => $user?->id,
                 'event' => 'failed_login',
-                'ip_address' => $request->ip(),
-                'details' => 'Failed login attempt for email: ' . $request->email,
+                'ip_address' => $ip,
+                'details' => 'Failed login attempt #' . $attempts . ' for email: ' . $request->email,
             ]);
+            
+            // Log suspicious if too many attempts
+            if ($attempts >= 5) {
+                LoginAttempt::logSuspicious($ip, $attempts);
+            }
 
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
+        
+        // Clear lock on successful login
+        LoginAttempt::clearLock($ip);
 
         if ($user->status === 'banned') {
             return $this->error('Your account has been banned.', 403);
@@ -116,7 +143,14 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Your account has been banned.'])->withInput();
         }
 
-        auth()->login($user, $request->boolean('remember'));
+        $remember = $request->boolean('remember');
+        
+        auth()->login($user, $remember);
+
+        if ($remember) {
+            config(['session.lifetime' => 43200]);
+            session()->put('remember', true);
+        }
 
         $user->update(['last_login_at' => now()]);
 

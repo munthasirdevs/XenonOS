@@ -9,7 +9,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         'App\Events\UserLoggedIn' => [
             'App\Listeners\LogAuthActivity',
-            'App\Listeners\TrackSession',
         ],
         'App\Events\UserRegistered' => [
             'App\Listeners\LogAuthActivity',
