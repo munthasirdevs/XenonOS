@@ -206,46 +206,6 @@
                         </button>
                     </div>
                     <div class="space-y-3">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-surface-container-lowest rounded-lg gap-4">
-                            <div class="flex items-center gap-4 min-w-0">
-                                <div class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
-                                    <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAraIOVAwR1sCks2UtxUqkEjG2bCn9aV9_Noyrq-WBUkFZmFP34K4uXhwShTKfV8HrYk6RiuhCZMQumKxze7OTuPxqsV_cgWalKz_DN_WSDmjVrXedCIQy4y9XLgT75OqK4hVVUi2ijzmg4hMjkE4oAXNWwaip2q4_ysZymVKjSvJE5bkgT-EqXRVQeJPjIeQiMnRdVOpuNPjm0ba0jldGAhDG3q2bEsHCHja9fxE6UL4FBorFD9wa8B5bCEozEi33iL4K_OvboeSE" alt="User profile" />
-                                </div>
-                                <div class="min-w-0">
-                                    <h6 class="text-sm font-bold text-on-surface truncate">Marcus Thornton</h6>
-                                    <p class="text-xs text-on-surface-variant truncate">{{ $client->email }} • External Partner</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between sm:justify-end gap-6 pl-[52px] sm:pl-0">
-                                <div class="text-right">
-                                    <p class="text-xs font-bold text-primary">Full Access</p>
-                                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Active until Dec 2024</p>
-                                </div>
-                                <button class="min-w-[44px] min-h-[44px] p-2 text-on-surface-variant hover:text-error transition-colors flex items-center justify-center rounded-lg hover:bg-error/10">
-                                    <span class="material-symbols-outlined">person_remove</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-surface-container-lowest rounded-lg gap-4">
-                            <div class="flex items-center gap-4 min-w-0">
-                                <div class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
-                                    <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjD1j551dLHAoYJ8Otw4IWVPCWCG_LJGVCMv0TIRaZ3TEX40u5feLvVQ7f_OcldQIJP8EO_Y8WCm16L8FIcUzYENn-In5_NkfdCDAmmr4W7x37Cvh8StOkKbL9n7B3lmRyVAf9ReXRKAuq9-zjRLK2Tw8vAHfteHyYnS4brljcPeaHWZEiKtBNy3o1Nm6Ibhlzjlh7MOtwCf3YmRINavs6N7tEMKY3jRZC7fXQzREYZrqOvXB3uumSh_BeCB3a0kEXUtJTc2pBNVoA" alt="User profile" />
-                                </div>
-                                <div class="min-w-0">
-                                    <h6 class="text-sm font-bold text-on-surface truncate">Elena Rodriguez</h6>
-                                    <p class="text-xs text-on-surface-variant truncate">{{ $client->email }} • Senior Analyst</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between sm:justify-end gap-6 pl-[52px] sm:pl-0">
-                                <div class="text-right">
-                                    <p class="text-xs font-bold text-on-surface-variant">View Only</p>
-                                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Permanent Access</p>
-                                </div>
-                                <button class="min-w-[44px] min-h-[44px] p-2 text-on-surface-variant hover:text-error transition-colors flex items-center justify-center rounded-lg hover:bg-error/10">
-                                    <span class="material-symbols-outlined">person_remove</span>
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </section>
             </div>
