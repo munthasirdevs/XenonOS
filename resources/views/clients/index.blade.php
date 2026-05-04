@@ -91,7 +91,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-outline-variant/5">
-                                    @foreach($clients as $client)
+                                    @forelse($clients as $client)
                                     <tr class="client-row group hover:bg-surface-container/60 cursor-pointer transition-colors"
                                         onclick="window.location='/clients/{{ $client->id }}'"
                                         tabindex="0" role="row" aria-label="{{ $client->name }}, {{ $client->company }}, {{ $client->status }}" data-id="{{ $client->id }}">
@@ -143,7 +143,13 @@
                                             ${{ number_format($client->total_revenue ?? 0, 0) }}
                                         </td>
                                     </tr>
-                                    @endforeach
+                                    @empty
+                                    <tr>
+                                        <td colspan="5" class="px-4 sm:px-6 py-12 text-center">
+                                            <p class="text-on-surface-variant text-lg">No Client Available</p>
+                                        </td>
+                                    </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
