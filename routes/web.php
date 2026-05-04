@@ -40,6 +40,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/password', [ProfileController::class, 'password'])->name('profile.password');
 
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::put('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password');
+    Route::post('/settings/preferences', [SettingsController::class, 'updatePreferences'])->name('settings.preferences');
+    Route::post('/settings/session/{sessionId}', [SettingsController::class, 'logoutSession'])->name('settings.logoutSession');
+    Route::post('/settings/purge-cache', [SettingsController::class, 'purgeCache'])->name('settings.purgeCache');
 });
 
 Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');

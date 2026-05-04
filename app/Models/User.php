@@ -21,6 +21,15 @@ class User extends Authenticatable
         'password',
         'status',
         'last_login_at',
+        'timezone',
+        'date_format',
+        'email_notifications',
+        'push_notifications',
+        'marketing_emails',
+        'survey_invites',
+        'quiet_hours_start',
+        'quiet_hours_end',
+        'plan_type',
     ];
 
     protected $hidden = [
@@ -34,6 +43,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'last_login_at' => 'datetime',
             'email_verified_at' => 'datetime',
+            'timezone' => 'string',
+            'date_format' => 'string',
         ];
     }
 
