@@ -12,7 +12,8 @@ class NotificationController extends Controller
     {
         $user = auth()->user();
         
-        $userNotifications = UserNotification::where('user_id', $user->id)
+        $userNotifications = UserNotification::with('notification:id,title,message,type,created_at')
+            ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->get();
         

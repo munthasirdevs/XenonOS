@@ -12,6 +12,7 @@ class ClientActivity extends Model
         'description',
         'type',
         'metadata',
+        'user_id',
         'created_by',
     ];
 
@@ -30,5 +31,10 @@ class ClientActivity extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

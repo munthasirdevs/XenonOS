@@ -5,23 +5,23 @@
 @section('content')
 <div class="max-w-3xl">
     @php
-        $type = $notification->type ?? 'system';
-        $icon = match($type) {
-            'security' => 'priority_high',
-            'task' => 'assignment',
-            'chat', 'message' => 'forum',
-            'project' => 'folder',
-            default => 'notifications'
-        };
-        $iconBg = match($type) {
-            'security' => 'bg-rose-500/10 text-rose-400',
-            'task' => 'bg-primary/10 text-primary',
-            'chat', 'message' => 'bg-tertiary/10 text-tertiary',
-            'project' => 'bg-emerald-500/10 text-emerald-400',
-            default => 'bg-blue-500/10 text-blue-400'
-        };
+    $type = $notification->type ?? 'system';
+    $icon = match($type) {
+    'security' => 'priority_high',
+    'task' => 'assignment',
+    'chat', 'message' => 'forum',
+    'project' => 'folder',
+    default => 'notifications'
+    };
+    $iconBg = match($type) {
+    'security' => 'bg-rose-500/10 text-rose-400',
+    'task' => 'bg-primary/10 text-primary',
+    'chat', 'message' => 'bg-tertiary/10 text-tertiary',
+    'project' => 'bg-emerald-500/10 text-emerald-400',
+    default => 'bg-blue-500/10 text-blue-400'
+    };
     @endphp
-    
+
     <a href="{{ route('notifications') }}" class="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary mb-6 transition-colors">
         <span class="material-symbols-outlined">arrow_back</span>
         <span class="text-sm font-medium">Back to notifications</span>

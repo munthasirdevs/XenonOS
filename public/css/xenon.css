@@ -1,0 +1,227 @@
+/* XenonOS Tailwind Configuration */
+
+/* Brand Colors */
+@layer base {
+    :root {
+        /* Surface Colors */
+        --color-surface: #0b0e14;
+        --color-surface-container: #12151e;
+        --color-surface-container-low: #0f121a;
+        --color-surface-container-high: #161922;
+        --color-surface-container-highest: #1a1d26;
+        --color-surface-bright: #1e222c;
+
+        /* On Surface */
+        --color-on-surface: #dfe2f1;
+        --color-on-surface-variant: #94a3b8;
+        --color-on-surface-muted: #64748b;
+
+        /* Primary */
+        --color-primary: #818cf8;
+        --color-primary-container: #4f46e5;
+        --color-on-primary: #1e1b4b;
+
+        /* Secondary */
+        --color-secondary: #a5b4fc;
+
+        /* Tertiary */
+        --color-tertiary: #ffb783;
+
+        /* Semantic */
+        --color-error: #ffb4ab;
+        --color-success: #34d399;
+        --color-warning: #fbbf24;
+        --color-info: #60a5fa;
+
+        /* Outline */
+        --color-outline: #475569;
+        --color-outline-variant: #464554;
+    }
+}
+
+/* Custom Colors - Tailwind Extended */
+@layer utilities {
+    /* Surface Colors */
+    .bg-surface {
+        background-color: var(--color-surface);
+    }
+    .bg-surface-container {
+        background-color: var(--color-surface-container);
+    }
+    .bg-surface-container-low {
+        background-color: var(--color-surface-container-low);
+    }
+    .bg-surface-container-high {
+        background-color: var(--color-surface-container-high);
+    }
+    .bg-surface-container-highest {
+        background-color: var(--color-surface-container-highest);
+    }
+
+    /* On Surface */
+    .text-on-surface {
+        color: var(--color-on-surface);
+    }
+    .text-on-surface-variant {
+        color: var(--color-on-surface-variant);
+    }
+    .text-on-surface-muted {
+        color: var(--color-on-surface-muted);
+    }
+
+    /* Primary */
+    .bg-primary {
+        background-color: var(--color-primary);
+    }
+    .text-primary {
+        color: var(--color-primary);
+    }
+    .bg-primary\/10 {
+        background-color: rgba(129, 140, 248, 0.1);
+    }
+    .bg-primary\/20 {
+        background-color: rgba(129, 140, 248, 0.2);
+    }
+    .border-primary {
+        border-color: var(--color-primary);
+    }
+    .border-primary\/20 {
+        border-color: rgba(129, 140, 248, 0.2);
+    }
+    .shadow-primary\/20 {
+        --tw-shadow-color: rgba(129, 140, 248, 0.2);
+    }
+    .shadow-primary\/30 {
+        --tw-shadow-color: rgba(129, 140, 248, 0.3);
+    }
+
+    /* Tertiary */
+    .bg-tertiary {
+        background-color: var(--color-tertiary);
+    }
+    .text-tertiary {
+        color: var(--color-tertiary);
+    }
+    .bg-tertiary\/10 {
+        background-color: rgba(255, 183, 131, 0.1);
+    }
+    .bg-tertiary\/20 {
+        background-color: rgba(255, 183, 131, 0.2);
+    }
+
+    /* Emerald (Success) */
+    .bg-emerald-500\/10 {
+        background-color: rgba(16, 185, 129, 0.1);
+    }
+    .text-emerald-400 {
+        color: #34d399;
+    }
+    .bg-emerald-400 {
+        background-color: #34d399;
+    }
+    .border-emerald-500\/20 {
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    /* Amber (Warning) */
+    .bg-amber-500\/10 {
+        background-color: rgba(245, 158, 11, 0.1);
+    }
+    .text-amber-400 {
+        color: #fbbf24;
+    }
+    .bg-amber-400 {
+        background-color: #fbbf24;
+    }
+    .border-amber-500\/20 {
+        border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    /* Red (Error/Blocked) */
+    .bg-red-500\/10 {
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+    .text-red-400 {
+        color: #f87171;
+    }
+    .bg-red-400 {
+        background-color: #f87171;
+    }
+    .border-red-500\/20 {
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    /* Rose */
+    .bg-rose-500\/10 {
+        background-color: rgba(244, 63, 94, 0.1);
+    }
+    .text-rose-400 {
+        color: #fb7185;
+    }
+    .bg-rose-400 {
+        background-color: #fb7185;
+    }
+    .border-rose-500\/20 {
+        border-color: rgba(244, 63, 94, 0.2);
+    }
+
+    /* Blue (Info) */
+    .bg-blue-500\/10 {
+        background-color: rgba(59, 130, 246, 0.1);
+    }
+    .text-blue-400 {
+        color: #60a5fa;
+    }
+    .bg-blue-400 {
+        background-color: #60a5fa;
+    }
+
+    /* Outline */
+    .border-outline-variant {
+        border-color: var(--color-outline-variant);
+    }
+    .border-outline-variant\/10 {
+        border-color: rgba(70, 69, 84, 0.1);
+    }
+    .border-outline-variant\/20 {
+        border-color: rgba(70, 69, 84, 0.2);
+    }
+}
+
+/* Font Families */
+.font-headline {
+    font-family: "Syne", sans-serif;
+    font-optical-sizing: auto;
+}
+
+.font-label {
+    font-family: "Outfit", sans-serif;
+    font-optical-sizing: auto;
+}
+
+body {
+    font-family: "Outfit", sans-serif;
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 300,
+        "GRAD" 0,
+        "opsz" 24;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+/* Focus States */
+*:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+}

@@ -7,48 +7,58 @@ use App\Http\Requests\TaskRequest;
 use App\Models\AuditLog;
 use App\Models\Task;
 use App\Models\TaskLog;
+use App\Models\Project;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class TaskController extends Controller
 {
     use ApiResponse;
 
+    private function getCacheKey(Request $request): string
+    {
+        return 'api_tasks_' . md5($request->getQueryString());
+    }
+
     public function index(Request $request)
     {
-        $query = Task::query()->with(['project', 'assignee']);
+        $cacheKey = $this->getCacheKey($request);
+        
+        $tasks = Cache::remember($cacheKey, 30, function() use ($request) {
+            $query = Task::select(['id', 'project_id', 'title', 'description', 'status', 'priority', 'assigned_to', 'start_date', 'due_date', 'estimated_hours', 'actual_hours', 'created_by', 'updated_by', 'created_at', 'updated_at'])
+                ->with(['project:id,name', 'assignee:id,name,email'])
+                ->orderBy('created_at', 'desc');
 
-        if ($request->has('project_id')) {
-            $query->where('project_id', $request->project_id);
-        }
+            if ($request->has('project_id')) {
+                $query->where('project_id', $request->project_id);
+            }
 
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            }
 
-        if ($request->has('priority')) {
-            $query->where('priority', $request->priority);
-        }
+            if ($request->has('priority')) {
+                $query->where('priority', $request->priority);
+            }
 
-        if ($request->has('assigned_to')) {
-            $query->where('assigned_to', $request->assigned_to);
-        }
+            if ($request->has('assigned_to')) {
+                $query->where('assigned_to', $request->assigned_to);
+            }
 
-        if ($request->has('q')) {
-            $search = $request->q;
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%');
-            });
-        }
+            if ($request->has('q')) {
+                $query->where(fn($q) => $q->where('title', 'like', '%' . $request->q . '%')
+                    ->orWhere('description', 'like', '%' . $request->q . '%'));
+            }
 
-        if ($request->has('overdue')) {
-            $query->where('status', '!=', 'done')
-                  ->whereNotNull('due_date')
-                  ->where('due_date', '<', now());
-        }
+            if ($request->has('overdue')) {
+                $query->where('status', '!=', 'done')
+                    ->whereNotNull('due_date')
+                    ->where('due_date', '<', now());
+            }
 
-        $tasks = $query->orderBy('created_at', 'desc')->paginate(15);
+            return $query->paginate(15);
+        });
 
         return $this->success($tasks);
     }
@@ -73,13 +83,24 @@ class TaskController extends Controller
             'description' => 'Task created: ' . $task->title,
         ]);
 
-        return $this->success($task->load(['project', 'assignee']), 'Task created successfully', 201);
+        Cache::forget('api_tasks_*');
+        Cache::forget('task_stats');
+
+        return $this->success($task->load(['project:id,name', 'assignee:id,name,email']), 'Task created successfully', 201);
     }
 
     public function show(Task $task)
     {
-        $task->load(['project', 'assignee', 'creator', 'logs']);
-        return $this->success($task);
+        $taskKey = "task_{$task->id}";
+        
+        $taskData = Cache::remember($taskKey, 60, fn() => $task->load([
+            'project:id,name,description',
+            'assignee:id,name,email',
+            'creator:id,name,email',
+            'logs' => fn($q) => $q->select('id', 'task_id', 'action', 'description', 'created_by', 'created_at')->latest()->limit(20)
+        ]));
+
+        return $this->success($taskData);
     }
 
     public function update(TaskRequest $request, Task $task)
@@ -104,7 +125,10 @@ class TaskController extends Controller
             'description' => 'Task updated: ' . $task->title,
         ]);
 
-        return $this->success($task->load(['project', 'assignee']), 'Task updated successfully');
+        Cache::forget("task_{$task->id}");
+        Cache::forget('api_tasks_*');
+
+        return $this->success($task->fresh()->load(['project:id,name', 'assignee:id,name,email']), 'Task updated successfully');
     }
 
     public function destroy(Request $request, Task $task)
@@ -124,6 +148,10 @@ class TaskController extends Controller
 
         $task->delete();
 
+        Cache::forget("task_{$task->id}");
+        Cache::forget('api_tasks_*');
+        Cache::forget('task_stats');
+
         return $this->success(null, 'Task deleted successfully');
     }
 
@@ -138,6 +166,9 @@ class TaskController extends Controller
 
         $this->logActivity($task, 'status_changed', 'Status changed from ' . $oldStatus . ' to ' . $request->status, $request->user()->id);
 
+        Cache::forget("task_{$task->id}");
+        Cache::forget('api_tasks_*');
+
         return $this->success($task, 'Task status updated successfully');
     }
 
@@ -151,55 +182,64 @@ class TaskController extends Controller
 
         $this->logActivity($task, 'assigned', 'Task assigned to user', $request->user()->id);
 
-        return $this->success($task->load('assignee'), 'Task assigned successfully');
+        Cache::forget("task_{$task->id}");
+
+        return $this->success($task->load('assignee:id,name,email'), 'Task assigned successfully');
     }
 
     public function logs(Task $task)
     {
-        $logs = $task->logs()->orderBy('created_at', 'desc')->paginate(20);
+        $cacheKey = "task_{$task->id}_logs_" . ($request->get('page', 1) ?? 1);
+        
+        $logs = Cache::remember($cacheKey, 30, fn() => 
+            TaskLog::where('task_id', $task->id)
+                ->select('id', 'task_id', 'action', 'description', 'created_by', 'created_at')
+                ->latest()
+                ->paginate(20)
+        );
+
         return $this->success($logs);
     }
 
     public function analytics(Request $request)
     {
-        $query = Task::query()->with('project');
+        $cacheKey = 'task_analytics_' . md5($request->getQueryString());
+        
+        $analytics = Cache::remember($cacheKey, 60, function() use ($request) {
+            $query = Task::query();
 
-        if ($request->has('project_id')) {
-            $query->where('project_id', $request->project_id);
-        }
+            if ($request->has('project_id')) {
+                $query->where('project_id', $request->project_id);
+            }
 
-        if ($request->has('user_id')) {
-            $query->where('assigned_to', $request->user_id);
-        }
+            if ($request->has('user_id')) {
+                $query->where('assigned_to', $request->user_id);
+            }
 
-        $tasks = $query->get();
+            $tasks = $query->get();
 
-        $total = $tasks->count();
-        $completed = $tasks->where('status', 'done')->count();
-        $todo = $tasks->where('status', 'todo')->count();
-        $inProgress = $tasks->where('status', 'in_progress')->count();
-        $review = $tasks->where('status', 'review')->count();
+            $total = $tasks->count();
+            $completed = $tasks->where('status', 'done')->count();
+            $todo = $tasks->where('status', 'todo')->count();
+            $inProgress = $tasks->where('status', 'in_progress')->count();
+            $review = $tasks->where('status', 'review')->count();
 
-        $overdue = $tasks->filter(function ($task) {
-            return $task->due_date && $task->due_date->isPast() && $task->status !== 'done';
-        })->count();
+            $overdue = $tasks->filter(fn($task) => $task->due_date && $task->due_date->isPast() && $task->status !== 'done')->count();
+            $onTime = $tasks->filter(fn($task) => $task->status === 'done' && $task->due_date && $task->due_date->isAfter($task->updated_at))->count();
 
-        $onTime = $tasks->filter(function ($task) {
-            return $task->status === 'done' && $task->due_date && $task->due_date->isAfter($task->updated_at);
-        })->count();
-
-        $analytics = [
-            'total' => $total,
-            'completed' => $completed,
-            'todo' => $todo,
-            'in_progress' => $inProgress,
-            'review' => $review,
-            'overdue' => $overdue,
-            'completion_rate' => $total > 0 ? round(($completed / $total) * 100) : 0,
-            'on_time_completion' => $completed > 0 ? round(($onTime / $completed) * 100) : 0,
-            'high_priority' => $tasks->where('priority', 'high')->count(),
-            'urgent' => $tasks->where('priority', 'urgent')->count(),
-        ];
+            return [
+                'total' => $total,
+                'completed' => $completed,
+                'todo' => $todo,
+                'in_progress' => $inProgress,
+                'review' => $review,
+                'overdue' => $overdue,
+                'completion_rate' => $total > 0 ? round(($completed / $total) * 100) : 0,
+                'on_time_completion' => $completed > 0 ? round(($onTime / $completed) * 100) : 0,
+                'high_priority' => $tasks->where('priority', 'high')->count(),
+                'urgent' => $tasks->where('priority', 'urgent')->count(),
+            ];
+        });
 
         return $this->success($analytics);
     }
@@ -211,29 +251,26 @@ class TaskController extends Controller
             'end' => 'required|date|after:start',
         ]);
 
-        $tasks = Task::whereNotNull('due_date')
-            ->whereBetween('due_date', [$request->start, $request->end])
-            ->with(['project', 'assignee'])
-            ->get()
-            ->map(function ($task) {
-                $colors = [
-                    'todo' => '#6b7280',
-                    'in_progress' => '#3b82f6',
-                    'review' => '#f59e0b',
-                    'done' => '#10b981',
-                ];
-                return [
+        $cacheKey = "task_calendar_{$request->start}_{$request->end}";
+        
+        $tasks = Cache::remember($cacheKey, 60, fn() => 
+            Task::whereNotNull('due_date')
+                ->whereBetween('due_date', [$request->start, $request->end])
+                ->select('id', 'project_id', 'title', 'status', 'priority', 'start_date', 'due_date', 'assigned_to')
+                ->with(['project:id,name', 'assignee:id,name'])
+                ->get()
+                ->map(fn($task) => [
                     'id' => $task->id,
                     'title' => $task->title,
                     'start' => $task->start_date ?? $task->due_date,
                     'end' => $task->due_date,
                     'status' => $task->status,
                     'priority' => $task->priority,
-                    'color' => $colors[$task->status] ?? '#6b7280',
-                    'project' => $task->project->name,
+                    'color' => ['todo' => '#6b7280', 'in_progress' => '#3b82f6', 'review' => '#f59e0b', 'done' => '#10b981'][$task->status] ?? '#6b7280',
+                    'project' => $task->project->name ?? null,
                     'assignee' => $task->assignee?->name,
-                ];
-            });
+                ])
+        );
 
         return $this->success($tasks);
     }
@@ -245,21 +282,19 @@ class TaskController extends Controller
             'due_date' => 'nullable|date',
         ]);
 
-        $oldStart = $task->start_date;
-        $oldDue = $task->due_date;
-
-        $task->update($request->only(['start_date', 'due_date']));
-
         $changes = [];
-        if ($oldStart !== $task->start_date) {
+        if ($task->start_date !== $request->start_date) {
             $changes[] = 'Start date changed';
         }
-        if ($oldDue !== $task->due_date) {
+        if ($task->due_date !== $request->due_date) {
             $changes[] = 'Due date changed';
         }
 
         if (!empty($changes)) {
+            $task->update($request->only(['start_date', 'due_date']));
             $this->logActivity($task, 'rescheduled', implode(', ', $changes), $request->user()->id);
+            
+            Cache::forget("task_{$task->id}");
         }
 
         return $this->success($task, 'Task rescheduled successfully');

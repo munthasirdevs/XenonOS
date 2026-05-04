@@ -28,54 +28,54 @@
     <!-- Notifications List -->
     <div class="space-y-4">
         @forelse($notifications as $date => $dateNotifications)
-            @php
-                $formattedDate = \Carbon\Carbon::parse($date)->format('F d, Y');
-                if ($date === now()->format('Y-m-d')) $formattedDate = 'Today';
-                elseif ($date === now()->subDay()->format('Y-m-d')) $formattedDate = 'Yesterday';
-            @endphp
-            <div class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mt-6 mb-2">{{ $formattedDate }}</div>
-            
-            @foreach($dateNotifications as $userNote)
-            @php
-                $notification = $userNote->notification;
-                $isUnread = is_null($userNote->read_at);
-                $type = $notification->type ?? 'system';
-                $icon = match($type) {
-                    'security' => 'priority_high',
-                    'task' => 'assignment',
-                    'chat', 'message' => 'forum',
-                    'project' => 'folder',
-                    default => 'notifications'
-                };
-                $iconBg = match($type) {
-                    'security' => 'bg-rose-500/10 text-rose-400',
-                    'task' => 'bg-primary/10 text-primary',
-                    'chat', 'message' => 'bg-tertiary/10 text-tertiary',
-                    'project' => 'bg-emerald-500/10 text-emerald-400',
-                    default => 'bg-blue-500/10 text-blue-400'
-                };
-            @endphp
-            <a href="{{ route('notifications.details', $userNote->notification_id) }}"
-                class="group relative bg-surface-container hover:bg-surface-container-high rounded-2xl p-5 flex items-start space-x-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 {{ $isUnread ? '' : 'opacity-60' }}">
-                @if($isUnread)
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-2xl"></div>
-                @endif
-                <div class="flex-shrink-0 w-12 h-12 rounded-2xl {{ $iconBg }} flex items-center justify-center">
-                    <span class="material-symbols-outlined">{{ $icon }}</span>
+        @php
+        $formattedDate = \Carbon\Carbon::parse($date)->format('F d, Y');
+        if ($date === now()->format('Y-m-d')) $formattedDate = 'Today';
+        elseif ($date === now()->subDay()->format('Y-m-d')) $formattedDate = 'Yesterday';
+        @endphp
+        <div class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mt-6 mb-2">{{ $formattedDate }}</div>
+
+        @foreach($dateNotifications as $userNote)
+        @php
+        $notification = $userNote->notification;
+        $isUnread = is_null($userNote->read_at);
+        $type = $notification->type ?? 'system';
+        $icon = match($type) {
+        'security' => 'priority_high',
+        'task' => 'assignment',
+        'chat', 'message' => 'forum',
+        'project' => 'folder',
+        default => 'notifications'
+        };
+        $iconBg = match($type) {
+        'security' => 'bg-rose-500/10 text-rose-400',
+        'task' => 'bg-primary/10 text-primary',
+        'chat', 'message' => 'bg-tertiary/10 text-tertiary',
+        'project' => 'bg-emerald-500/10 text-emerald-400',
+        default => 'bg-blue-500/10 text-blue-400'
+        };
+        @endphp
+        <a href="{{ route('notifications.details', $userNote->notification_id) }}"
+            class="group relative bg-surface-container hover:bg-surface-container-high rounded-2xl p-5 flex items-start space-x-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 {{ $isUnread ? '' : 'opacity-60' }}">
+            @if($isUnread)
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-2xl"></div>
+            @endif
+            <div class="flex-shrink-0 w-12 h-12 rounded-2xl {{ $iconBg }} flex items-center justify-center">
+                <span class="material-symbols-outlined">{{ $icon }}</span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                    <h3 class="text-lg font-semibold text-white truncate {{ $isUnread ? '' : 'text-slate-400' }}">{{ $notification->title }}</h3>
+                    <span class="text-xs text-on-surface-variant font-medium">{{ $userNote->created_at ? $userNote->created_at->diffForHumans() : 'Recently' }}</span>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between mb-1">
-                        <h3 class="text-lg font-semibold text-white truncate {{ $isUnread ? '' : 'text-slate-400' }}">{{ $notification->title }}</h3>
-                        <span class="text-xs text-on-surface-variant font-medium">{{ $userNote->created_at ? $userNote->created_at->diffForHumans() : 'Recently' }}</span>
-                    </div>
-                    <p class="text-sm text-on-surface-variant mb-3 max-w-2xl leading-relaxed line-clamp-2">{{ $notification->message ?? 'No message' }}</p>
-                    <div class="flex items-center space-x-2">
-                        <span class="w-2 h-2 rounded-full {{ $isUnread ? 'bg-primary animate-pulse' : 'bg-slate-600' }}"></span>
-                        <span class="text-xs font-bold {{ $isUnread ? 'text-primary' : 'text-slate-500' }} uppercase tracking-widest">{{ $isUnread ? 'Unread' : 'Read' }}</span>
-                    </div>
+                <p class="text-sm text-on-surface-variant mb-3 max-w-2xl leading-relaxed line-clamp-2">{{ $notification->message ?? 'No message' }}</p>
+                <div class="flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full {{ $isUnread ? 'bg-primary animate-pulse' : 'bg-slate-600' }}"></span>
+                    <span class="text-xs font-bold {{ $isUnread ? 'text-primary' : 'text-slate-500' }} uppercase tracking-widest">{{ $isUnread ? 'Unread' : 'Read' }}</span>
                 </div>
-            </a>
-            @endforeach
+            </div>
+        </a>
+        @endforeach
         @empty
         <div class="text-center py-20">
             <span class="material-symbols-outlined text-6xl text-slate-600">notifications_off</span>

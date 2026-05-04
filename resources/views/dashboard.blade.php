@@ -75,20 +75,41 @@
             Revenue Analytics
         </h3>
         <div class="h-64 flex items-end gap-3 mb-4">
-            <div class="flex-1 bg-primary/20 rounded-t-lg flex items-end"><div class="w-full bg-primary rounded-t-lg" style="height: 45%"></div></div>
-            <div class="flex-1 bg-primary/20 rounded-t-lg flex items-end"><div class="w-full bg-primary rounded-t-lg" style="height: 62%"></div></div>
-            <div class="flex-1 bg-primary/20 rounded-t-lg flex items-end"><div class="w-full bg-primary rounded-t-lg" style="height: 55%"></div></div>
-            <div class="flex-1 bg-primary/20 rounded-t-lg flex items-end"><div class="w-full bg-primary rounded-t-lg" style="height: 78%"></div></div>
-            <div class="flex-1 bg-primary/20 rounded-t-lg flex items-end"><div class="w-full bg-primary rounded-t-lg" style="height: 68%"></div></div>
-            <div class="flex-1 bg-emerald-400/20 rounded-t-lg flex items-end"><div class="w-full bg-emerald-400 rounded-t-lg" style="height: 92%"></div></div>
+            <div class="flex-1 bg-primary/20 rounded-t-lg flex items-end">
+                <div class="w-full bg-primary rounded-t-lg" style="height: 45%"></div>
+            </div>
+            <div class="flex-1 bg-primary/20 rounded-t-lg flex items-end">
+                <div class="w-full bg-primary rounded-t-lg" style="height: 62%"></div>
+            </div>
+            <div class="flex-1 bg-primary/20 rounded-t-lg flex items-end">
+                <div class="w-full bg-primary rounded-t-lg" style="height: 55%"></div>
+            </div>
+            <div class="flex-1 bg-primary/20 rounded-t-lg flex items-end">
+                <div class="w-full bg-primary rounded-t-lg" style="height: 78%"></div>
+            </div>
+            <div class="flex-1 bg-primary/20 rounded-t-lg flex items-end">
+                <div class="w-full bg-primary rounded-t-lg" style="height: 68%"></div>
+            </div>
+            <div class="flex-1 bg-emerald-400/20 rounded-t-lg flex items-end">
+                <div class="w-full bg-emerald-400 rounded-t-lg" style="height: 92%"></div>
+            </div>
         </div>
         <div class="flex justify-between text-[10px] text-on-surface-variant mb-4">
             <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span class="text-emerald-400 font-bold">Jun</span>
         </div>
         <div class="grid grid-cols-3 gap-4 pt-4 border-t border-white/5">
-            <div class="text-center"><p class="text-[10px] text-on-surface-variant uppercase">Total</p><p class="text-xl font-bold text-on-surface">${{ number_format($stats['totalRevenue'] ?? 0) }}</p></div>
-            <div class="text-center border-x border-white/5"><p class="text-[10px] text-on-surface-variant uppercase">This Month</p><p class="text-xl font-bold text-primary">${{ number_format($stats['receivedThisMonth'] ?? 0) }}</p></div>
-            <div class="text-center"><p class="text-[10px] text-on-surface-variant uppercase">Pending</p><p class="text-xl font-bold text-amber-400">${{ number_format($stats['pendingAmount'] ?? 0) }}</p></div>
+            <div class="text-center">
+                <p class="text-[10px] text-on-surface-variant uppercase">Total</p>
+                <p class="text-xl font-bold text-on-surface">${{ number_format($stats['totalRevenue'] ?? 0) }}</p>
+            </div>
+            <div class="text-center border-x border-white/5">
+                <p class="text-[10px] text-on-surface-variant uppercase">This Month</p>
+                <p class="text-xl font-bold text-primary">${{ number_format($stats['receivedThisMonth'] ?? 0) }}</p>
+            </div>
+            <div class="text-center">
+                <p class="text-[10px] text-on-surface-variant uppercase">Pending</p>
+                <p class="text-xl font-bold text-amber-400">${{ number_format($stats['pendingAmount'] ?? 0) }}</p>
+            </div>
         </div>
     </div>
 
@@ -104,7 +125,7 @@
                 <p class="text-xs font-bold text-on-surface">All Clear</p>
             </div>
             @endforelse
-            
+
             @if($latestSecurityReport)
             <div class="mt-4 p-3 bg-primary/5 rounded-xl border-l-4 border-primary">
                 <p class="text-xs font-bold text-primary">Security Report</p>
@@ -137,7 +158,10 @@
             @forelse($recentClients as $client)
             <div class="flex items-center gap-4 p-3 bg-surface-container rounded-xl mb-2">
                 <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">{{ substr($client->name, 0, 1) }}</div>
-                <div><p class="text-sm font-bold text-on-surface">{{ $client->name }}</p><p class="text-xs text-on-surface-variant">{{ $client->email }}</p></div>
+                <div>
+                    <p class="text-sm font-bold text-on-surface">{{ $client->name }}</p>
+                    <p class="text-xs text-on-surface-variant">{{ $client->email }}</p>
+                </div>
             </div>
             @empty
             <p class="text-on-surface-variant text-center py-4">No clients</p>
@@ -169,7 +193,10 @@
             @forelse($teamMembers as $member)
             <div class="flex items-center gap-4 p-3 bg-surface-container rounded-xl mb-2">
                 <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined">badge</span></div>
-                <div><p class="text-sm font-bold text-on-surface">{{ $member->name }}</p><p class="text-xs text-primary">{{ $member->role ?? 'Member' }}</p></div>
+                <div>
+                    <p class="text-sm font-bold text-on-surface">{{ $member->name }}</p>
+                    <p class="text-xs text-primary">{{ $member->role ?? 'Member' }}</p>
+                </div>
             </div>
             @empty
             <p class="text-on-surface-variant text-center py-4">No team members</p>
@@ -236,14 +263,26 @@
                 Tasks
             </h4>
             <div class="grid grid-cols-3 gap-2 mb-4">
-                <div class="bg-surface-container rounded-xl p-2 text-center"><p class="text-lg font-bold text-rose-400">{{ $stats['overdueTasks'] ?? 0 }}</p><p class="text-[9px] text-on-surface-variant">Overdue</p></div>
-                <div class="bg-surface-container rounded-xl p-2 text-center"><p class="text-lg font-bold text-amber-400">{{ $stats['highPriorityTasks'] ?? 0 }}</p><p class="text-[9px] text-on-surface-variant">High</p></div>
-                <div class="bg-surface-container rounded-xl p-2 text-center"><p class="text-lg font-bold text-emerald-400">{{ $stats['completedTasksToday'] ?? 0 }}</p><p class="text-[9px] text-on-surface-variant">Done</p></div>
+                <div class="bg-surface-container rounded-xl p-2 text-center">
+                    <p class="text-lg font-bold text-rose-400">{{ $stats['overdueTasks'] ?? 0 }}</p>
+                    <p class="text-[9px] text-on-surface-variant">Overdue</p>
+                </div>
+                <div class="bg-surface-container rounded-xl p-2 text-center">
+                    <p class="text-lg font-bold text-amber-400">{{ $stats['highPriorityTasks'] ?? 0 }}</p>
+                    <p class="text-[9px] text-on-surface-variant">High</p>
+                </div>
+                <div class="bg-surface-container rounded-xl p-2 text-center">
+                    <p class="text-lg font-bold text-emerald-400">{{ $stats['completedTasksToday'] ?? 0 }}</p>
+                    <p class="text-[9px] text-on-surface-variant">Done</p>
+                </div>
             </div>
             @forelse($tasks as $task)
             <label class="flex items-center gap-3 p-3 bg-surface-container rounded-xl mb-2 cursor-pointer">
                 <input type="checkbox" class="w-4 h-4 rounded" />
-                <div><p class="text-sm text-on-surface">{{ $task->title }}</p><p class="text-[9px] text-{{ $task->priority === 'high' ? 'rose-400' : 'primary' }}">{{ strtoupper($task->priority) }}</p></div>
+                <div>
+                    <p class="text-sm text-on-surface">{{ $task->title }}</p>
+                    <p class="text-[9px] text-{{ $task->priority === 'high' ? 'rose-400' : 'primary' }}">{{ strtoupper($task->priority) }}</p>
+                </div>
             </label>
             @empty
             <p class="text-on-surface-variant text-center py-4">No pending tasks</p>
@@ -273,8 +312,14 @@
             </h4>
             <p class="text-xl font-bold text-on-surface mb-4">${{ number_format($stats['receivedThisMonth'] ?? 0) }}</p>
             <div class="grid grid-cols-2 gap-2 pt-4 border-t border-white/5">
-                <div class="bg-surface-container rounded-xl p-2"><p class="text-[9px] text-on-surface-variant">Received</p><p class="text-sm font-bold text-emerald-400">${{ number_format($stats['receivedThisMonth'] ?? 0) }}</p></div>
-                <div class="bg-surface-container rounded-xl p-2"><p class="text-[9px] text-on-surface-variant">Pending</p><p class="text-sm font-bold text-amber-400">${{ number_format($stats['pendingAmount'] ?? 0) }}</p></div>
+                <div class="bg-surface-container rounded-xl p-2">
+                    <p class="text-[9px] text-on-surface-variant">Received</p>
+                    <p class="text-sm font-bold text-emerald-400">${{ number_format($stats['receivedThisMonth'] ?? 0) }}</p>
+                </div>
+                <div class="bg-surface-container rounded-xl p-2">
+                    <p class="text-[9px] text-on-surface-variant">Pending</p>
+                    <p class="text-sm font-bold text-amber-400">${{ number_format($stats['pendingAmount'] ?? 0) }}</p>
+                </div>
             </div>
         </section>
     </div>

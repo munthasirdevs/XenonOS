@@ -34,22 +34,32 @@
         font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
         font-size: 20px;
     }
+
     .active-icon {
         font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
+
     .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
     }
+
     .custom-scrollbar::-webkit-scrollbar-track {
         background: transparent;
     }
+
     .custom-scrollbar::-webkit-scrollbar-thumb {
         background: #1e222c;
         border-radius: 10px;
     }
+
     @media (max-width: 768px) {
-        .sidebar { transform: translateX(-100%); }
-        .sidebar.open { transform: translateX(0); }
+        .sidebar {
+            transform: translateX(-100%);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
     }
 </style>
 
@@ -100,8 +110,8 @@
             <span class="material-symbols-outlined">payments</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Billing</span>
         </a>
-        <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined">person_add</span>
+        <a href="{{ route('clients') }}" class="{{ request()->routeIs('clients*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ request()->routeIs('clients*') ? 'active-icon' : '' }}">person_add</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Clients</span>
         </a>
         <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">

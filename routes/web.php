@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ClientController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -21,6 +22,12 @@ Route::get('/login', function () {
 Route::post('/login', [AuthController::class, 'loginWeb'])->name('login.submit');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/clients', [ClientController::class, 'index'])->name('clients');
+    Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');
+    Route::get('/clients/{id}/projects', [ClientController::class, 'projects'])->name('clients.projects');
+    Route::get('/clients/{id}/activity', [ClientController::class, 'activity'])->name('clients.activity');
+    Route::get('/clients/{id}/documents', [ClientController::class, 'documents'])->name('clients.documents');
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');

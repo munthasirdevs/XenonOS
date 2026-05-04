@@ -13,7 +13,7 @@
     <!-- Appearance -->
     <div class="bg-surface-container rounded-2xl p-6 border border-white/5">
         <h3 class="text-lg font-semibold text-white mb-4">Appearance</h3>
-        
+
         <div class="space-y-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -30,7 +30,7 @@
     <!-- Notifications Settings -->
     <div class="bg-surface-container rounded-2xl p-6 border border-white/5">
         <h3 class="text-lg font-semibold text-white mb-4">Notifications</h3>
-        
+
         <div class="space-y-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -67,7 +67,7 @@
     <!-- Session Settings -->
     <div class="bg-surface-container rounded-2xl p-6 border border-white/5">
         <h3 class="text-lg font-semibold text-white mb-4">Session & Security</h3>
-        
+
         <div class="space-y-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -94,7 +94,7 @@
     <!-- Danger Zone -->
     <div class="bg-surface-container rounded-2xl p-6 border border-rose-500/20">
         <h3 class="text-lg font-semibold text-rose-400 mb-4">Danger Zone</h3>
-        
+
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-on-surface">Delete Account</p>
