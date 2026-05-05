@@ -34,7 +34,7 @@
             </div>
             <div class="flex-1">
                 <h1 class="text-2xl font-headline font-bold text-white mb-2">{{ $notification->title }}</h1>
-                <p class="text-sm text-on-surface-variant">{{ $notification->created_at->format('M d, Y \a\t h:i A') }}</p>
+                <p class="text-sm text-on-surface-variant">{{ $notification->created_at ? format_user_time($notification->created_at, 'M d, Y \a\t h:i A') : 'N/A' }}</p>
             </div>
         </div>
 

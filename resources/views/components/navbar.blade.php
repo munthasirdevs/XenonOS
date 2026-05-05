@@ -143,7 +143,7 @@
     <!-- User Footer -->
     <div class="mt-auto px-6 py-5 border-t border-outline-variant/10 bg-surface-container-low/80 backdrop-blur-xl">
         <div class="flex items-center gap-3 mb-4">
-            <img alt="User" class="w-10 h-10 rounded-full border border-primary/20 object-cover shadow-lg shadow-primary/5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdsutWN3dSe1C9s1z1T09w2CQEGzGY7NUXrrF9vIvSiGX-qHq-1Ty8SNDz5H2f2v-KN43tKSeYY4aZ94NQ52JcxBF1cr0Lk_A1YSQjb6Wcpo7wSiYM6ahtNkO7w6R1U2XZotD17laHQjivb70K0KIV8Ve_z0ttjpIjJ3hZZIO4OsNTyj63D42_pEcORgqBAFO80KhPsOJYmMpEJeIHNpeA3UidFUmqNqNY26f6fcdEIwAnXKtKTO7SU7r3dP3QEwudGqBULNSoYc" />
+            <img alt="User" class="w-10 h-10 rounded-full border border-primary/20 object-cover shadow-lg shadow-primary/5" src="{{ Auth::user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=818cf8&color=fff&size=128' }}"
             <div class="flex flex-col min-w-0">
                 <span class="text-[13px] font-bold text-on-surface truncate font-headline">{{ Auth::user()->name ?? 'User' }}</span>
                 <span class="text-[10px] text-on-surface-variant/70 truncate font-label">{{ Auth::user()->email ?? 'user@example.com' }}</span>

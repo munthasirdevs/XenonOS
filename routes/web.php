@@ -21,8 +21,14 @@ Route::get('/login', function () {
 
 Route::post('/login', [AuthController::class, 'loginWeb'])->name('login.submit');
 
+Route::get('/signup/{code}', [ClientController::class, 'showSignup'])->name('signup.show');
+Route::post('/signup/{code}', [ClientController::class, 'processSignup'])->name('signup.process');
+
 Route::middleware('auth')->group(function () {
     Route::get('/clients', [ClientController::class, 'index'])->name('clients');
+    Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
+    Route::post('/clients/invite', [ClientController::class, 'generateInvite'])->name('clients.invite');
+    Route::get('/client/dashboard', [ClientController::class, 'clientDashboard'])->name('client.dashboard');
     Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');
     Route::get('/clients/{id}/projects', [ClientController::class, 'projects'])->name('clients.projects');
     Route::get('/clients/{id}/activity', [ClientController::class, 'activity'])->name('clients.activity');
@@ -41,9 +47,18 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::put('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password');
-    Route::post('/settings/preferences', [SettingsController::class, 'updatePreferences'])->name('settings.preferences');
+    Route::put('/settings/preferences', [SettingsController::class, 'updatePreferences'])->name('settings.preferences');
     Route::post('/settings/session/{sessionId}', [SettingsController::class, 'logoutSession'])->name('settings.logoutSession');
     Route::post('/settings/purge-cache', [SettingsController::class, 'purgeCache'])->name('settings.purgeCache');
+    Route::get('/settings/export', [SettingsController::class, 'exportData'])->name('settings.export');
+    Route::post('/settings/export', [SettingsController::class, 'exportData'])->name('settings.exportPost');
+    Route::post('/settings/delete-account', [SettingsController::class, 'deleteAccount'])->name('settings.deleteAccount');
+    Route::post('/settings/toggle-chat-channel', [SettingsController::class, 'toggleChatChannel'])->name('settings.toggleChatChannel');
+    Route::post('/settings/notification-setting', [SettingsController::class, 'updateNotificationSetting'])->name('settings.notificationSetting');
+    Route::post('/settings/quiet-hours', [SettingsController::class, 'updateQuietHours'])->name('settings.quietHours');
+    Route::post('/settings/auth-rule', [SettingsController::class, 'updateAuthRule'])->name('settings.authRule');
 });
+
+Route::post('/settings/toggle-2fa', [SettingsController::class, 'toggle2FA'])->name('settings.toggle2fa');
 
 Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');

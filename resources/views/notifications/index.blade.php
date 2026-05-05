@@ -27,12 +27,12 @@
 
     <!-- Notifications List -->
     <div class="space-y-4">
-        @forelse($notifications as $date => $dateNotifications)
-        @php
-        $formattedDate = \Carbon\Carbon::parse($date)->format('F d, Y');
-        if ($date === now()->format('Y-m-d')) $formattedDate = 'Today';
-        elseif ($date === now()->subDay()->format('Y-m-d')) $formattedDate = 'Yesterday';
-        @endphp
+@forelse($notifications as $date => $dateNotifications)
+@php
+$formattedDate = format_user_time($date, 'F d, Y');
+if ($date === now()->format('Y-m-d')) $formattedDate = 'Today';
+elseif ($date === now()->subDay()->format('Y-m-d')) $formattedDate = 'Yesterday';
+@endphp
         <div class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mt-6 mb-2">{{ $formattedDate }}</div>
 
         @foreach($dateNotifications as $userNote)
@@ -66,7 +66,7 @@
             <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between mb-1">
                     <h3 class="text-lg font-semibold text-white truncate {{ $isUnread ? '' : 'text-slate-400' }}">{{ $notification->title }}</h3>
-                    <span class="text-xs text-on-surface-variant font-medium">{{ $userNote->created_at ? $userNote->created_at->diffForHumans() : 'Recently' }}</span>
+                    <span class="text-xs text-on-surface-variant font-medium">{{ $userNote->created_at ? user_time_ago($userNote->created_at) : 'Recently' }}</span>
                 </div>
                 <p class="text-sm text-on-surface-variant mb-3 max-w-2xl leading-relaxed line-clamp-2">{{ $notification->message ?? 'No message' }}</p>
                 <div class="flex items-center space-x-2">

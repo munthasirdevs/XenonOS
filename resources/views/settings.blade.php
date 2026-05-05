@@ -7,7 +7,7 @@
 $user = Auth::user();
 $sessions = $sessions ?? collect();
 $securityLogs = $securityLogs ?? collect();
-$timezone = $user->timezone ?? 'UTC';
+$timezone = $user->timezone ?? 'London';
 $dateFormat = $user->date_format ?? 'dd-mm-yyyy';
 $emailNotifications = $user->email_notifications ?? true;
 $pushNotifications = $user->push_notifications ?? true;
@@ -117,7 +117,11 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                                         <p class="text-[9px] text-primary font-bold uppercase tracking-widest mt-0.5">Recommended</p>
                                     </div>
                                 </div>
-                                <div role="switch" aria-checked="true" tabindex="0" class="toggle-switch active" aria-label="Enable Authenticator App"></div>
+                                <form action="{{ route('settings.toggle2fa') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" name="enable" value="{{ $user->two_factor_secret ? '0' : '1' }}" class="toggle-switch {{ $user->two_factor_secret ? 'active' : 'inactive' }}" aria-label="Toggle Authenticator App">
+                                    </button>
+                                </form>
                             </div>
                             <div class="p-4 sm:p-5 bg-surface-container-low rounded-xl sm:rounded-2xl flex items-center justify-between gap-3 opacity-70">
                                 <div class="flex items-center gap-3">
@@ -183,7 +187,7 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                             </div>
                             <div>
                                 <p class="text-sm font-semibold">{{ str_contains($session->user_agent ?? '', 'Mobile') ? 'Mobile Device' : 'Desktop' }}</p>
-                                <p class="text-[11px] text-on-surface-variant">{{ $session->ip_address ?? 'Unknown' }} • {{ $session->last_activity ? \Carbon\Carbon::parse($session->last_activity)->diffForHumans() : 'Active now' }}</p>
+                                <p class="text-[11px] text-on-surface-variant">{{ $session->ip_address ?? 'Unknown' }} • {{ $session->last_activity ? user_time_ago($session->last_activity) : 'Active now' }}</p>
                             </div>
                         </div>
                         <form action="{{ route('settings.logoutSession', $session->id) }}" method="POST">
@@ -218,7 +222,7 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                             @forelse($securityLogs as $log)
                             <tr class="group">
                                 <td scope="row" class="bg-surface-container first:rounded-l-xl py-2.5 sm:py-3 pl-3 text-on-surface-variant font-mono text-[10px] whitespace-nowrap">
-                                    {{ $log->created_at ? \Carbon\Carbon::parse($log->created_at)->format('M d, H:i') : 'N/A' }}
+                                    {{ $log->created_at ? format_user_time($log->created_at, 'M d, H:i') : 'N/A' }}
                                 </td>
                                 <td class="bg-surface-container font-medium whitespace-nowrap">
                                     <span class="flex items-center gap-1.5">
@@ -253,6 +257,7 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                     </div>
                     <form action="{{ route('settings.preferences') }}" method="POST" class="space-y-4 sm:space-y-6">
                         @csrf
+                        @method('PUT')
                         <div class="flex items-center justify-between p-4 rounded-xl sm:rounded-2xl bg-surface-container-low hover:bg-surface-bright/30 transition-all">
                             <div class="space-y-1">
                                 <p class="text-sm font-bold font-headline">Project Updates</p>
@@ -284,13 +289,22 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                         <h3 class="font-headline text-lg sm:text-xl font-semibold">Chat Channels</h3>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        @foreach(['#general', '#design', '#dev'] as $channel)
+                        @php
+                        $userChannels = json_decode($user->chat_channels ?? '[]', true);
+                        $defaultChannels = ['#general', '#design', '#dev'];
+                        @endphp
+                        @foreach($defaultChannels as $channel)
                         <div class="flex items-center justify-between p-4 rounded-xl sm:rounded-2xl bg-surface-container-low border border-primary/20">
                             <div class="flex items-center gap-3">
                                 <div class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
                                 <span class="text-sm font-bold">{{ $channel }}</span>
                             </div>
-                            <input type="checkbox" checked class="toggle-switch active w-11 h-6 rounded-full cursor-pointer" />
+                            <form action="{{ route('settings.toggleChatChannel') }}" method="POST" class="toggle-channel-form" data-channel="{{ $channel }}">
+                                @csrf
+                                <input type="hidden" name="channel" value="{{ $channel }}">
+                                <button type="submit" class="toggle-switch {{ in_array($channel, $userChannels) ? 'active' : 'inactive' }}">
+                                </button>
+                            </form>
                         </div>
                         @endforeach
                     </div>
@@ -299,35 +313,41 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
 
             <section class="bg-surface-container rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 relative overflow-hidden group hover:border-primary/30 transition-all duration-500">
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                <div class="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 relative z-10">
-                    <span class="material-symbols-outlined text-primary">nightlight</span>
-                    <h3 class="font-headline text-lg sm:text-xl font-semibold">Quiet Hours / DND</h3>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 relative z-10">
-                    <div class="lg:col-span-1">
-                        <p class="text-sm text-on-surface leading-relaxed font-medium">Mute all push notifications during your focus time. System alerts will still be archived in your activity feed.</p>
+                <form id="quiet-hours-form" action="{{ route('settings.quietHours') }}" method="POST">
+                    @csrf
+                    <div class="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 relative z-10">
+                        <span class="material-symbols-outlined text-primary">nightlight</span>
+                        <h3 class="font-headline text-lg sm:text-xl font-semibold">Quiet Hours / DND</h3>
                     </div>
-                    <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest pl-1 block">Start Time</label>
-                            <div class="flex items-center gap-4 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-container-low shadow-inner">
-                                <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shadow-xl">
-                                    <span class="material-symbols-outlined">schedule</span>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 relative z-10">
+                        <div class="lg:col-span-1">
+                            <p class="text-sm text-on-surface leading-relaxed font-medium">Mute all push notifications during your focus time. System alerts will still be archived in your activity feed.</p>
+                        </div>
+                        <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest pl-1 block">Start Time</label>
+                                <div class="flex items-center gap-4 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-container-low shadow-inner">
+                                    <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shadow-xl">
+                                        <span class="material-symbols-outlined">schedule</span>
+                                    </div>
+                                    <input type="time" name="quiet_hours_start" value="{{ $quietHoursStart }}" class="bg-transparent text-lg sm:text-xl font-bold font-headline w-full min-w-[80px]" />
                                 </div>
-                                <span class="text-lg sm:text-xl font-bold font-headline">{{ $quietHoursStart }}</span>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest pl-1 block">End Time</label>
+                                <div class="flex items-center gap-4 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-container-low shadow-inner">
+                                    <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-tertiary shadow-xl">
+                                        <span class="material-symbols-outlined">light_mode</span>
+                                    </div>
+                                    <input type="time" name="quiet_hours_end" value="{{ $quietHoursEnd }}" class="bg-transparent text-lg sm:text-xl font-bold font-headline w-full min-w-[80px]" />
+                                </div>
                             </div>
                         </div>
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest pl-1 block">End Time</label>
-                            <div class="flex items-center gap-4 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-container-low shadow-inner">
-                                <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-tertiary shadow-xl">
-                                    <span class="material-symbols-outlined">light_mode</span>
-                                </div>
-                                <span class="text-lg sm:text-xl font-bold font-headline">{{ $quietHoursEnd }}</span>
-                            </div>
-                        </div>
                     </div>
-                </div>
+                    <div class="mt-6 relative z-10">
+                        <button type="submit" class="px-6 py-3 bg-primary text-on-primary rounded-xl font-bold text-sm tracking-wide hover:opacity-90 transition-opacity">Save Quiet Hours</button>
+                    </div>
+                </form>
             </section>
 
             <section class="bg-surface-container rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8">
@@ -411,6 +431,7 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                     </div>
                     <form action="{{ route('settings.preferences') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                         @csrf
+                        @method('PUT')
                         <div class="space-y-2">
                             <label for="timezone" class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest pl-1 block">Time Zone</label>
                             <div class="relative group">
@@ -459,7 +480,7 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                     <div class="p-5 sm:p-6 rounded-xl sm:rounded-2xl bg-surface-container-low border border-white/5 space-y-4 relative z-10 shadow-inner">
                         <div class="flex flex-col gap-1">
                             <p class="text-[9px] uppercase tracking-widest text-primary font-bold">Account Created</p>
-                            <p class="text-sm font-bold tracking-wide">{{ $user->created_at ? $user->created_at->format('M d, Y') : 'N/A' }}</p>
+                            <p class="text-sm font-bold tracking-wide">{{ $user->created_at ? format_user_time($user->created_at, 'M d, Y') : 'N/A' }}</p>
                         </div>
                         <div class="flex flex-col gap-1">
                             <p class="text-[9px] uppercase tracking-widest text-primary font-bold">User ID</p>
@@ -545,33 +566,21 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                     </div>
                     <p class="text-xs text-on-surface-variant mb-6 leading-relaxed">Download a compiled local copy of your account activity, project history, and billing records for your personal archives.</p>
                     <div class="space-y-3 sm:space-y-4 mb-6">
-                        <button class="w-full flex items-center justify-between p-4 rounded-xl sm:rounded-2xl bg-surface-container-low border border-white/5 hover:border-primary/50 hover:bg-surface-container transition-all group shadow-inner">
+                        <button id="export-json" type="button" class="w-full flex items-center justify-between p-4 rounded-xl sm:rounded-2xl bg-surface-container-low border border-white/5 hover:border-primary/50 hover:bg-surface-container transition-all group shadow-inner cursor-pointer">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface-variant group-hover:text-primary shadow-xl transition-colors">
                                     <span class="material-symbols-outlined">description</span>
-                                </div>
-                                <div class="text-left">
-                                    <p class="text-sm font-bold font-headline">Export as PDF</p>
-                                    <p class="text-[9px] text-on-surface-variant uppercase tracking-widest font-bold mt-0.5">Optimized for reading</p>
-                                </div>
-                            </div>
-                            <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">download</span>
-                        </button>
-                        <button class="w-full flex items-center justify-between p-4 rounded-xl sm:rounded-2xl bg-surface-container-low border border-white/5 hover:border-primary/50 hover:bg-surface-container transition-all group shadow-inner">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface-variant group-hover:text-tertiary shadow-xl transition-colors">
-                                    <span class="font-mono text-base font-bold">{'{ }'}</span>
                                 </div>
                                 <div class="text-left">
                                     <p class="text-sm font-bold font-headline">Export as JSON</p>
                                     <p class="text-[9px] text-on-surface-variant uppercase tracking-widest font-bold mt-0.5">Optimized for dev teams</p>
                                 </div>
                             </div>
-                            <span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary transition-colors">download</span>
+                            <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">download</span>
                         </button>
                     </div>
                     <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                        <p class="text-[9px] text-on-surface-variant uppercase tracking-widest font-bold w-full text-center">Last Export: <span class="font-mono">14 days ago</span></p>
+                        <p class="text-[9px] text-on-surface-variant uppercase tracking-widest font-bold w-full text-center">Last Export: <span class="font-mono">{{ $user->last_export_at ? user_time_ago($user->last_export_at) : 'Never' }}</span></p>
                     </div>
                 </section>
 
@@ -589,7 +598,7 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                                 </div>
                                 <div>
                                     <p class="text-sm font-semibold">{{ str_contains($session->user_agent ?? '', 'Mobile') ? 'Mobile Device' : 'Desktop' }}</p>
-                                    <p class="text-[10px] text-on-surface-variant">{{ $session->ip_address ?? 'Unknown' }} • {{ $session->last_activity ? \Carbon\Carbon::parse($session->last_activity)->diffForHumans() : 'Active now' }}</p>
+                                    <p class="text-[10px] text-on-surface-variant">{{ $session->ip_address ?? 'Unknown' }} • {{ $session->last_activity ? user_time_ago($session->last_activity) : 'Active now' }}</p>
                                 </div>
                             </div>
                             <span class="px-2 py-1 rounded {{ $index === 0 ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant' }} text-[9px] font-bold uppercase tracking-widest">{{ $index === 0 ? 'Active' : 'Inactive' }}</span>
@@ -612,7 +621,10 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                         <h3 class="text-xl sm:text-2xl font-bold text-amber-400 font-headline">Advanced Cache Management</h3>
                         <p class="text-sm text-on-surface leading-relaxed max-w-2xl">Purge all locally cached data, temporary files, and stale workspace states. This action will force a complete re-sync on next reload and may temporarily impact performance.</p>
                     </div>
-                    <button class="px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400 hover:bg-amber-400 hover:text-surface transition-all font-bold text-[10px] uppercase tracking-widest whitespace-nowrap shrink-0">Purge Cache</button>
+                    <form action="{{ route('settings.purgeCache') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400 hover:bg-amber-400 hover:text-surface transition-all font-bold text-[10px] uppercase tracking-widest whitespace-nowrap shrink-0">Purge Cache</button>
+                    </form>
                 </div>
             </section>
 
@@ -627,14 +639,34 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 relative z-10">
                     <div class="space-y-4">
                         <p class="text-xs text-on-surface leading-relaxed">Permanently delete all workspace data, projects, files, and user accounts. This action is irreversible and will destroy all associated metadata.</p>
-                        <button class="w-full px-6 py-3 rounded-xl bg-rose-400/10 border border-rose-400/20 text-rose-400 hover:bg-rose-400 hover:text-white transition-all font-bold text-[10px] uppercase tracking-widest">Delete Workspace</button>
+                        <button type="button" class="w-full px-6 py-3 rounded-xl bg-rose-400/10 border border-rose-400/20 text-rose-400 hover:bg-rose-400 hover:text-white transition-all font-bold text-[10px] uppercase tracking-widest">Delete Workspace</button>
                     </div>
                     <div class="space-y-4">
                         <p class="text-xs text-on-surface leading-relaxed">Permanently delete your account and all associated data across all workspaces. This action cannot be undone.</p>
-                        <button class="w-full px-6 py-3 rounded-xl bg-rose-400/10 border border-rose-400/20 text-rose-400 hover:bg-rose-400 hover:text-white transition-all font-bold text-[10px] uppercase tracking-widest">Delete Account</button>
+                        <button id="delete-account-btn" type="button" class="w-full px-6 py-3 rounded-xl bg-rose-400/10 border border-rose-400/20 text-rose-400 hover:bg-rose-400 hover:text-white transition-all font-bold text-[10px] uppercase tracking-widest">Delete Account</button>
                     </div>
                 </div>
             </section>
+
+            <div id="delete-account-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                <div class="bg-surface-container border border-rose-400/30 rounded-3xl p-6 sm:p-8 max-w-md w-full">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 rounded-full bg-rose-400/10 flex items-center justify-center mx-auto mb-4">
+                            <span class="material-symbols-outlined text-rose-400 text-4xl">warning</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-rose-400">Delete Account?</h3>
+                        <p class="text-sm text-on-surface-variant mt-2">This action cannot be undone. Type <span class="font-mono text-rose-400">DELETE_MY_ACCOUNT</span> to confirm.</p>
+                    </div>
+                    <form action="{{ route('settings.deleteAccount') }}" method="POST">
+                        @csrf
+                        <input type="text" id="delete-confirm-input" name="confirm" class="w-full bg-surface-container-low border border-rose-400/30 rounded-xl px-4 py-3 text-sm mb-4" placeholder="Type confirmation" required>
+                        <div class="flex gap-3">
+                            <button type="button" id="cancel-delete" class="flex-1 p-3 bg-surface-container text-on-surface rounded-xl font-bold text-sm">Cancel</button>
+                            <button type="submit" class="flex-1 p-3 bg-rose-400 text-white rounded-xl font-bold text-sm">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -693,5 +725,59 @@ function checkPasswordStrength(password) {
         container.style.display = 'none';
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.toggle-channel-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('{{ route("settings.toggleChatChannel") }}', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: formData
+            }).then(() => this.submit());
+        });
+    });
+
+    document.querySelectorAll('.notification-toggle').forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const setting = this.dataset.setting;
+            const value = this.checked ? 1 : 0;
+            fetch('{{ route("settings.notificationSetting") }}', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ setting: setting, value: value })
+            });
+        });
+    });
+
+    const quietHoursForm = document.getElementById('quiet-hours-form');
+    if (quietHoursForm) {
+        quietHoursForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('{{ route("settings.quietHours") }}', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: formData
+            }).then(() => window.location.reload());
+        });
+    }
+
+    const exportJsonBtn = document.getElementById('export-json');
+    if (exportJsonBtn) {
+        exportJsonBtn.addEventListener('click', function() {
+            window.location.href = '{{ route("settings.export") }}';
+        });
+    }
+
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
+    const deleteAccountModal = document.getElementById('delete-account-modal');
+    const deleteConfirmInput = document.getElementById('delete-confirm-input');
+    if (deleteAccountBtn && deleteAccountModal) {
+        deleteAccountBtn.addEventListener('click', () => deleteAccountModal.classList.remove('hidden'));
+        document.getElementById('cancel-delete')?.addEventListener('click', () => deleteAccountModal.classList.add('hidden'));
+    }
+});
 </script>
 @endsection

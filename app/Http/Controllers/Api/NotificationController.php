@@ -85,7 +85,7 @@ class NotificationController extends Controller
         return $this->success(null, 'Read notifications cleared');
     }
 
-    public function send(Request $request)
+public function send(Request $request)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -97,11 +97,6 @@ class NotificationController extends Controller
 
         $notification = UserNotification::create($request->all());
         
-        if ($request->has('send_email') && $request->send_email) {
-            $user = \App\Models\User::find($request->user_id);
-            $user->notify(new \App\Notifications\GeneralNotification($notification));
-        }
-
         return $this->success($notification, 'Notification sent', 201);
     }
 }

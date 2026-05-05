@@ -77,7 +77,7 @@
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10">
                     <div class="flex items-start gap-8">
                         <div class="relative group">
-                            <img alt="Organization profile image" class="w-32 h-32 rounded-3xl object-cover shadow-2xl border border-outline-variant/10" src="{{ $client->avatar_url ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdsutWN3dSe1C9s1z1T09w2CQEGzGY7NUXrrF9vIvSiGX-qHq-1Ty8SNDz5H2f2v-KN43tKSeYY4aZ94NQ52JcxBF1cr0Lk_A1YSQjb6Wcpo7wSiYM6ahtNkO7w6R1U2XZotD17laHQjivb70K0KIV8Ve_z0ttjpIjJ3hZZIO4OsNTyj63D42_pEcORgqBAFO80KhPsOJYmMpEJeIHNpeA3UidFUmqNqNY26f6fcdEIwAnXKtKTO7SU7r3dP3QEwudGqBULNSoYc' }}" />
+                            <img alt="Organization profile image" class="w-32 h-32 rounded-3xl object-cover shadow-2xl border border-outline-variant/10" src="{{ $client->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($client->name) . '&background=818cf8&color=fff&size=128' }}" />
                             <div class="absolute -bottom-2 -right-2 bg-primary p-2 rounded-xl text-on-primary shadow-lg">
                                 <span class="material-symbols-outlined text-lg">verified</span>
                             </div>
@@ -147,7 +147,7 @@
                                 </div>
                                 <div>
                                     <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mb-1">Deadline</p>
-                                    <p class="text-on-surface font-semibold">{{ $project->end_date?->format('M d, Y') ?? 'TBD' }}</p>
+                                    <p class="text-on-surface font-semibold">{{ $project->end_date ? format_user_time($project->end_date, 'M d, Y') : 'TBD' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -204,7 +204,7 @@
                                 <span>Status</span>
                             </div>
                             <div class="flex justify-between font-semibold text-sm">
-                                <span>{{ $project->end_date?->format('M d') ?? 'TBD' }}</span>
+                                <span>{{ $project->end_date ? format_user_time($project->end_date, 'M d') : 'TBD' }}</span>
                                 <span class="text-primary">{{ ucfirst($project->status) }}</span>
                             </div>
                         </div>

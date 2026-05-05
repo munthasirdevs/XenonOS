@@ -19,7 +19,7 @@
             <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
                 <div class="flex flex-col sm:flex-row items-start gap-6 flex-1">
                     <div class="w-24 h-24 rounded-2xl bg-surface-container-highest flex items-center justify-center text-primary border border-outline-variant/10 shadow-xl overflow-hidden flex-shrink-0">
-                        <img alt="{{ $client->name }} Logo" class="w-full h-full object-cover" src="{{ $client->avatar_url ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdsutWN3dSe1C9s1z1T09w2CQEGzGY7NUXrrF9vIvSiGX-qHq-1Ty8SNDz5H2f2v-KN43tKSeYY4aZ94NQ52JcxBF1cr0Lk_A1YSQjb6Wcpo7wSiYM6ahtNkO7w6R1U2XZotD17laHQjivb70K0KIV8Ve_z0ttjpIjJ3hZZIO4OsNTyj63D42_pEcORgqBAFO80KhPsOJYmMpEJeIHNpeA3UidFUmqNqNY26f6fcdEIwAnXKtKTO7SU7r3dP3QEwudGqBULNSoYc' }}" />
+                        <img alt="{{ $client->name }} Logo" class="w-full h-full object-cover" src="{{ $client->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($client->name) . '&background=818cf8&color=fff&size=128' }}" />
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-3 mb-2">

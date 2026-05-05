@@ -78,7 +78,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 sm:gap-8">
                     <div class="flex flex-col sm:flex-row items-start gap-6 md:gap-8 flex-1 min-w-0">
                         <div class="w-24 h-24 md:w-28 md:h-28 rounded-xl bg-surface-container border border-outline-variant/10 overflow-hidden shadow-2xl flex-shrink-0">
-                            <img class="w-full h-full object-cover" src="{{ $client->avatar_url ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdsutWN3dSe1C9s1z1T09w2CQEGzGY7NUXrrF9vIvSiGX-qHq-1Ty8SNDz5H2f2v-KN43tKSeYY4aZ94NQ52JcxBF1cr0Lk_A1YSQjb6Wcpo7wSiYM6ahtNkO7w6R1U2XZotD17laHQjivb70K0KIV8Ve_z0ttjpIjJ3hZZIO4OsNTyj63D42_pEcORgqBAFO80KhPsOJYmMpEJeIHNpeA3UidFUmqNqNY26f6fcdEIwAnXKtKTO7SU7r3dP3QEwudGqBULNSoYc' }}" alt="{{ $client->name }} company logo" />
+                            <img class="w-full h-full object-cover" src="{{ $client->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($client->name) . '&background=818cf8&color=fff&size=128' }}" alt="{{ $client->name }} company logo" />
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="flex flex-wrap items-center gap-3 mb-2">
@@ -175,7 +175,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <h5 class="font-headline font-bold text-base mb-1 truncate text-on-surface" title="{{ $doc->title }}">{{ $doc->title }}</h5>
-                            <p class="text-xs text-on-surface-variant">Modified {{ $doc->created_at ? $doc->created_at->diffForHumans() : 'Recently' }}</p>
+                            <p class="text-xs text-on-surface-variant">Modified {{ $doc->created_at ? user_time_ago($doc->created_at) : 'Recently' }}</p>
                         </div>
                         <div class="mt-6 flex gap-2">
                             <button class="flex-1 min-h-[36px] py-2 bg-surface-container-lowest hover:bg-primary/10 hover:text-primary rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5">

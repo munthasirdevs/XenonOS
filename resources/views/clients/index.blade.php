@@ -25,7 +25,7 @@
                         Manage and monitor your global agency clients, project health, and financial cycles from one central dashboard.
                     </p>
                 </div>
-                <button type="button" class="bg-primary hover:bg-primary/90 active:scale-[0.98] text-on-primary font-semibold px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-2 transition-all duration-150 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 w-full sm:w-auto min-h-[44px] text-sm sm:text-base">
+                <button type="button" onclick="document.getElementById('add-client-modal').classList.remove('hidden')" class="bg-primary hover:bg-primary/90 active:scale-[0.98] text-on-primary font-semibold px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-2 transition-all duration-150 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 w-full sm:w-auto min-h-[44px] text-sm sm:text-base">
                     <span class="material-symbols-outlined text-lg sm:text-xl">add</span>
                     <span>Add New Client</span>
                 </button>
@@ -98,7 +98,7 @@
                                         <td class="px-4 sm:px-6 py-4 sm:py-5">
                                             <div class="flex items-center gap-3 sm:gap-4">
                                                 <img class="client-avatar w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl object-cover shrink-0"
-                                                    src="{{ $client->avatar_url ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdsutWN3dSe1C9s1z1T09w2CQEGzGY7NUXrrF9vIvSiGX-qHq-1Ty8SNDz5H2f2v-KN43tKSeYY4aZ94NQ52JcxBF1cr0Lk_A1YSQjb6Wcpo7wSiYM6ahtNkO7w6R1U2XZotD17laHQjivb70K0KIV8Ve_z0ttjpIjJ3hZZIO4OsNTyj63D42_pEcORgqBAFO80KhPsOJYmMpEJeIHNpeA3UidFUmqNqNY26f6fcdEIwAnXKtKTO7SU7r3dP3QEwudGqBULNSoYc' }}"
+                                                    src="{{ $client->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($client->name) . '&background=818cf8&color=fff&size=128' }}"
                                                     alt="Avatar of {{ $client->name }}" loading="lazy" />
                                                 <div class="min-w-0">
                                                     <p
@@ -221,7 +221,7 @@
                                         <p class="text-sm text-on-surface leading-snug">
                                             <strong class="font-semibold text-on-surface">{{ $activity->client->name ?? 'Client' }}</strong> {{ $activity->description }}
                                         </p>
-                                        <time class="block text-xs text-on-surface-muted mt-1.5">{{ $activity->created_at ? $activity->created_at->diffForHumans() : 'Recently' }}</time>
+                                        <time class="block text-xs text-on-surface-muted mt-1.5">{{ $activity->created_at ? user_time_ago($activity->created_at) : 'Recently' }}</time>
                                     </div>
                                 </li>
                                 @endforeach
@@ -229,9 +229,11 @@
                         </div>
                     </div>
                 </aside>
-            </div>
+</div>
         </div>
     </main>
+
+    @include('components.confirm-modal')
 </body>
 
 </html>

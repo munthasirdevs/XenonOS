@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withSchedule(function ($schedule) {
+        $schedule->command('app:cleanup-invites')->daily();
+    })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
         

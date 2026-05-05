@@ -47,7 +47,6 @@ class AlertRule extends Model
     {
         return [
             'send_notification',
-            'send_email',
             'update_status',
             'create_task',
         ];

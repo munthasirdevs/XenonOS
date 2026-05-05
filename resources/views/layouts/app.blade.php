@@ -127,42 +127,15 @@
                     Systems Operational
                 </span>
                 <span class="h-1 w-1 bg-white/10 rounded-full"></span>
-                    Last Updated: <span id="last-updated" class="font-mono">{{ now()->format('M d, Y H:i') }}</span>
+                    <span class="font-mono" id="last-updated" data-timezone="{{ Auth::user()->timezone ?? 'London' }}">{{ format_user_time(now(), 'M d, Y H:i') }}</span>
             </div>
             <div>
                 © {{ now()->year }} Xenon Studios • v{{ config('app.version', '1.0.0') }}
             </div>
         </footer>
-
-<script>
-function getTimezoneOffset(tz) {
-    const offsets = {
-        'London': '+00:00', 'NewYork': '-05:00', 'Paris': '+01:00', 'Japan': '+09:00',
-        'Beijing': '+08:00', 'India': '+05:30', 'Bangladesh': '+06:00'
-    };
-    return offsets[tz] || '+00:00';
-}
-
-function formatTimeByTimezone(date, tz) {
-    const offsets = {
-        'London': 0, 'NewYork': -5, 'Paris': 1, 'Japan': 9,
-        'Beijing': 8, 'India': 5.5, 'Bangladesh': 6
-    };
-    var offset = offsets[tz] || 0;
-    var utc = date.getTime() + (date.getTimezoneOffset() * 60000);
-    var localDate = new Date(utc + (offset * 3600000));
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months[localDate.getMonth()] + ' ' + localDate.getDate() + ', ' + 
-        String(localDate.getHours()).padStart(2,'0') + ':' + String(localDate.getMinutes()).padStart(2,'0');
-}
-
-setInterval(function() {
-    var tz = '{{ Auth::user()->timezone ?? "London" }}';
-    var now = new Date();
-    document.getElementById('last-updated').textContent = formatTimeByTimezone(now, tz);
-}, 60000);
-</script>
     </main>
+
+    <script src="{{ asset('js/timezone.js') }}"></script>
 
     @stack('scripts')
 </body>

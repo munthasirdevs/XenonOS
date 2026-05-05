@@ -130,7 +130,7 @@
             <div class="mt-4 p-3 bg-primary/5 rounded-xl border-l-4 border-primary">
                 <p class="text-xs font-bold text-primary">Security Report</p>
                 <p class="text-[10px] text-on-surface-variant mt-1">{{ $latestSecurityReport->message }}</p>
-                <p class="text-[9px] text-on-surface-variant mt-1">{{ $latestSecurityReport->created_at?->diffForHumans() }}</p>
+                <p class="text-[9px] text-on-surface-variant mt-1">{{ $latestSecurityReport->created_at ? user_time_ago($latestSecurityReport->created_at) : 'N/A' }}</p>
             </div>
             @endif
         </div>
@@ -243,7 +243,7 @@
                     <div class="min-w-0 flex-1">
                         <div class="flex justify-between items-start">
                             <p class="text-xs font-bold text-on-surface">{{ Str::limit($note->title, 25) }}</p>
-                            <span class="text-[10px] text-on-surface-variant">{{ $userNote->created_at?->diffForHumans() }}</span>
+                            <span class="text-[10px] text-on-surface-variant">{{ $userNote->created_at ? user_time_ago($userNote->created_at) : 'N/A' }}</span>
                         </div>
                         <p class="text-[10px] text-on-surface-variant mt-1">{{ Str::limit($note->message, 35) }}</p>
                     </div>
