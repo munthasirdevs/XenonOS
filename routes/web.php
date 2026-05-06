@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\NotificationController;
@@ -64,6 +65,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/notification-setting', [SettingsController::class, 'updateNotificationSetting'])->name('settings.notificationSetting');
         Route::post('/settings/quiet-hours', [SettingsController::class, 'updateQuietHours'])->name('settings.quietHours');
         Route::post('/settings/auth-rule', [SettingsController::class, 'updateAuthRule'])->name('settings.authRule');
+
+        Route::get('/activity', [ActivityController::class, 'index'])->name('activity');
+        Route::get('/activity/sessions', [ActivityController::class, 'sessions'])->name('activity.sessions');
+        Route::get('/activity/security', [ActivityController::class, 'security'])->name('activity.security');
+        Route::get('/activity/export', [ActivityController::class, 'exportCsv'])->name('activity.export');
+        Route::get('/activity/charts', [ActivityController::class, 'charts'])->name('activity.charts');
+        Route::delete('/sessions/{id}/logout', [ActivityController::class, 'forceLogout'])->name('sessions.forceLogout');
     });
 
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');

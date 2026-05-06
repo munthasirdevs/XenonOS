@@ -95,8 +95,8 @@
             <span class="material-symbols-outlined">analytics</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Analytics</span>
         </a>
-        <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined">history</span>
+        <a href="{{ route('activity') }}" class="{{ request()->routeIs('activity*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ request()->routeIs('activity*') ? 'active-icon' : '' }}">history</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Activity</span>
         </a>
         <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">

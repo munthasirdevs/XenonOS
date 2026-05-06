@@ -20,7 +20,6 @@
                         'surface-container-high': '#161922',
                         'surface-container-lowest': '#06080c',
                         'background': '#0b0e14',
-                        'surface-container-highest': '#1a1d26',
                         'primary': '#818cf8',
                         'primary-container': '#4f46e5',
                         'secondary': '#a5b4fc',
@@ -49,73 +48,16 @@
             }
         }
     </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Syne:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <style>
-        body {
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .font-headline {
-            font-family: 'Syne', sans-serif;
-        }
-
-        .font-label {
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-            font-size: 20px;
-        }
-
-        .active-icon {
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #1e222c;
-            border-radius: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-        }
-
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
-    @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 
 <body class="flex min-h-screen bg-background text-on-surface antialiased">
-    <!-- Navbar -->
     <x-navbar />
 
-    <!-- Main Content -->
     <main class="flex-1 md:ml-[260px] min-h-screen transition-all duration-300">
-        <!-- Top spacing for mobile menu -->
         <div class="h-16 md:h-0"></div>
-
         <div class="p-6 md:p-8">
             @yield('content')
         </div>
@@ -126,17 +68,14 @@
                     <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></span>
                     Systems Operational
                 </span>
-                <span class="h-1 w-1 bg-white/10 rounded-full"></span>
-                    <span class="font-mono" id="last-updated" data-timezone="{{ Auth::user()->timezone ?? 'London' }}">{{ format_user_time(now(), 'M d, Y H:i') }}</span>
             </div>
             <div>
-                © {{ now()->year }} Xenon Studios • v{{ config('app.version', '1.0.0') }}
+                &copy; {{ now()->year }} Xenon Studios
             </div>
         </footer>
     </main>
 
-    <script src="{{ asset('js/timezone.js') }}"></script>
-
+    <script src="{{ asset('js/app.js') }}"></script>
     @stack('scripts')
 </body>
 
