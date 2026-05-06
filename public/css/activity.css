@@ -1,34 +1,13 @@
-/* Activity Page Custom Styles */
+/* Activity Page CSS */
 .activity-tab {
     padding-bottom: 1rem;
     border-bottom: 2px solid transparent;
-    color: var(--color-on-surface-variant);
+    color: var(--on-surface-variant);
     transition: all 0.2s ease;
 }
+.activity-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.activity-tab:hover { color: var(--on-surface); }
 
-.activity-tab.active {
-    color: var(--color-primary);
-    border-bottom-color: var(--color-primary);
-}
-
-.activity-tab:hover {
-    color: var(--color-on-surface);
-}
-
-.severity-normal {
-    background-color: rgba(129, 140, 248, 0.1);
-    color: var(--color-primary);
-    border: 1px solid rgba(129, 140, 248, 0.2);
-}
-
-.severity-critical {
-    background-color: rgba(192, 132, 252, 0.1);
-    color: var(--color-tertiary);
-    border: 1px solid rgba(192, 132, 252, 0.2);
-}
-
-.severity-info {
-    background-color: rgba(100, 116, 139, 0.1);
-    color: #94a3b8;
-    border: 1px solid rgba(100, 116, 139, 0.2);
-}
+.severity-normal { background: rgba(129, 140, 248, 0.1); color: var(--primary); border: 1px solid rgba(129, 140, 248, 0.2); }
+.severity-critical { background: rgba(192, 132, 252, 0.1); color: var(--tertiary); border: 1px solid rgba(192, 132, 252, 0.2); }
+.severity-info { background: rgba(100, 116, 139, 0.1); color: var(--on-surface-variant); border: 1px solid rgba(100, 116, 139, 0.2); }

@@ -18,26 +18,14 @@
                         'surface-container': '#12151e',
                         'surface-container-low': '#0f121a',
                         'surface-container-high': '#161922',
-                        'surface-container-lowest': '#06080c',
                         'background': '#0b0e14',
                         'primary': '#818cf8',
-                        'primary-container': '#4f46e5',
-                        'secondary': '#a5b4fc',
-                        'tertiary': '#ffb783',
                         'on-primary': '#1e1b4b',
                         'on-surface': '#dfe2f1',
                         'on-surface-variant': '#94a3b8',
-                        'outline': '#475569',
-                        'outline-variant': '#464554',
-                        'error': '#ffb4ab',
-                        'emerald-400': '#34d399',
-                        'emerald-500': '#10b981',
-                        'amber-400': '#fbbf24',
-                        'amber-500': '#f59e0b',
-                        'blue-400': '#60a5fa',
-                        'rose-400': '#fb7185',
-                        'rose-500': '#f43f5e',
-                        'purple-600': '#9333ea',
+                        'error': '#f87171',
+                        'success': '#34d399',
+                        'tertiary': '#c084fc',
                     },
                     fontFamily: {
                         headline: ['Syne', 'sans-serif'],
@@ -49,8 +37,8 @@
         }
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Syne:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/global.css') }}">
+    @stack('styles')
 </head>
 
 <body class="flex min-h-screen bg-background text-on-surface antialiased">
@@ -69,13 +57,11 @@
                     Systems Operational
                 </span>
             </div>
-            <div>
-                &copy; {{ now()->year }} Xenon Studios
-            </div>
+            <div>&copy; {{ now()->year }} Xenon Studios</div>
         </footer>
     </main>
 
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/global.js') }}"></script>
     @stack('scripts')
 </body>
 
