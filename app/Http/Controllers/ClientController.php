@@ -29,7 +29,7 @@ class ClientController extends Controller
             'newThisMonth' => Client::whereMonth('created_at', now()->month)->count(),
         ]);
 
-        $recentActivities = Cache::remember('recent_activities', 30, fn() => 
+        $recentActivities = Cache::remember('recent_activities', 30, fn() =>
             ClientActivity::select('id', 'client_id', 'description', 'type', 'created_at')
                 ->with('client:id,name')
                 ->orderBy('created_at', 'desc')
@@ -37,7 +37,22 @@ class ClientController extends Controller
                 ->get()
         );
 
-        return view('clients.index', compact('clients', 'recentActivities') + $stats);
+        $inviteStats = Cache::remember('invite_stats', 60, fn() => [
+            'created' => DB::table('client_invites')
+                ->where('created_at', '>=', now()->subDays(30))
+                ->count(),
+            'signed_up' => DB::table('client_invites')
+                ->whereNotNull('used_at')
+                ->where('used_at', '>=', now()->subDays(30))
+                ->count(),
+            'expired' => DB::table('client_invites')
+                ->whereNull('is_used')
+                ->where('expires_at', '<', now())
+                ->where('created_at', '>=', now()->subDays(30))
+                ->count(),
+        ]);
+
+        return view('clients.index', compact('clients', 'recentActivities', 'inviteStats') + $stats);
     }
 
     public function show($id)
@@ -128,10 +143,10 @@ class ClientController extends Controller
         return view('clients.documents', compact('client', 'documents'));
     }
 
-    private function generateRandomCode($length = 6)
+    private function generateCode($length = 5)
     {
         $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
-        $code = '';
+        $code = 'xenon';
         for ($i = 0; $i < $length; $i++) {
             $code .= $chars[random_int(0, strlen($chars) - 1)];
         }
@@ -147,9 +162,9 @@ class ClientController extends Controller
 
         $expiresHours = (int) ($validated['expires_hours'] ?? 24);
         $clientId = $validated['client_id'] ?? null;
-        
-        $code = $this->generateRandomCode(6);
-        
+
+        $code = $this->generateCode(5);
+
         $invite = DB::table('client_invites')->insertGetId([
             'code' => $code,
             'email' => 'pending@invite',
@@ -157,17 +172,19 @@ class ClientController extends Controller
             'invited_by' => auth()->id(),
             'expires_at' => now()->addHours($expiresHours),
             'expires_hours' => $expiresHours,
+            'is_used' => false,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
         $inviteLink = route('signup.show', $code);
-        
+
         return response()->json([
             'success' => true,
             'code' => $code,
             'link' => $inviteLink,
             'expires_at' => now()->addHours($expiresHours)->format('M d, Y H:i'),
+            'expires_hours' => $expiresHours,
         ]);
     }
 
@@ -176,22 +193,14 @@ class ClientController extends Controller
         $invite = DB::table('client_invites')
             ->where('code', $code)
             ->whereNull('deleted_at')
+            ->where('is_used', false)
             ->first();
 
         if (!$invite) {
             return view('auth.signup', [
-                'error' => 'This invite link is invalid.',
+                'error' => 'This invite link is invalid or has already been used.',
                 'code' => $code,
                 'invalid' => true,
-            ]);
-        }
-
-        if ($invite->used_at) {
-            return view('auth.signup', [
-                'error' => 'This invite link has already been used.',
-                'code' => $code,
-                'already_used' => true,
-                'contact' => 'Contact Xenon HelpLine for a new invite.',
             ]);
         }
 
@@ -217,14 +226,11 @@ class ClientController extends Controller
         $invite = DB::table('client_invites')
             ->where('code', $code)
             ->whereNull('deleted_at')
+            ->where('is_used', false)
             ->first();
 
         if (!$invite) {
-            return back()->with('error', 'This invite link is invalid.');
-        }
-
-        if ($invite->used_at) {
-            return back()->with('error', 'This invite link has already been used. Contact Xenon HelpLine for a new invite.');
+            return back()->with('error', 'This invite link is invalid or has already been used.');
         }
 
         if (now()->gt($invite->expires_at)) {
@@ -253,6 +259,7 @@ class ClientController extends Controller
         DB::table('client_invites')
             ->where('code', $code)
             ->update([
+                'is_used' => true,
                 'used_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -266,7 +273,6 @@ class ClientController extends Controller
             ]);
         }
 
-        // Auto-login the new client
         Auth::login($client);
 
         return redirect()->route('client.dashboard')->with('success', 'Welcome! Your account has been created.');

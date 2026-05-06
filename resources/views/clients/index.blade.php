@@ -25,10 +25,16 @@
                         Manage and monitor your global agency clients, project health, and financial cycles from one central dashboard.
                     </p>
                 </div>
-                <button type="button" onclick="document.getElementById('add-client-modal').classList.remove('hidden')" class="bg-primary hover:bg-primary/90 active:scale-[0.98] text-on-primary font-semibold px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-2 transition-all duration-150 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 w-full sm:w-auto min-h-[44px] text-sm sm:text-base">
-                    <span class="material-symbols-outlined text-lg sm:text-xl">add</span>
-                    <span>Add New Client</span>
-                </button>
+                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <button type="button" onclick="openInviteModal()" class="bg-surface-container-high hover:bg-surface-container-high/80 text-on-surface font-semibold px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-2 transition-all duration-150 hover:shadow-lg w-full sm:w-auto min-h-[44px] text-sm sm:text-base">
+                        <span class="material-symbols-outlined text-lg sm:text-xl">mail</span>
+                        <span>Invite Client</span>
+                    </button>
+                    <button type="button" onclick="document.getElementById('add-client-modal').classList.remove('hidden')" class="bg-primary hover:bg-primary/90 active:scale-[0.98] text-on-primary font-semibold px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-2 transition-all duration-150 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 w-full sm:w-auto min-h-[44px] text-sm sm:text-base">
+                        <span class="material-symbols-outlined text-lg sm:text-xl">add</span>
+                        <span>Add New Client</span>
+                    </button>
+                </div>
             </header>
 
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 md:gap-8">
@@ -206,6 +212,24 @@
                             </div>
                         </div>
 
+                        <div class="bg-surface-container-low p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl">
+                            <p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-3">Invite Stats (30 Days)</p>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="text-center">
+                                    <p class="text-2xl sm:text-3xl font-headline font-semibold text-on-surface">{{ $inviteStats['created'] ?? 0 }}</p>
+                                    <p class="text-[10px] text-on-surface-muted">Created</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-2xl sm:text-3xl font-headline font-semibold text-emerald-400">{{ $inviteStats['signed_up'] ?? 0 }}</p>
+                                    <p class="text-[10px] text-on-surface-muted">Signed Up</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-2xl sm:text-3xl font-headline font-semibold text-amber-400">{{ $inviteStats['expired'] ?? 0 }}</p>
+                                    <p class="text-[10px] text-on-surface-muted">Expired</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="bg-surface-container-low p-6 rounded-3xl">
                             <div class="flex justify-between items-center mb-5">
                                 <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Recent Events</h3>
@@ -234,6 +258,158 @@
     </main>
 
     @include('components.confirm-modal')
+
+    <!-- Add Client Modal -->
+    <div id="add-client-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('add-client-modal').classList.add('hidden')"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-surface-container rounded-3xl shadow-2xl p-6">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-xl font-bold text-on-surface">Add New Client</h3>
+                <button type="button" onclick="document.getElementById('add-client-modal').classList.add('hidden')" class="p-2 hover:bg-surface-container-high rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-on-surface">close</span>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ route('clients.store') }}">
+                @csrf
+                <div class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-on-surface mb-2">Name *</label>
+                        <input type="text" id="name" name="name" required class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-on-surface mb-2">Email *</label>
+                        <input type="email" id="email" name="email" required class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label for="company" class="block text-sm font-medium text-on-surface mb-2">Company</label>
+                        <input type="text" id="company" name="company" class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-on-surface mb-2">Phone</label>
+                        <input type="text" id="phone" name="phone" class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-on-surface mb-2">Address</label>
+                        <textarea id="address" name="address" rows="2" class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-on-primary font-semibold py-3 rounded-xl">
+                        Create Client
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invite Modal -->
+    <div id="invite-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeInviteModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-surface-container rounded-3xl shadow-2xl p-6">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-xl font-bold text-on-surface">Generate Invite Link</h3>
+                <button type="button" onclick="closeInviteModal()" class="p-2 hover:bg-surface-container-high rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-on-surface">close</span>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="expires-hours" class="block text-sm font-medium text-on-surface mb-2">Link Expiry</label>
+                    <select id="expires-hours" class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary appearance-none cursor-pointer">
+                        <option value="8">8 Hours</option>
+                        <option value="12">12 Hours</option>
+                        <option value="24" selected>24 Hours</option>
+                        <option value="48">48 Hours</option>
+                    </select>
+                </div>
+
+                <button type="button" onclick="generateInviteLink()" id="generate-btn" class="w-full bg-primary hover:bg-primary/90 active:scale-[0.98] text-on-primary font-semibold py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-150 shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined">link</span>
+                    <span>Generate Link</span>
+                </button>
+
+                <div id="invite-result" class="hidden space-y-3 pt-2">
+                    <div class="p-3 bg-surface-container-high rounded-xl">
+                        <p class="text-xs text-on-surface-muted mb-1">Invite Link</p>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="invite-link" readonly class="flex-1 bg-transparent text-on-surface text-sm font-mono truncate">
+                            <button type="button" onclick="copyInviteLink()" class="p-2 hover:bg-surface-container rounded-lg transition-colors" title="Copy link">
+                                <span class="material-symbols-outlined text-primary">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+                    <p id="invite-expiry" class="text-xs text-on-surface-muted text-center"></p>
+                </div>
+
+                <div id="invite-error" class="hidden p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                    <p id="invite-error-msg" class="text-sm text-red-400"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openInviteModal() {
+            document.getElementById('invite-modal').classList.remove('hidden');
+            document.getElementById('invite-result').classList.add('hidden');
+            document.getElementById('invite-error').classList.add('hidden');
+        }
+
+        function closeInviteModal() {
+            document.getElementById('invite-modal').classList.add('hidden');
+        }
+
+        function generateInviteLink() {
+            const btn = document.getElementById('generate-btn');
+            const hours = document.getElementById('expires-hours').value;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Generating...';
+
+            fetch('/clients/invite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ expires_hours: parseInt(hours) })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('invite-link').value = data.link;
+                    document.getElementById('invite-expiry').textContent = 'Expires: ' + data.expires_at;
+                    document.getElementById('invite-result').classList.remove('hidden');
+                    document.getElementById('invite-error').classList.add('hidden');
+                } else {
+                    document.getElementById('invite-error-msg').textContent = data.message || 'Failed to generate link';
+                    document.getElementById('invite-error').classList.remove('hidden');
+                    document.getElementById('invite-result').classList.add('hidden');
+                }
+            })
+            .catch(err => {
+                document.getElementById('invite-error-msg').textContent = 'An error occurred';
+                document.getElementById('invite-error').classList.remove('hidden');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">link</span> Generate Link';
+            });
+        }
+
+        function copyInviteLink() {
+            const link = document.getElementById('invite-link').value;
+            navigator.clipboard.writeText(link).then(() => {
+                const btn = event.target.closest('button');
+                btn.innerHTML = '<span class="material-symbols-outlined text-emerald-400">check</span>';
+                setTimeout(() => {
+                    btn.innerHTML = '<span class="material-symbols-outlined text-primary">content_copy</span>';
+                }, 2000);
+            });
+        }
+
+        window.openInviteModal = openInviteModal;
+        window.closeInviteModal = closeInviteModal;
+    </script>
 </body>
 
 </html>
