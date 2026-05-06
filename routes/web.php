@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/clients/invite', [ClientController::class, 'generateInvite'])->name('clients.invite');
     Route::get('/client/dashboard', [ClientController::class, 'clientDashboard'])->name('client.dashboard');
     Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');
+    Route::delete('/clients/{id}', [ClientController::class, 'destroy'])->name('clients.destroy');
     Route::get('/clients/{id}/projects', [ClientController::class, 'projects'])->name('clients.projects');
     Route::get('/clients/{id}/activity', [ClientController::class, 'activity'])->name('clients.activity');
     Route::get('/clients/{id}/documents', [ClientController::class, 'documents'])->name('clients.documents');

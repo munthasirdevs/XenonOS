@@ -6,10 +6,13 @@ use App\Models\Client;
 use App\Models\ClientActivity;
 use App\Models\ClientDocument;
 use App\Models\Project;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
@@ -132,7 +135,14 @@ class ClientController extends Controller
             ->paginate(15)
             ->appends($request->query());
 
-        return view('clients.activity', compact('client', 'activities'));
+        $activityStats = [
+            'project_updates' => 45,
+            'file_management' => 30,
+            'communications' => 15,
+            'tasks' => 10,
+        ];
+
+        return view('clients.activity', compact('client', 'activities', 'activityStats'));
     }
 
     public function documents($id)
@@ -143,7 +153,15 @@ class ClientController extends Controller
         return view('clients.documents', compact('client', 'documents'));
     }
 
-    private function generateCode($length = 5)
+    public function destroy($id)
+    {
+        $client = Client::findOrFail($id);
+        $client->delete();
+
+        return redirect()->route('clients')->with('success', 'Client deleted successfully.');
+    }
+
+    private function generateCode($length = 8)
     {
         $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
         $code = 'xenon';
@@ -153,39 +171,59 @@ class ClientController extends Controller
         return $code;
     }
 
-    public function generateInvite(Request $request)
+public function generateInvite(Request $request)
     {
-        $validated = $request->validate([
-            'client_id' => 'nullable|exists:clients,id',
-            'expires_hours' => 'nullable|integer|in:8,12,24,48',
-        ]);
+        try {
+            $userId = auth()->id();
+            $cooldownSeconds = 60; // 1 minute cooldown
 
-        $expiresHours = (int) ($validated['expires_hours'] ?? 24);
-        $clientId = $validated['client_id'] ?? null;
+            // Check last invite time
+            $lastInvite = DB::table('client_invites')
+                ->where('invited_by', $userId)
+                ->orderBy('created_at', 'desc')
+                ->first();
 
-        $code = $this->generateCode(5);
+            if ($lastInvite) {
+                $lastCreated = Carbon::parse($lastInvite->created_at);
+                $secondsSinceLastInvite = $lastCreated->diffInSeconds(Carbon::now());
+                
+                if ($secondsSinceLastInvite < $cooldownSeconds) {
+                    $remainingTime = $cooldownSeconds - $secondsSinceLastInvite;
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Please wait ' . ceil($remainingTime) . ' seconds before generating another link.'
+                    ], 429);
+                }
+            }
 
-        $invite = DB::table('client_invites')->insertGetId([
-            'code' => $code,
-            'email' => 'pending@invite',
-            'client_id' => $clientId,
-            'invited_by' => auth()->id(),
-            'expires_at' => now()->addHours($expiresHours),
-            'expires_hours' => $expiresHours,
-            'is_used' => false,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            $code = $this->generateCode(11);
 
-        $inviteLink = route('signup.show', $code);
+            $inviteId = DB::table('client_invites')->insertGetId([
+                'code' => $code,
+                'email' => 'pending@invite',
+                'client_id' => null,
+                'invited_by' => $userId,
+                'expires_at' => now()->addHours(24), // Default 24 hours expiry for the invite link
+                'expires_hours' => 24,
+                'is_used' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'code' => $code,
-            'link' => $inviteLink,
-            'expires_at' => now()->addHours($expiresHours)->format('M d, Y H:i'),
-            'expires_hours' => $expiresHours,
-        ]);
+            $inviteLink = route('signup.show', $code);
+
+            return response()->json([
+                'success' => true,
+                'code' => $code,
+                'link' => $inviteLink,
+                'expires_at' => now()->addHours(24)->format('M d, Y H:i'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function showSignup($code)
@@ -241,19 +279,30 @@ class ClientController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'password' => 'required|min:8|confirmed',
+            'phone' => 'nullable|string|max:50',
+            'password' => 'required|min:8',
             'company' => 'nullable|string|max:255',
         ]);
 
         $fullName = $validated['first_name'] . ' ' . $validated['last_name'];
 
+        // Create User for authentication
+        $user = User::create([
+            'name' => $fullName,
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'status' => 'active',
+        ]);
+
+        // Create Client record for CRM
         $client = Client::create([
             'name' => $fullName,
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
             'company' => $validated['company'] ?? null,
             'status' => 'active',
-            'password' => $validated['password'],
             'total_revenue' => 0,
+            'created_by' => $invite->invited_by,
         ]);
 
         DB::table('client_invites')
@@ -267,13 +316,13 @@ class ClientController extends Controller
         if ($invite->client_id) {
             ClientActivity::create([
                 'client_id' => $invite->client_id,
-                'user_id' => $client->id,
+                'user_id' => $user->id,
                 'type' => 'signup',
                 'description' => 'Team member joined: ' . $fullName,
             ]);
         }
 
-        Auth::login($client);
+        Auth::login($user);
 
         return redirect()->route('client.dashboard')->with('success', 'Welcome! Your account has been created.');
     }

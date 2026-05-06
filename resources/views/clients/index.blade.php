@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clients List - XenonOS</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/swal-custom.js') }}"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Syne:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/xenon.css') }}">
     <link rel="stylesheet" href="{{ asset('css/clients.css') }}">
@@ -25,16 +27,10 @@
                         Manage and monitor your global agency clients, project health, and financial cycles from one central dashboard.
                     </p>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <button type="button" onclick="openInviteModal()" class="bg-surface-container-high hover:bg-surface-container-high/80 text-on-surface font-semibold px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-2 transition-all duration-150 hover:shadow-lg w-full sm:w-auto min-h-[44px] text-sm sm:text-base">
-                        <span class="material-symbols-outlined text-lg sm:text-xl">mail</span>
-                        <span>Invite Client</span>
-                    </button>
-                    <button type="button" onclick="document.getElementById('add-client-modal').classList.remove('hidden')" class="bg-primary hover:bg-primary/90 active:scale-[0.98] text-on-primary font-semibold px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-2 transition-all duration-150 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 w-full sm:w-auto min-h-[44px] text-sm sm:text-base">
-                        <span class="material-symbols-outlined text-lg sm:text-xl">add</span>
-                        <span>Add New Client</span>
-                    </button>
-                </div>
+                <button type="button" onclick="openInviteModal()" class="bg-primary hover:bg-primary/90 active:scale-[0.98] text-on-primary font-semibold px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-2 transition-all duration-150 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 w-full sm:w-auto min-h-[44px] text-sm sm:text-base">
+                    <span class="material-symbols-outlined text-lg sm:text-xl">mail</span>
+                    <span>Invite Client</span>
+                </button>
             </header>
 
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 md:gap-8">
@@ -253,53 +249,11 @@
                         </div>
                     </div>
                 </aside>
-</div>
+            </div>
         </div>
     </main>
 
     @include('components.confirm-modal')
-
-    <!-- Add Client Modal -->
-    <div id="add-client-modal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('add-client-modal').classList.add('hidden')"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-surface-container rounded-3xl shadow-2xl p-6">
-            <div class="flex justify-between items-center mb-5">
-                <h3 class="text-xl font-bold text-on-surface">Add New Client</h3>
-                <button type="button" onclick="document.getElementById('add-client-modal').classList.add('hidden')" class="p-2 hover:bg-surface-container-high rounded-xl transition-colors">
-                    <span class="material-symbols-outlined text-on-surface">close</span>
-                </button>
-            </div>
-
-            <form method="POST" action="{{ route('clients.store') }}">
-                @csrf
-                <div class="space-y-4">
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-on-surface mb-2">Name *</label>
-                        <input type="text" id="name" name="name" required class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary">
-                    </div>
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-on-surface mb-2">Email *</label>
-                        <input type="email" id="email" name="email" required class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary">
-                    </div>
-                    <div>
-                        <label for="company" class="block text-sm font-medium text-on-surface mb-2">Company</label>
-                        <input type="text" id="company" name="company" class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary">
-                    </div>
-                    <div>
-                        <label for="phone" class="block text-sm font-medium text-on-surface mb-2">Phone</label>
-                        <input type="text" id="phone" name="phone" class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary">
-                    </div>
-                    <div>
-                        <label for="address" class="block text-sm font-medium text-on-surface mb-2">Address</label>
-                        <textarea id="address" name="address" rows="2" class="w-full bg-surface-container-high text-on-surface text-sm rounded-xl py-3 px-4 border-0 focus:ring-2 focus:ring-primary"></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-on-primary font-semibold py-3 rounded-xl">
-                        Create Client
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <!-- Invite Modal -->
     <div id="invite-modal" class="fixed inset-0 z-50 hidden">
@@ -361,39 +315,41 @@
 
         function generateInviteLink() {
             const btn = document.getElementById('generate-btn');
-            const hours = document.getElementById('expires-hours').value;
             btn.disabled = true;
             btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Generating...';
 
             fetch('/clients/invite', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ expires_hours: parseInt(hours) })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('invite-link').value = data.link;
-                    document.getElementById('invite-expiry').textContent = 'Expires: ' + data.expires_at;
-                    document.getElementById('invite-result').classList.remove('hidden');
-                    document.getElementById('invite-error').classList.add('hidden');
-                } else {
-                    document.getElementById('invite-error-msg').textContent = data.message || 'Failed to generate link';
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('invite-link').value = data.link;
+                        document.getElementById('invite-expiry').textContent = 'Expires: ' + data.expires_at;
+                        document.getElementById('invite-result').classList.remove('hidden');
+                        document.getElementById('invite-error').classList.add('hidden');
+                        SwalCustom.success('Link Generated!', 'Your invite link is ready to use.');
+                    } else {
+                        document.getElementById('invite-error-msg').textContent = data.message || 'Failed to generate link';
+                        document.getElementById('invite-error').classList.remove('hidden');
+                        document.getElementById('invite-result').classList.add('hidden');
+                        SwalCustom.error('Error', data.message || 'Failed to generate link');
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('invite-error-msg').textContent = 'An error occurred';
                     document.getElementById('invite-error').classList.remove('hidden');
-                    document.getElementById('invite-result').classList.add('hidden');
-                }
-            })
-            .catch(err => {
-                document.getElementById('invite-error-msg').textContent = 'An error occurred';
-                document.getElementById('invite-error').classList.remove('hidden');
-            })
-            .finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-outlined">link</span> Generate Link';
-            });
+                    SwalCustom.error('Error', 'Network error occurred');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span class="material-symbols-outlined">link</span> Generate Link';
+                });
         }
 
         function copyInviteLink() {
@@ -401,6 +357,7 @@
             navigator.clipboard.writeText(link).then(() => {
                 const btn = event.target.closest('button');
                 btn.innerHTML = '<span class="material-symbols-outlined text-emerald-400">check</span>';
+                SwalCustom.success('Copied!', 'Link copied to clipboard!');
                 setTimeout(() => {
                     btn.innerHTML = '<span class="material-symbols-outlined text-primary">content_copy</span>';
                 }, 2000);
