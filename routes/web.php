@@ -33,10 +33,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/clients/invite', [ClientController::class, 'generateInvite'])->name('clients.invite');
         Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');
         Route::delete('/clients/{id}', [ClientController::class, 'destroy'])->name('clients.destroy');
-        Route::get('/clients/{id}/projects', [ClientController::class, 'projects'])->name('clients.projects');
-        Route::get('/clients/{id}/activity', [ClientController::class, 'activity'])->name('clients.activity');
+        Route::post('/clients/{id}/documents', [ClientController::class, 'uploadDocument'])->name('clients.uploadDocument');
         Route::get('/clients/activity', [ClientController::class, 'allActivity'])->name('clients.activity.all');
-        Route::get('/clients/{id}/documents', [ClientController::class, 'documents'])->name('clients.documents');
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');

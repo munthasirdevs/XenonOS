@@ -70,14 +70,62 @@ class ClientController extends Controller
         ];
 
         $recentProjects = Cache::remember("client_{$id}_projects", 60, fn() => 
-            Project::select('id', 'name', 'status', 'priority', 'description')
+            Project::select('id', 'name', 'status', 'priority', 'description', 'end_date')
                 ->where('client_id', $id)
                 ->latest()
-                ->limit(3)
+                ->limit(10)
                 ->get()
         );
 
-        return view('clients.show', compact('client', 'stats', 'recentProjects'));
+        $activities = ClientActivity::where('client_id', $id)
+            ->with('user:id,name')
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        $documents = ClientDocument::where('client_id', $id)
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('clients.clientDetails', compact('client', 'stats', 'recentProjects', 'activities', 'documents'));
+    }
+
+    public function uploadDocument(Request $request, $id)
+    {
+        $client = Client::findOrFail($id);
+
+        $request->validate([
+            'file' => 'required|file|max:10240', // 10MB max
+            'title' => 'nullable|string|max:255',
+        ]);
+
+        $file = $request->file('file');
+        $filename = $file->getClientOriginalName();
+        $path = $file->store('client-documents/' . $client->id, 'public');
+
+        $document = ClientDocument::create([
+            'client_id' => $client->id,
+            'uploaded_by' => auth()->id(),
+            'title' => $request->title ?? $filename,
+            'file_id' => null, // Would link to File model if needed
+        ]);
+
+        // Log activity
+        ClientActivity::create([
+            'client_id' => $client->id,
+            'user_id' => auth()->id(),
+            'type' => 'document_uploaded',
+            'description' => 'Uploaded document: ' . ($request->title ?? $filename),
+        ]);
+
+        Cache::forget("client_{$id}_documents");
+
+        return response()->json([
+            'success' => true,
+            'message' => 'File uploaded successfully',
+            'document' => $document,
+        ]);
     }
 
     public function store(Request $request)
