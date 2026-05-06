@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ClientController;
@@ -37,6 +39,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/clients/activity', [ClientController::class, 'allActivity'])->name('clients.activity.all');
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/files', [FileController::class, 'index'])->name('files');
+        Route::post('/files', [FileController::class, 'store'])->name('files.store');
+        Route::post('/files/{id}/share', [FileController::class, 'shareFile'])->name('files.share.create');
+        Route::delete('/files/{id}/share', [FileController::class, 'disableShare'])->name('files.share.disable');
+        Route::delete('/files/{id}', [FileController::class, 'destroy'])->name('files.destroy');
+        Route::get('/files/share/{hash}', [FileController::class, 'viewShared'])->name('files.share.view');
+        Route::post('/files/share/{hash}/verify', [FileController::class, 'verifyPassword'])->name('files.share.verify');
+        Route::get('/files/share/{hash}/download', [FileController::class, 'downloadShared'])->name('files.share.download');
+        Route::get('/payments', [PaymentController::class, 'index'])->name('payments');
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
         Route::get('/notifications/{notification}', [NotificationController::class, 'details'])->name('notifications.details');
         Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
