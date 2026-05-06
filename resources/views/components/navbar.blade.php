@@ -82,12 +82,9 @@
         <a href="{{ route('notifications') }}" class="{{ request()->routeIs('notifications*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
             <span class="material-symbols-outlined {{ request()->routeIs('notifications*') ? 'active-icon' : '' }}">notifications</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Notifications</span>
-            @if(isset($unreadCount) && $unreadCount > 0)
-            <span class="ml-auto bg-rose-500/20 text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $unreadCount }}</span>
-            @endif
         </a>
-        <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined">folder</span>
+        <a href="{{ route('files') }}" class="{{ request()->routeIs('files*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ request()->routeIs('files*') ? 'active-icon' : '' }}">folder</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Files</span>
         </a>
         <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
@@ -106,10 +103,6 @@
             <span class="material-symbols-outlined">verified_user</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Roles</span>
         </a>
-        <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined">payments</span>
-            <span class="text-[12px] font-semibold tracking-wide font-label">Billing</span>
-        </a>
         <a href="{{ route('clients') }}" class="{{ request()->routeIs('clients*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
             <span class="material-symbols-outlined {{ request()->routeIs('clients*') ? 'active-icon' : '' }}">person_add</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Clients</span>
@@ -121,6 +114,10 @@
         <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
             <span class="material-symbols-outlined">task_alt</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Tasks</span>
+        </a>
+        <a href="{{ route('payments') }}" class="{{ request()->routeIs('payments*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ request()->routeIs('payments*') ? 'active-icon' : '' }}">payments</span>
+            <span class="text-[12px] font-semibold tracking-wide font-label">Payments</span>
         </a>
         <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
             <span class="material-symbols-outlined">assessment</span>
@@ -144,26 +141,26 @@
     <div class="mt-auto px-6 py-5 border-t border-outline-variant/10 bg-surface-container-low/80 backdrop-blur-xl">
         <div class="flex items-center gap-3 mb-4">
             <img alt="User" class="w-10 h-10 rounded-full border border-primary/20 object-cover shadow-lg shadow-primary/5" src="{{ Auth::user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=818cf8&color=fff&size=128' }}"
-            <div class="flex flex-col min-w-0">
-                <span class="text-[13px] font-bold text-on-surface truncate font-headline">{{ Auth::user()->name ?? 'User' }}</span>
-                <span class="text-[10px] text-on-surface-variant/70 truncate font-label">{{ Auth::user()->email ?? 'user@example.com' }}</span>
-            </div>
+                <div class="flex flex-col min-w-0">
+            <span class="text-[13px] font-bold text-on-surface truncate font-headline">{{ Auth::user()->name ?? 'User' }}</span>
+            <span class="text-[10px] text-on-surface-variant/70 truncate font-label">{{ Auth::user()->email ?? 'user@example.com' }}</span>
         </div>
-        <!-- Bottom Buttons -->
-        <div class="flex items-center gap-2">
-            <a href="{{ route('profile') }}" class="flex-1 flex items-center justify-center py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-bright transition-all">
-                <span class="material-symbols-outlined text-lg">person</span>
-            </a>
-            <a href="{{ route('settings') }}" class="flex-1 flex items-center justify-center py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-bright transition-all">
-                <span class="material-symbols-outlined text-lg">settings</span>
-            </a>
-            <form method="POST" action="{{ route('logout') }}" class="flex-1">
-                @csrf
-                <button type="submit" class="w-full flex items-center justify-center py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all">
-                    <span class="material-symbols-outlined text-lg">logout</span>
-                </button>
-            </form>
-        </div>
+    </div>
+    <!-- Bottom Buttons -->
+    <div class="flex items-center gap-2">
+        <a href="{{ route('profile') }}" class="flex-1 flex items-center justify-center py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-bright transition-all">
+            <span class="material-symbols-outlined text-lg">person</span>
+        </a>
+        <a href="{{ route('settings') }}" class="flex-1 flex items-center justify-center py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-bright transition-all">
+            <span class="material-symbols-outlined text-lg">settings</span>
+        </a>
+        <form method="POST" action="{{ route('logout') }}" class="flex-1">
+            @csrf
+            <button type="submit" class="w-full flex items-center justify-center py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all">
+                <span class="material-symbols-outlined text-lg">logout</span>
+            </button>
+        </form>
+    </div>
     </div>
 </aside>
 
