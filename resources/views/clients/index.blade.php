@@ -225,28 +225,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="bg-surface-container-low p-6 rounded-3xl">
-                            <div class="flex justify-between items-center mb-5">
-                                <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Recent Events</h3>
-                                <button type="button" class="text-xs text-primary font-bold flex items-center gap-1.5 hover:text-primary/80 transition-colors">View All</button>
-                            </div>
-                            <ul class="space-y-5">
-                                @foreach($recentActivities as $activity)
-                                <li class="flex gap-3 sm:gap-4 group">
-                                    <div class="activity-icon-container w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-surface-container-high flex items-center justify-center shrink-0 group-hover:bg-surface-container-high/80 transition-colors">
-                                        <span class="material-symbols-outlined text-primary text-base sm:text-lg">description</span>
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <p class="text-sm text-on-surface leading-snug">
-                                            <strong class="font-semibold text-on-surface">{{ $activity->client->name ?? 'Client' }}</strong> {{ $activity->description }}
-                                        </p>
-                                        <time class="block text-xs text-on-surface-muted mt-1.5">{{ $activity->created_at ? user_time_ago($activity->created_at) : 'Recently' }}</time>
-                                    </div>
-                                </li>
-                                @endforeach
-                            </ul>
-                        </div>
                     </div>
                 </aside>
             </div>

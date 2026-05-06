@@ -1,7 +1,8 @@
 // SweetAlert2 Custom Alerts for XenonOS
 // Dark theme configuration
 
-const SwalCustom = {
+if (typeof window.SwalCustom === 'undefined') {
+    const SwalCustom = {
     dark: {
         background: '#1c1c1c',
         color: '#fff',
@@ -105,3 +106,4 @@ const SwalCustom = {
 
 // Export for use in other files
 window.SwalCustom = SwalCustom;
+}

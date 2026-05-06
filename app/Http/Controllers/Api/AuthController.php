@@ -162,7 +162,15 @@ class AuthController extends Controller
 
         event(new UserLoggedIn($user, $request->ip(), $request->userAgent()));
 
-        return redirect()->intended('/dashboard')->with('success', 'Welcome back!');
+        if ($user->hasAnyRole(['admin', 'superadmin'])) {
+            return redirect()->intended('/dashboard')->with('success', 'Welcome back!');
+        }
+
+        if ($user->hasRole('client')) {
+            return redirect()->intended('/client/dashboard')->with('success', 'Welcome back!');
+        }
+
+        return redirect()->intended('/')->with('success', 'Welcome back!');
     }
 
     // Web Logout (Session-based)

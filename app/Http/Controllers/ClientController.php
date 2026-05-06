@@ -145,6 +145,17 @@ class ClientController extends Controller
         return view('clients.activity', compact('client', 'activities', 'activityStats'));
     }
 
+    public function allActivity(Request $request)
+    {
+        $activities = ClientActivity::with('client:id,name')
+            ->when($request->type && $request->type !== 'all', fn($q) => $q->where('type', $request->type))
+            ->latest()
+            ->paginate(20)
+            ->appends($request->query());
+
+        return view('clients.activity', compact('activities'));
+    }
+
     public function documents($id)
     {
         $client = Client::findOrFail($id);
@@ -346,6 +357,6 @@ public function generateInvite(Request $request)
         $recentFiles = collect([]);
         $pendingInvoice = 4250.00;
         
-        return view('clients.dashboard', compact('client', 'stats', 'projects', 'serviceOrders', 'notifications', 'recentActivities', 'recentFiles', 'pendingInvoice'));
+        return view('users.dashboard', compact('client', 'stats', 'projects', 'serviceOrders', 'notifications', 'recentActivities', 'recentFiles', 'pendingInvoice'));
     }
 }
