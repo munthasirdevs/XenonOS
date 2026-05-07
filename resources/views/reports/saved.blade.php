@@ -3,17 +3,11 @@
 @section('title', 'Saved Reports - XenonOS')
 
 @push('styles')
-<style>
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-    }
-    .indigo-gradient {
-        background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/reports-saved.css') }}">
 @endpush
 
 @section('content')
+<x-navbar />
 <main class="p-8 min-h-[calc(100vh-4rem)] flex flex-col">
     <section class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>

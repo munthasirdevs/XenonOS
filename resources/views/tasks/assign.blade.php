@@ -3,17 +3,11 @@
 @section('title', 'Assign Task - XenonOS')
 
 @push('styles')
-<style>
-    .step-indicator.active {
-        background: linear-gradient(135deg, #818cf8, #6366f1);
-    }
-    .step-progress {
-        width: 33%;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/tasks-assign.css') }}">
 @endpush
 
 @section('content')
+<x-navbar />
 <div class="p-8 lg:p-12">
     <div class="mb-10 flex justify-between items-end">
         <div>
@@ -326,5 +320,5 @@
 @endsection
 
 @push('scripts')
-<script></script>
+<script src="{{ asset('js/tasks-assign.js') }}"></script>
 @endpush

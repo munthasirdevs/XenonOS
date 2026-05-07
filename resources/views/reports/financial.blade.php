@@ -3,13 +3,11 @@
 @section('title', 'Financial Reports')
 
 @push('styles')
-<style>
-    .font-headline { font-family: 'Syne', sans-serif; }
-    .font-label { font-family: 'Outfit', sans-serif; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/reports-financial.css') }}">
 @endpush
 
 @section('content')
+<x-navbar />
 <div class="space-y-12">
     <!-- Header -->
     <div class="mb-10">

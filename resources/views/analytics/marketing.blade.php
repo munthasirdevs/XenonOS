@@ -3,13 +3,11 @@
 @section('title', 'Analytics - Marketing | Admin Panel')
 
 @push('styles')
-<style>
-    .font-headline { font-family: 'Syne', sans-serif; }
-    .font-label { font-family: 'Outfit', sans-serif; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/analytics-marketing.css') }}">
 @endpush
 
 @section('content')
+<x-navbar />
 <div class="max-w-[1600px] mx-auto">
     <!-- Header -->
     <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6 sm:mb-8 md:mb-10">

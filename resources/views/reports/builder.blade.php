@@ -3,14 +3,11 @@
 @section('title', 'Report Builder - XenonOS')
 
 @push('styles')
-<style>
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/reports-builder.css') }}">
 @endpush
 
 @section('content')
+<x-navbar />
 <main class="min-h-screen grid grid-cols-12 gap-0 overflow-hidden">
     <aside class="col-span-12 md:col-span-3 bg-surface-container-low p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar border-r border-outline-variant/10">
         <div>

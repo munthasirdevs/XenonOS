@@ -3,14 +3,11 @@
 @section('title', 'Support Reports - XenonOS')
 
 @push('styles')
-<style>
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/reports-support.css') }}">
 @endpush
 
 @section('content')
+<x-navbar />
 <div class="p-8">
     <section class="mb-12 flex justify-between items-end">
         <div>

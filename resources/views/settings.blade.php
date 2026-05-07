@@ -2,6 +2,10 @@
 
 @section('title', 'Settings - XenonOS')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/settings.css') }}">
+@endpush
+
 @section('content')
 @php
 $user = Auth::user();
@@ -16,6 +20,7 @@ $surveyInvites = $user->survey_invites ?? false;
 $quietHoursStart = $user->quiet_hours_start ?? '22:00';
 $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
 @endphp
+<x-navbar />
 <div class="space-y-8 md:space-y-10 lg:space-y-12">
     <section class="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
         <div>
@@ -671,27 +676,9 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
     </div>
 </div>
 
-<style>
-.settings-tab-btn.active { @apply bg-surface-container text-on-surface; }
-.toggle-switch { @apply w-11 h-6 rounded-full cursor-pointer transition-all duration-200 relative; }
-.toggle-switch.active { @apply bg-emerald-400; }
-.toggle-switch.inactive { @apply bg-surface-container-high; }
-.toggle-switch::after { content: ''; @apply absolute w-5 h-5 bg-white rounded-full top-0.5 left-0.5 transition-transform duration-200; }
-.toggle-switch.active::after { @apply translate-x-5; }
-.toggle-switch.inactive::after { @apply translate-x-0; }
-</style>
-
-<script>
-function switchTab(tabId) {
-    document.querySelectorAll('.settings-content').forEach(p => p.classList.add('hidden'));
-    document.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('panel-' + tabId).classList.remove('hidden');
-    document.getElementById('panel-' + tabId).setAttribute('aria-selected', 'true');
-    document.getElementById('tab-' + tabId).classList.add('active');
-    document.getElementById('tab-' + tabId).setAttribute('aria-selected', 'true');
-}
-
-function checkPasswordStrength(password) {
+@push('scripts')
+<script src="{{ asset('js/settings.js') }}"></script>
+@endpush
     let strength = 0;
     let text = 'Weak';
     let colorClass = 'text-rose-400';

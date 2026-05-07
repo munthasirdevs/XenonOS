@@ -3,14 +3,11 @@
 @section('title', 'Activity Logs - XenonOS')
 
 @push('styles')
-<style>
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/activity-admin.css') }}">
 @endpush
 
 @section('content')
+<x-navbar />
 <main class="flex-1 min-h-screen flex flex-col" role="main">
     <div class="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-8 md:py-10 lg:py-12">
         <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6 sm:mb-8 md:mb-10">

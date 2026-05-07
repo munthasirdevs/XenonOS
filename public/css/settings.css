@@ -1,0 +1,36 @@
+.settings-tab-btn.active {
+    background-color: rgb(var(--color-surface-container));
+    color: rgb(var(--color-on-surface));
+}
+.toggle-switch {
+    width: 2.75rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 200ms;
+    position: relative;
+    display: inline-block;
+}
+.toggle-switch.active {
+    background-color: #34d399;
+}
+.toggle-switch.inactive {
+    background-color: rgb(var(--color-surface-container-high));
+}
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: white;
+    border-radius: 9999px;
+    top: 0.125rem;
+    left: 0.125rem;
+    transition: transform 200ms;
+}
+.toggle-switch.active::after {
+    transform: translateX(1.25rem);
+}
+.toggle-switch.inactive::after {
+    transform: translateX(0);
+}

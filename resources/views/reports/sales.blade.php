@@ -3,13 +3,11 @@
 @section('title', 'Sales Reports')
 
 @push('styles')
-<style>
-    .font-headline { font-family: 'Syne', sans-serif; }
-    .font-manrope { font-family: 'Outfit', sans-serif; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/reports-sales.css') }}">
 @endpush
 
 @section('content')
+<x-navbar />
 <div class="space-y-8">
     <!-- Header -->
     <section class="flex flex-col md:flex-row justify-between items-end gap-6">

@@ -3,13 +3,11 @@
 @section('title', 'Reports - Q4 Performance Growth')
 
 @push('styles')
-<style>
-    .font-syne { font-family: 'Syne', sans-serif; }
-    .font-outfit { font-family: 'Outfit', sans-serif; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/reports-insights.css') }}">
 @endpush
 
 @section('content')
+<x-navbar />
 <div class="space-y-8">
     <!-- Header -->
     <section class="flex flex-col md:flex-row md:items-end justify-between gap-6">

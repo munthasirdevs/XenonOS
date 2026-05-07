@@ -3,14 +3,11 @@
 @section('title', 'Add New Role - XenonOS')
 
 @push('styles')
-<style>
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/roles-add.css') }}">
 @endpush
 
 @section('content')
+<x-navbar />
 <main class="flex-1 min-h-screen flex flex-col">
     <div class="py-8 max-w-7xl mx-auto">
         <header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
