@@ -138,8 +138,8 @@
     </nav>
 
     <!-- User Footer -->
-    <div class="mt-auto px-6 py-5 border-t border-outline-variant/10 bg-surface-container-low/80 backdrop-blur-xl">
-        <div class="flex items-center gap-3 mb-4">
+    <div class="mt-auto px-6 py-4 border-t border-outline-variant/10 bg-surface-container-low/80 backdrop-blur-xl">
+        <div class="flex items-center gap-3">
             <img alt="User" class="w-10 h-10 rounded-full border border-primary/20 object-cover shadow-lg shadow-primary/5" src="{{ Auth::user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=818cf8&color=fff&size=128' }}"
                 <div class="flex flex-col min-w-0">
             <span class="text-[13px] font-bold text-on-surface truncate font-headline">{{ Auth::user()->name ?? 'User' }}</span>
