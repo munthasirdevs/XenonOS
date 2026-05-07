@@ -1,0 +1,120 @@
+﻿/* Team Index Page Styles */
+
+/* Team card hover glow effect */
+.team-card-glow {
+    position: relative;
+}
+
+.team-card-glow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(129, 140, 248, 0.3), transparent 50%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.group:hover.team-card-glow::before {
+    opacity: 1;
+}
+
+/* Checkbox styling for team members */
+.team-member-checkbox {
+    cursor: pointer;
+}
+
+.team-member-checkbox:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Add member card hover */
+#add-member-card:hover .material-symbols-outlined {
+    transform: scale(1.1);
+}
+
+/* Selected state for cards */
+.team-member-card.selected {
+    border: 2px solid var(--primary);
+}
+
+/* Department filter active state */
+.department-filter-btn.active {
+    background-color: var(--surface-container-high);
+    color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Stats cards hover effects */
+.stats-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Project avatar badges */
+.project-avatar {
+    transition: transform 0.2s ease;
+}
+
+.project-avatar:hover {
+    transform: scale(1.2);
+    z-index: 10;
+}
+
+/* Status badge pulse animation for active users */
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.status-dot-active {
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Selection counter animation */
+#selected-count {
+    transition: all 0.2s ease;
+}
+
+#selected-count.updated {
+    transform: scale(1.2);
+    color: var(--primary);
+}
+
+/* Delete button disabled state */
+#delete-selected:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive adjustments for team cards */
+@media (max-width: 640px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 640px) and (max-width: 1279px) {
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .team-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

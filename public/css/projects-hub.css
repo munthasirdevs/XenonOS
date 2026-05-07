@@ -1,0 +1,75 @@
+/* Projects Hub Page Styles */
+:root {
+    --hub-primary: #818cf8;
+    --hub-tertiary: #c084fc;
+    --hub-success: #34d399;
+    --hub-error: #f87171;
+}
+
+.project-card {
+    transition: all 0.4s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-4px) scale(1.02);
+}
+
+.project-card .progress-bar {
+    transition: width 0.5s ease-in-out;
+}
+
+.add-card {
+    border-style: dashed;
+}
+
+.add-card:hover {
+    border-color: var(--hub-primary);
+}
+
+.add-card:hover .material-symbols-outlined {
+    color: var(--hub-primary);
+}
+
+.status-active {
+    background-color: rgba(129, 140, 248, 0.1);
+    color: var(--hub-primary);
+    border-color: rgba(129, 140, 248, 0.2);
+}
+
+.status-pending {
+    background-color: rgba(192, 132, 252, 0.1);
+    color: var(--hub-tertiary);
+    border-color: rgba(192, 132, 252, 0.2);
+}
+
+.status-completed {
+    background-color: rgba(52, 211, 153, 0.1);
+    color: var(--hub-success);
+    border-color: rgba(52, 211, 153, 0.2);
+}
+
+.status-delayed {
+    background-color: rgba(248, 113, 113, 0.1);
+    color: var(--hub-error);
+    border-color: rgba(248, 113, 113, 0.2);
+}
+
+.efficiency-chart > div {
+    transition: height 0.3s ease;
+}
+
+.filter-button:hover {
+    background-color: var(--surface-container-high);
+}
+
+.view-toggle-active {
+    background-color: var(--surface-container-high);
+    color: var(--hub-primary);
+}
+
+@media (max-width: 768px) {
+    .project-card {
+        height: auto !important;
+        min-height: 280px;
+    }
+}

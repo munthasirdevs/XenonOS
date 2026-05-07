@@ -1,0 +1,64 @@
+﻿/**
+ * Communication Index Page Styles
+ * Chat Control - System Admin
+ */
+
+/* Glass Glow Effect */
+.glass-glow {
+    position: relative;
+}
+
+.glass-glow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(192, 193, 255, 0.1) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.glass-glow:hover::before {
+    opacity: 1;
+}
+
+/* Smooth Table Transitions */
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(var(--surface-bright-rgb), 0.3);
+}
+
+/* Custom Checkbox Toggle Animation */
+.peer:checked + div {
+    animation: toggleOn 0.2s ease forwards;
+}
+
+@keyframes toggleOn {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Progress Bar Animation */
+.progress-fill {
+    transition: width 0.5s ease-out;
+}
+
+/* Button Hover Effects */
+button:active {
+    transform: scale(0.98);
+}
+
+/* Material Symbols Font */
+.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.material-symbols-outlined[data-fill="1"] {
+    font-variation-settings: "FILL" 1;
+}

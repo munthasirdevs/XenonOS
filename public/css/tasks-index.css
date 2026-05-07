@@ -1,0 +1,111 @@
+/*
+ * Tasks Index Page Styles
+ * Custom styles for the tasks index page
+ */
+
+/* Custom scrollbar for table */
+.overflow-x-auto {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+/* No scrollbar utility */
+.no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Table row hover transitions */
+tr.group {
+    transition: background-color 0.2s ease;
+}
+
+/* Action button groups */
+tr.group:hover .flex.justify-end {
+    opacity: 1;
+}
+
+/* Button hover effects */
+button:active {
+    transform: scale(0.95);
+}
+
+/* Smooth transitions for interactive elements */
+button, input, select {
+    transition: all 0.2s ease;
+}
+
+/* Focus ring enhancements */
+input:focus, select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(192, 193, 255, 0.3);
+}
+
+/* Sticky filter section */
+.sticky {
+    position: sticky;
+}
+
+/* Backdrop blur support */
+.backdrop-blur-md {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Avatar stack overlap */
+.-space-x-2 > * {
+    margin-left: -0.5rem;
+}
+
+.-space-x-3 > * {
+    margin-left: -0.75rem;
+}
+
+/* First avatar in stack */
+.-space-x-2 > :first-child,
+.-space-x-3 > :first-child {
+    margin-left: 0;
+}
+
+/* Priority badges */
+.bg-secondary-container\/30,
+.bg-secondary-container\/20,
+.bg-tertiary-container\/20,
+.bg-error-container\/20,
+.bg-primary-container\/20 {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Animation for subtle pulse on active elements */
+@keyframes pulse-subtle {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Status indicator pulse */
+.rounded-full.bg-secondary,
+.rounded-full.bg-tertiary,
+.rounded-full.bg-primary {
+    animation: pulse-subtle 2s infinite;
+}

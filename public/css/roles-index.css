@@ -1,0 +1,108 @@
+﻿/* Roles Index Page Custom Styles */
+
+/* Additional custom styles beyond Tailwind */
+.font-headline {
+    font-family: 'Syne', sans-serif;
+}
+
+/* Custom scrollbar for table */
+.overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: rgb(71 85 105);
+    border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: rgb(51 65 85);
+}
+
+/* Toggle switch enhancement */
+.toggle-checkbox:checked {
+    right: 0;
+    border-color: #68D391;
+}
+
+.toggle-checkbox:focus {
+    outline: none;
+}
+
+/* Table row hover enhancement */
+tr.hover\:bg-surface-bright\/20:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Button hover effects */
+button[class*="hover:text-"] {
+    position: relative;
+}
+
+button[class*="hover:text-"]:hover::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 8px;
+    background: currentColor;
+    opacity: 0.1;
+}
+
+/* Avatar ring effect */
+img[class*="rounded-full"][class*="border-"] {
+    transition: transform 0.2s ease;
+}
+
+img[class*="rounded-full"][class*="border-"]:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+/* Search input enhancement */
+input[type="text"][placeholder="Add users..."] {
+    transition: all 0.2s ease;
+}
+
+input[type="text"][placeholder="Add users..."]:focus {
+    box-shadow: 0 0 0 3px rgba(104, 211, 145, 0.15);
+}
+
+/* Security log timeline */
+.security-log-item::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 20px;
+    bottom: 0;
+    width: 1px;
+    background: rgba(148, 163, 184, 0.2);
+}
+
+.security-log-item:last-child::before {
+    display: none;
+}
+
+/* Permission matrix toggle animation */
+.permission-toggle {
+    transition: background-color 0.3s ease;
+}
+
+.permission-toggle:checked {
+    background-color: #68D391;
+}
+
+/* Gradient bar animation */
+.gradient-bar {
+    background: linear-gradient(90deg, #68D391 0%, #68D391 100%);
+    animation: shimmer 2s infinite;
+    background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+    0% { background-position: -100% 0; }
+    100% { background-position: 100% 0; }
+}

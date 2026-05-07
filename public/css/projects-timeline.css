@@ -1,0 +1,72 @@
+﻿/* Projects Timeline Styles */
+
+.indigo-glow {
+    background: linear-gradient(90deg, #6366f1 0%, #a855f7 50%, #6366f1 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Ghost Border Effect */
+.ghost-border {
+    position: relative;
+    overflow: hidden;
+}
+
+.ghost-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Timeline connecting line animation */
+.absolute.left-\[27px\] {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.6) 0%, rgba(99, 102, 241, 0.2) 100%);
+}
+
+/* Phase card hover effects */
+.group:hover {
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.15);
+}
+
+/* View switcher button active state */
+.bg-surface-container-high.text-on-surface {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+/* Milestone add card hover */
+.border-dashed:hover {
+    border-color: #6366f1 !important;
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.border-dashed:hover .material-symbols-outlined {
+    color: #6366f1;
+}
+
+/* Phase icons pulse animation for active phase */
+.rounded-2xl.bg-\[#6366f1\] {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
+    50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.6); }
+}
+
+/* Progress bar animation */
+.w-\[64\%\], .w-\[42\%\] {
+    transition: width 1s ease-out;
+}
