@@ -1,16 +1,15 @@
 @extends('layouts.app')
 
 @push('styles')
-<style>
-    .font-syne { font-family: 'Syne', sans-serif; }
-    .font-outfit { font-family: 'Outfit', sans-serif; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/projects-files-workspace.css') }}">
 @endpush
 
-@section('title', 'XenonOS | Files Workspace')
+@section('title', 'Project Files - XenonOS')
 
 @section('content')
-<main class="min-h-screen flex flex-col">
+<x-navbar />
+
+<main class="flex-1 md:ml-[260px] min-h-screen">
     <div class="p-4 md:p-8">
         <div class="grid grid-cols-12 gap-4 md:gap-6">
             <div class="col-span-12 lg:col-span-4 bg-surface-container rounded-2xl p-6 border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center text-center gap-4 group hover:border-primary/50 transition-all duration-400 bg-gradient-to-br from-surface-container to-surface-container-low min-h-[200px]">
@@ -104,6 +103,10 @@
                 </div>
             </div>
         </div>
-    </div>
+</div>
 </main>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/projects-files-workspace.js') }}"></script>
+@endpush

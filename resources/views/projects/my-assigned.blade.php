@@ -1,17 +1,16 @@
 @extends('layouts.app')
 
 @push('styles')
-<style>
-    .font-syne { font-family: 'Syne', sans-serif; }
-    .font-outfit { font-family: 'Outfit', sans-serif; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/projects-my-assigned.css') }}">
 @endpush
 
-@section('title', 'XenonOS | Assigned Projects')
+@section('title', 'My Assigned Projects - XenonOS')
 
 @section('content')
-<main class="min-h-screen transition-all duration-300 flex flex-col">
-    <section class="p-6 md:p-10 max-w-7xl mx-auto">
+<x-navbar />
+
+<main class="flex-1 md:ml-[260px] min-h-screen">
+    <section class="p-6 md:p-10">
         <div class="mb-12">
             <h2 class="font-syne font-extrabold text-3xl md:text-5xl tracking-tight text-on-surface mb-2">Assigned Projects</h2>
             <p class="text-on-surface-variant font-outfit text-lg max-w-2xl">Manage your active priorities and tracking your momentum across the intelligence network.</p>
@@ -103,6 +102,10 @@
                 </div>
             </div>
         </div>
-    </section>
+</section>
 </main>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/projects-my-assigned.js') }}"></script>
+@endpush

@@ -1,16 +1,15 @@
 ﻿@extends('layouts.app')
 
 @push('styles')
-<style>
-    .font-syne { font-family: 'Syne', sans-serif; }
-    .font-outfit { font-family: 'Outfit', sans-serif; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/projects-overview.css') }}">
 @endpush
 
-@section('title', 'XenonOS | Project Intelligence Workspace')
+@section('title', 'Project Intelligence - XenonOS')
 
 @section('content')
-<main class="min-h-screen flex flex-col">
+<x-navbar />
+
+<main class="flex-1 md:ml-[260px] min-h-screen">
     <section class="px-4 md:px-8 pt-8 pb-4">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div class="space-y-4">
@@ -154,6 +153,10 @@
                 <span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">close</span>
             </div>
         </div>
-    </section>
+</section>
 </main>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/projects-overview.js') }}"></script>
+@endpush

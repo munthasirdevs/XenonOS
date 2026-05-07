@@ -1,17 +1,16 @@
 @extends('layouts.app')
 
 @push('styles')
-<style>
-    .font-syne { font-family: 'Syne', sans-serif; }
-    .font-outfit { font-family: 'Outfit', sans-serif; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/projects-tasks-workspace.css') }}">
 @endpush
 
-@section('title', 'XenonOS | Project Details Workspace')
+@section('title', 'Project Tasks - XenonOS')
 
 @section('content')
-<main class="min-h-screen flex flex-col">
-    <section class="p-4 md:p-8 space-y-6 md:space-y-8">
+<x-navbar />
+
+<main class="flex-1 md:ml-[260px] min-h-screen">
+    <section class="p-4 md:p-8">
         <div class="bg-surface-container rounded-2xl p-6 shadow-[0_32px_32px_-4px_rgba(10,14,24,0.5)] border border-outline-variant/5">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="space-y-1">
@@ -128,6 +127,10 @@
                 <button class="mt-6 w-full py-3 bg-surface-container-highest rounded-xl text-sm font-bold text-primary hover:bg-primary hover:text-on-primary transition-all">View Detailed Report</button>
             </div>
         </div>
-    </section>
+</section>
 </main>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/projects-tasks-workspace.js') }}"></script>
+@endpush

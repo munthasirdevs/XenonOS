@@ -1,0 +1,53 @@
+/* Project Tasks Workspace Styles */
+.task-workspace {
+    transition: all 0.3s ease;
+}
+
+.task-workspace:hover {
+    box-shadow: 0 32px 32px -4px rgba(10, 14, 24, 0.5);
+}
+
+.task-list-item {
+    transition: all 0.2s ease;
+}
+
+.task-list-item:hover {
+    background: var(--surface-container);
+}
+
+.status-pill {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.status-active {
+    background: rgba(129, 140, 248, 0.1);
+    color: #818cf8;
+}
+
+.status-pending {
+    background: rgba(148, 163, 184, 0.1);
+    color: #94a3b8;
+}
+
+.status-completed {
+    background: rgba(52, 211, 153, 0.1);
+    color: #34d399;
+}
+
+.insight-card {
+    background: linear-gradient(to bottom right, var(--secondary-container), var(--surface-container));
+}
+
+.insight-card button {
+    transition: all 0.2s ease;
+}
+
+.insight-card button:hover {
+    background: var(--primary);
+    color: var(--on-primary);
+}

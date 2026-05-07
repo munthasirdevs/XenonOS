@@ -1,0 +1,32 @@
+/* Projects Overview Styles */
+.ai-insight {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.progress-ring {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 25;
+    transform: rotate(-90deg);
+    transform-origin: center;
+}
+
+.kpi-card {
+    transition: transform 0.3s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+}
+
+.metric-pill {
+    transition: all 0.2s ease;
+}
+
+.metric-pill:hover {
+    background: var(--surface-container-high);
+}

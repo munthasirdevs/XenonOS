@@ -1,16 +1,15 @@
 @extends('layouts.app')
 
 @push('styles')
-<style>
-    .font-headline { font-family: 'Syne', sans-serif; }
-    .font-outfit { font-family: 'Outfit', sans-serif; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/projects-assigned.css') }}">
 @endpush
 
-@section('title', 'Assigned Projects - System Admin')
+@section('title', 'Assigned Projects - XenonOS')
 
 @section('content')
-<main class="flex-1 min-h-screen flex flex-col justify-center">
+<x-navbar />
+
+<main class="flex-1 md:ml-[260px] min-h-screen">
     <div class="px-4 md:px-10 p-8 md:p-12 space-y-10">
         <section class="flex flex-col md:flex-row justify-between items-end md:items-center gap-6">
             <div class="space-y-2">
@@ -137,6 +136,10 @@
             <div class="bg-surface-container-low p-6 rounded-2xl relative overflow-hidden group"><div class="absolute top-0 left-0 w-1 h-full bg-secondary/40 group-hover:bg-secondary transition-colors"></div><p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Team Capacity</p><h4 class="text-3xl font-headline font-light text-on-surface">84%</h4><p class="text-xs text-on-surface-variant mt-2 flex items-center gap-1">Optimal operating range</p></div>
             <div class="bg-surface-container-low p-6 rounded-2xl relative overflow-hidden group"><div class="absolute top-0 left-0 w-1 h-full bg-slate-600/40 group-hover:bg-slate-400 transition-colors"></div><p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Avg. Completion Time</p><h4 class="text-3xl font-headline font-light text-on-surface">14d</h4><p class="text-xs text-on-surface-variant mt-2 flex items-center gap-1">-2d compared to industry</p></div>
         </section>
-    </div>
+</div>
 </main>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/projects-assigned.js') }}"></script>
+@endpush

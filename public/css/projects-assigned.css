@@ -1,0 +1,80 @@
+/* Projects Assigned Page Styles */
+:root {
+    --assigned-primary: #818cf8;
+    --assigned-tertiary: #c084fc;
+    --assigned-success: #34d399;
+}
+
+.card-with-accent {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-with-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--assigned-primary);
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+}
+
+.card-with-accent:hover::before {
+    opacity: 1;
+}
+
+.card-tertiary::before {
+    background: var(--assigned-tertiary);
+}
+
+.card-success::before {
+    background: var(--assigned-success);
+}
+
+.filter-chip {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.filter-chip:hover {
+    background: var(--surface-bright);
+}
+
+.project-row {
+    transition: all 0.2s ease;
+}
+
+.project-row:hover {
+    background: var(--surface-container);
+}
+
+.stat-card {
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover .stat-accent {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
