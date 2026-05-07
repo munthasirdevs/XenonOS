@@ -1,19 +1,14 @@
 ﻿@extends('layouts.app')
 
-@section('title', 'Task Details - XenonOS')
-
 @push('styles')
-<style>
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/tasks-details.css') }}">
 @endpush
 
+@section('title', 'Task Details - XenonOS')
+
 @section('content')
+<x-navbar />
+
 <div class="p-8">
     <div class="max-w-7xl mx-auto">
         <div class="mb-12">
@@ -211,5 +206,5 @@
 @endsection
 
 @push('scripts')
-<script></script>
+<script src="{{ asset('js/tasks-details.js') }}"></script>
 @endpush

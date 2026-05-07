@@ -1,0 +1,37 @@
+/* Task Analytics Styles */
+.progress-bar {
+    transition: width 0.3s ease;
+}
+
+.kpi-card {
+    transition: all 0.3s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.chart-container {
+    transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.stat-trend-up {
+    color: #34d399;
+}
+
+.stat-trend-down {
+    color: #f87171;
+}
+
+.filter-dropdown {
+    transition: all 0.2s ease;
+}
+
+.filter-dropdown:hover {
+    background: var(--surface-container-high);
+}

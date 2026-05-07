@@ -1,0 +1,48 @@
+/* Task Calendar Styles */
+.calendar-event {
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.calendar-event:active {
+    cursor: grabbing;
+}
+
+.calendar-event:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.calendar-day {
+    transition: all 0.2s ease;
+}
+
+.calendar-day:hover {
+    background: var(--surface-container);
+}
+
+.calendar-day.today {
+    background: var(--primary);
+    color: var(--on-primary);
+}
+
+.calendar-day.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+.calendar-nav-btn {
+    transition: all 0.2s ease;
+}
+
+.calendar-nav-btn:hover {
+    background: var(--surface-container-high);
+    transform: scale(1.05);
+}

@@ -1,19 +1,14 @@
 ﻿@extends('layouts.app')
 
-@section('title', 'Active Tasks - XenonOS')
-
 @push('styles')
-<style>
-    .line-clamp-1 {
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/tasks-hub.css') }}">
 @endpush
 
+@section('title', 'Active Tasks - XenonOS')
+
 @section('content')
+<x-navbar />
+
 <div class="p-6 lg:p-10">
     <header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div class="space-y-2">
@@ -236,5 +231,5 @@
 @endsection
 
 @push('scripts')
-<script></script>
+<script src="{{ asset('js/tasks-hub.js') }}"></script>
 @endpush

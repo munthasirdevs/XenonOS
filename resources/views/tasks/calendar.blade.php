@@ -1,19 +1,14 @@
 ﻿@extends('layouts.app')
 
-@section('title', 'Task Calendar - XenonOS')
-
 @push('styles')
-<style>
-    .calendar-event {
-        cursor: grab;
-    }
-    .calendar-event:active {
-        cursor: grabbing;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/tasks-calendar.css') }}">
 @endpush
 
+@section('title', 'Task Calendar - XenonOS')
+
 @section('content')
+<x-navbar />
+
 <div class="p-8">
     <div class="max-w-[1600px] mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
@@ -226,5 +221,5 @@
 @endsection
 
 @push('scripts')
-<script></script>
+<script src="{{ asset('js/tasks-calendar.js') }}"></script>
 @endpush

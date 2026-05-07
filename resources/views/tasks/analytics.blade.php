@@ -1,16 +1,14 @@
 ﻿@extends('layouts.app')
 
-@section('title', 'Task Analytics - XenonOS')
-
 @push('styles')
-<style>
-    .progress-bar {
-        transition: width 0.3s ease;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/tasks-analytics.css') }}">
 @endpush
 
+@section('title', 'Task Analytics - XenonOS')
+
 @section('content')
+<x-navbar />
+
 <div class="max-w-[1600px] mx-auto p-8">
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
         <div>
@@ -270,5 +268,5 @@
 @endsection
 
 @push('scripts')
-<script></script>
+<script src="{{ asset('js/tasks-analytics.js') }}"></script>
 @endpush
