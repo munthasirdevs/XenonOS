@@ -1,0 +1,12 @@
+/* Client Details Page CSS */
+.d-none { display: none !important; }
+.timeline-line { position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #818cf8 0%, rgba(129, 140, 248, 0.1) 100%); }
+.timeline-dot { position: absolute; left: 12px; top: 8px; width: 18px; height: 18px; border-radius: 50%; }
+
+.client-tab { padding-bottom: 1rem; border-bottom: 2px solid transparent; transition: all 0.2s; cursor: pointer; }
+.client-tab.text-primary { color: #818cf8; border-bottom-color: #818cf8; }
+.client-tab.text-on-surface-variant { color: #94a3b8; }
+.client-tab.text-on-surface-variant:hover { color: #dfe2f1; }
+
+.client-panel { display: block; }
+.client-panel.d-none { display: none; }

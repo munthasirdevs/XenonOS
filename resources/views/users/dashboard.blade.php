@@ -1,33 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | XenonOS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Syne:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
-    <style>
-        .font-sans { font-family: 'Outfit', sans-serif; }
-        .font-headline { font-family: 'Syne', sans-serif; }
-        .font-mono { font-family: 'ui-monospace', 'SFMono-Regular', monospace; }
-        .space-font { font-family: 'Space Mono', monospace; }
-        .ubuntu { font-family: 'Ubuntu', sans-serif; }
-        .bg-surface { background-color: #0B0F19; }
-        .bg-surface-container { background-color: #1F2937; }
-        .bg-surface-container-low { background-color: #1F2937/30; }
-        .text-on-surface { color: #F9FAFB; }
-        .text-on-surface-variant { color: #9CA3AF; }
-        .bg-primary { background-color: #6366F1; }
-        .text-primary { color: #6366F1; }
-        .border-white\/5 { border-color: rgba(255,255,255,0.05); }
-        .bg-emerald-500\/10 { background-color: rgba(16,185,129,0.1); }
-        .text-emerald-400 { color: #10B981; }
-        .bg-blue-500\/10 { background-color: rgba(59,130,246,0.1); }
-        .text-blue-400 { color: #60A5FA; }
-        .bg-amber-500\/10 { background-color: rgba(245,158,11,0.1); }
-        .text-amber-400 { color: #FBBF24; }
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/user-dashboard.css') }}">
+@endpush
+
+@section('title', 'Dashboard - XenonOS')
+
+@section('content')
+<x-navbar />
+
+<main class="flex-1 md:ml-[260px] min-h-screen">
         .bg-rose-500\/10 { background-color: rgba(244,63,94,0.1); }
         .text-rose-400 { color: #F43F5E; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -348,7 +330,8 @@
             </div>
         </footer>
     </main>
+@endsection
 
-</body>
-
-</html>
+@push('scripts')
+<script src="{{ asset('js/user-dashboard.js') }}"></script>
+@endpush

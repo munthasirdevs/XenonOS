@@ -1,60 +1,16 @@
-<!DOCTYPE html>
-<html class="dark" lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $client->name }} - XenonOS</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        'surface-container-highest': '#1a1d26',
-                        'surface-bright': '#1e222c',
-                        'surface-container': '#12151e',
-                        'surface-container-low': '#0f121a',
-                        'surface-container-high': '#161922',
-                        'surface-container-lowest': '#06080c',
-                        'background': '#0b0e14',
-                        'primary': '#818cf8',
-                        'primary-container': '#4f46e5',
-                        'secondary': '#a5b4fc',
-                        'tertiary': '#ffb783',
-                        'on-primary': '#1e1b4b',
-                        'on-surface': '#dfe2f1',
-                        'on-surface-variant': '#94a3b8',
-                        'on-surface-muted': '#64748b',
-                        'outline': '#475569',
-                        'outline-variant': '#464554',
-                        'error': '#ffb4ab',
-                        'emerald-400': '#34d399',
-                        'amber-400': '#fbbf24',
-                    },
-                    fontFamily: {
-                        headline: ['Syne', 'sans-serif'],
-                        body: ['Outfit', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Syne:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="{{ asset('css/xenon.css') }}">
-    <style>
-        .d-none { display: none !important; }
-        .timeline-line { position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #818cf8 0%, rgba(129, 140, 248, 0.1) 100%); }
-        .timeline-dot { position: absolute; left: 12px; top: 8px; width: 18px; height: 18px; border-radius: 50%; }
-    </style>
-</head>
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/client-details.css') }}">
+@endpush
 
-<body class="flex min-h-screen bg-surface font-body">
-    <x-navbar />
+@section('title', $client->name . ' - XenonOS')
 
-    <main class="flex-1 md:ml-[260px] min-h-screen">
-        <div class="p-6 md:p-8">
+@section('content')
+<x-navbar />
+
+<main class="flex-1 md:ml-[260px] min-h-screen">
+    <div class="p-6 md:p-8">
 
             <!-- MASTER HEADER -->
             <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6 sm:mb-8 md:mb-10">
@@ -371,114 +327,9 @@
             </div>
             <!-- END PANEL: DOCUMENTS -->
 
-        </div>
-    </main>
+        </main>
+@endsection
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.client-tab');
-            const panels = document.querySelectorAll('.client-panel');
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = tab.dataset.tab;
-                    if (!target) return;
-
-                    tabs.forEach(t => {
-                        t.classList.remove('text-primary', 'font-bold', 'border-b-2', 'border-primary');
-                        t.classList.add('text-on-surface-variant', 'font-medium');
-                        t.setAttribute('aria-selected', 'false');
-                    });
-
-                    tab.classList.remove('text-on-surface-variant', 'font-medium');
-                    tab.classList.add('text-primary', 'font-bold', 'border-b-2', 'border-primary');
-                    tab.setAttribute('aria-selected', 'true');
-
-                    panels.forEach(panel => {
-                        if (panel.dataset.panel === target) {
-                            panel.classList.remove('d-none');
-                        } else {
-                            panel.classList.add('d-none');
-                        }
-                    });
-                });
-            });
-        });
-
-        // File Upload Handler
-        function handleFileSelect(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const clientId = {{ $client->id }};
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('title', file.name);
-
-            const progressDiv = document.getElementById('upload-progress');
-            const progressBar = document.getElementById('progress-bar');
-            const uploadStatus = document.getElementById('upload-status');
-            const uploadText = document.getElementById('upload-text');
-            const resultDiv = document.getElementById('upload-result');
-
-            progressDiv.classList.remove('hidden');
-            uploadText.textContent = 'Uploading ' + file.name + '...';
-            progressBar.style.width = '30%';
-
-            fetch('/clients/' + clientId + '/documents', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                progressBar.style.width = '100%';
-                uploadStatus.textContent = 'Upload complete!';
-                
-                if (data.success) {
-                    // Add new document to grid
-                    const grid = document.getElementById('documents-grid');
-                    const emptyDiv = grid.querySelector('.col-span-full');
-                    if (emptyDiv) emptyDiv.remove();
-
-                    const doc = data.document;
-                    const newDoc = document.createElement('div');
-                    newDoc.className = 'bg-surface-container rounded-2xl p-4 hover:bg-surface-container-high transition-colors cursor-pointer';
-                    newDoc.innerHTML = `
-                        <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-3">
-                            <span class="material-symbols-outlined text-primary">description</span>
-                        </div>
-                        <p class="text-sm font-medium text-on-surface truncate">${doc.title || 'Document'}</p>
-                        <p class="text-xs text-on-surface-variant">Just now</p>
-                    `;
-                    grid.insertBefore(newDoc, grid.firstChild);
-
-                    // Reset form
-                    input.value = '';
-                    uploadText.textContent = 'File uploaded successfully!';
-                } else {
-                    uploadStatus.textContent = 'Upload failed: ' + (data.message || 'Unknown error');
-                }
-
-                setTimeout(() => {
-                    progressDiv.classList.add('hidden');
-                    uploadText.textContent = 'Drag & drop files here';
-                    progressBar.style.width = '0%';
-                }, 2000);
-            })
-            .catch(err => {
-                progressBar.style.width = '100%';
-                uploadStatus.textContent = 'Upload failed: Network error';
-                setTimeout(() => {
-                    progressDiv.classList.add('hidden');
-                    progressBar.style.width = '0%';
-                }, 3000);
-            });
-        }
-    </script>
-</body>
-
-</html>
+@push('scripts')
+<script src="{{ asset('js/client-details.js') }}"></script>
+@endpush
