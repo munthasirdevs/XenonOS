@@ -97,6 +97,12 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
+    public function chats(): BelongsToMany
+    {
+        return $this->belongsToMany(Chat::class, 'chat_users')
+                    ->withTimestamps();
+    }
+
     public function clientNotifications(): BelongsToMany
     {
         return $this->belongsToMany(Notification::class, 'user_notifications')

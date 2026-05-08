@@ -7,6 +7,7 @@ use App\Models\Chat;
 use App\Models\Message;
 use App\Models\User;
 use App\Traits\ApiResponse;
+use App\Events\ChatMessageSent;
 use Illuminate\Http\Request;
 
 class ChatController extends Controller
@@ -82,6 +83,8 @@ class ChatController extends Controller
             'message' => $request->message,
             'type' => 'text',
         ]);
+
+        event(new ChatMessageSent($message));
 
         return $this->success($message->load('sender:id,name'), 'Message sent successfully', 201);
     }

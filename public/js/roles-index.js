@@ -1,143 +1,263 @@
 ﻿/**
  * Roles Index Page JavaScript
- * Handles interactive functionality for roles and permissions management
+ * Full API integration for roles and permissions management
  */
 
+let currentRoleId = null;
+let currentPermissions = [];
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize components
-    initPermissionToggles();
-    initActionButtons();
-    initUserSearch();
+    initRolesList();
+    initPermissionMatrix();
     initRoleActions();
 });
 
-/**
- * Initialize permission toggle switches
- */
-function initPermissionToggles() {
-    const toggles = document.querySelectorAll('.permission-toggle, input[type="checkbox"]');
+async function initRolesList() {
+    if (typeof API === 'undefined') {
+        console.log('API service not loaded');
+        return;
+    }
     
-    toggles.forEach(toggle => {
-        toggle.addEventListener('change', function(e) {
-            const permissionName = e.target.getAttribute('aria-label') || 'Permission';
-            const action = e.target.checked ? 'enabled' : 'disabled';
-            
-            // Show feedback (could be replaced with toast notification)
-            console.log(${permissionName}: );
-            
-            // Add visual feedback
-            const label = e.target.closest('label');
-            if (label) {
-                label.classList.add('transition-all');
-            }
-        });
-    });
+    try {
+        const response = await API.roles.getAll();
+        renderRoles(response.data || response);
+        loadPermissionModules();
+    } catch (error) {
+        console.error('Failed to load roles:', error);
+    }
 }
 
-/**
- * Initialize action buttons (edit, copy, delete)
- */
-function initActionButtons() {
-    const editButtons = document.querySelectorAll('button:has(.material-symbols-outlined:text-lg)');
+function renderRoles(roles) {
+    const tbody = document.querySelector('#roles-table tbody');
+    if (!tbody) {
+        renderInlineRoles(roles);
+        return;
+    }
     
-    editButtons.forEach(button => {
-        const icon = button.querySelector('.material-symbols-outlined');
-        if (!icon) return;
+    if (!roles || roles.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-8 py-8 text-center text-on-surface-variant">No roles found</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = roles.map(role => {
+        const isSelected = role.id === currentRoleId;
+        const userCount = role.users?.length || 0;
         
-        const iconText = icon.textContent.trim();
+        const userAvatars = role.users?.slice(0, 3).map(u => `
+            <img class="w-8 h-8 rounded-full border-2 border-surface-container-low"
+                src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=random&size=32" />
+        `).join('') || '';
         
-        if (iconText === 'edit') {
-            button.addEventListener('click', handleEdit);
-        } else if (iconText === 'content_copy') {
-            button.addEventListener('click', handleCopy);
-        } else if (iconText === 'delete') {
-            button.addEventListener('click', handleDelete);
+        const moreUsers = userCount > 3 ? `
+            <div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-surface-container-low flex items-center justify-center text-[10px] font-bold">
+                +${userCount - 3}
+            </div>
+        ` : '';
+        
+        return `
+            <tr class="hover:bg-surface-bright/20 transition-colors ${isSelected ? 'bg-primary/10' : ''}" 
+                onclick="selectRole(${role.id})" style="cursor:pointer">
+                <td class="px-8 py-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-8 ${isSelected ? 'bg-primary' : 'bg-tertiary'} rounded-full"></div>
+                        <div>
+                            <p class="font-semibold text-on-surface">${role.name}</p>
+                            <p class="text-xs text-on-surface-variant">${role.slug}</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-8 py-5">
+                    <div class="flex -space-x-2">
+                        ${userAvatars}
+                        ${moreUsers}
+                    </div>
+                </td>
+                <td class="px-8 py-5">
+                    <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase">
+                        Active
+                    </span>
+                </td>
+                <td class="px-8 py-5 text-right">
+                    <div class="flex justify-end gap-2">
+                        <button class="p-2 hover:bg-surface-container rounded-lg" onclick="event.stopPropagation(); editRole(${role.id})">
+                            <span class="material-symbols-outlined text-lg">edit</span>
+                        </button>
+                        <button class="p-2 hover:bg-surface-container rounded-lg text-error" onclick="event.stopPropagation(); deleteRole(${role.id})">
+                            <span class="material-symbols-outlined text-lg">delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderInlineRoles(roles) {
+    const rows = document.querySelectorAll('tbody tr');
+    if (rows.length === 0) return;
+    
+    roles.forEach((role, index) => {
+        if (rows[index]) {
+            const nameCell = rows[index].querySelector('.font-semibold');
+            if (nameCell) nameCell.textContent = role.name;
         }
     });
 }
 
-/**
- * Handle edit action
- */
-function handleEdit(e) {
-    const row = e.target.closest('tr');
-    const roleName = row?.querySelector('.font-semibold')?.textContent;
-    console.log('Edit role:', roleName);
-    // Add modal or redirect logic here
-}
-
-/**
- * Handle copy/duplicate action
- */
-function handleCopy(e) {
-    const row = e.target.closest('tr');
-    const roleName = row?.querySelector('.font-semibold')?.textContent;
-    console.log('Duplicate role:', roleName);
-    // Add copy logic here
-}
-
-/**
- * Handle delete action
- */
-function handleDelete(e) {
-    const row = e.target.closest('tr');
-    const roleName = row?.querySelector('.font-semibold')?.textContent;
-    
-    if (confirm(Are you sure you want to delete the "" role?)) {
-        console.log('Delete role:', roleName);
-        // Add delete API call here
+async function loadPermissionModules() {
+    try {
+        const response = await API.permissions.getByModule();
+        renderPermissionMatrix(response);
+    } catch (error) {
+        console.error('Failed to load permissions:', error);
     }
 }
 
-/**
- * Initialize user search functionality
- */
-function initUserSearch() {
-    const searchInput = document.querySelector('input[name="search_users"]');
+function renderPermissionMatrix(permissionsByModule) {
+    const container = document.querySelector('.space-y-4');
+    if (!container) return;
     
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(function(e) {
-            const query = e.target.value.trim();
-            if (query.length >= 2) {
-                console.log('Search users:', query);
-                // Add user search API call here
-            }
-        }, 300));
+    let html = '';
+    
+    Object.entries(permissionsByModule).forEach(([module, permissions]) => {
+        html += `
+            <div class="permission-module mb-6">
+                <h4 class="text-sm font-bold uppercase text-on-surface-variant mb-3">${module}</h4>
+                <div class="space-y-2">
+                    ${permissions.map(perm => `
+                        <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+                                    <span class="material-symbols-outlined">${getModuleIcon(module)}</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm">${perm.name}</p>
+                                    <p class="text-xs text-on-surface-variant">${perm.slug}</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="permission-toggle sr-only peer" 
+                                    data-permission-id="${perm.id}" />
+                                <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full 
+                                    peer-checked:after:translate-x-full peer-checked:after:border-white 
+                                    after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
+                                    after:bg-white after:border-gray-300 after:border after:rounded-full 
+                                    after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    initPermissionToggles();
+}
+
+function getModuleIcon(module) {
+    const icons = {
+        user: 'person',
+        role: 'groups',
+        client: 'business',
+        project: 'folder',
+        task: 'task_alt',
+        file: 'insert_drive_file',
+        billing: 'payments',
+        chat: 'chat',
+        announcement: 'campaign',
+        report: 'assessment',
+        settings: 'settings'
+    };
+    return icons[module] || 'extension';
+}
+
+async function selectRole(roleId) {
+    currentRoleId = roleId;
+    
+    try {
+        const response = await API.roles.getPermissions(roleId);
+        currentPermissions = response.data || response;
         
-        // Handle Enter key
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                console.log('Add user:', e.target.value);
-                // Add user addition logic here
-            }
+        document.querySelectorAll('.permission-toggle').forEach(toggle => {
+            const permId = parseInt(toggle.dataset.permissionId);
+            toggle.checked = currentPermissions.some(p => p.id === permId);
         });
+        
+        await initRolesList();
+    } catch (error) {
+        console.error('Failed to load role permissions:', error);
     }
 }
 
-/**
- * Initialize role actions
- */
+function initPermissionToggles() {
+    const toggles = document.querySelectorAll('.permission-toggle');
+    
+    toggles.forEach(toggle => {
+        toggle.addEventListener('change', async () => {
+            if (!currentRoleId) {
+                alert('Please select a role first');
+                toggle.checked = !toggle.checked;
+                return;
+            }
+            
+            const permissionId = toggle.dataset.permissionId;
+            
+            try {
+                if (toggle.checked) {
+                    await API.roles.assignPermission(currentRoleId, permissionId);
+                } else {
+                    await API.roles.syncPermissions(currentRoleId, 
+                        currentPermissions.map(p => p.id).filter(id => id != permissionId)
+                    );
+                }
+                console.log('Permission updated');
+            } catch (error) {
+                console.error('Failed to update permission:', error);
+                toggle.checked = !toggle.checked;
+            }
+        });
+    });
+}
+
+async function editRole(roleId) {
+    window.location.href = '/roles/' + roleId;
+}
+
+async function deleteRole(roleId) {
+    if (!confirm('Are you sure you want to delete this role?')) return;
+    
+    try {
+        await API.roles.delete(roleId);
+        await initRolesList();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
 function initRoleActions() {
-    // Add New Role button
-    const addRoleBtn = document.querySelector('button:has(.material-symbols-outlined:text-lg)');
-    if (addRoleBtn && addRoleBtn.textContent.includes('Add New Role')) {
-        addRoleBtn.addEventListener('click', function() {
-            console.log('Open Add New Role modal');
-            // Add modal open logic here
+    const addButton = document.querySelector('button:has(.material-symbols-outlined)');
+    if (addButton && addButton.textContent.includes('Add New Role')) {
+        addButton.addEventListener('click', () => {
+            const name = prompt('Enter role name:');
+            if (!name) return;
+            
+            const slug = name.toLowerCase().replace(/\s+/g, '_');
+            
+            API.roles.create({ name: name, slug: slug })
+                .then(() => initRolesList())
+                .catch(error => alert('Failed to create role: ' + error.message));
         });
     }
     
-    // Select All button
-    const selectAllBtn = document.querySelector('button:has-text("SELECT ALL")');
+    const selectAllBtn = document.querySelector('button:text("SELECT ALL")');
     if (selectAllBtn) {
         selectAllBtn.addEventListener('click', function() {
-            const checkboxes = document.querySelectorAll('.permission-toggle, .space-y-4 input[type="checkbox"]');
+            const checkboxes = document.querySelectorAll('.permission-toggle');
             const allChecked = Array.from(checkboxes).every(cb => cb.checked);
             
             checkboxes.forEach(cb => {
                 cb.checked = !allChecked;
-                // Trigger change event
                 const event = new Event('change', { bubbles: true });
                 cb.dispatchEvent(event);
             });
@@ -146,43 +266,16 @@ function initRoleActions() {
         });
     }
     
-    // Remove user buttons
     const removeButtons = document.querySelectorAll('button[aria-label^="Remove"]');
     removeButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             const userRow = e.target.closest('.flex.items-center.justify-between');
             const userName = userRow?.querySelector('.text-xs.font-bold')?.textContent;
             
-            if (userName && confirm(Remove  from this role?)) {
+            if (userName && confirm('Remove ' + userName + ' from this role?')) {
                 console.log('Remove user:', userName);
                 userRow.remove();
             }
         });
     });
-}
-
-/**
- * Debounce utility function
- */
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Export functions for potential module use
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        initPermissionToggles,
-        initActionButtons,
-        initUserSearch,
-        initRoleActions,
-        debounce
-    };
 }
