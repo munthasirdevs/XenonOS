@@ -15,7 +15,7 @@
             <h2 class="text-5xl font-light font-headline tracking-tight text-on-surface">Roles &amp; Permissions</h2>
             <p class="text-on-surface-variant mt-2 max-w-lg">Manage organizational hierarchies and granular access control for your workspace modules.</p>
         </div>
-        <button class="bg-primary text-on-primary font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+        <button onclick="openAddRoleModal()" class="bg-primary text-on-primary font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
             <span class="material-symbols-outlined text-lg">add</span>
             Add New Role
         </button>
@@ -25,10 +25,10 @@
         <div class="bg-surface-container-low rounded-2xl overflow-hidden shadow-xl group transition-all duration-300 hover:-translate-y-1">
             <div class="p-6 border-b border-outline-variant/10 flex justify-between items-center">
                 <h3 class="text-lg font-semibold font-headline">Active Directory</h3>
-                <span class="text-xs text-on-surface-variant font-medium">4 Total Roles</span>
+                <span class="text-xs text-on-surface-variant font-medium">{{ $roles->count() ?? 0 }} Total Roles</span>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
+                <table id="roles-table" class="w-full text-left">
                     <thead class="bg-surface-container/50 text-on-surface-variant text-[11px] uppercase tracking-widest font-bold">
                         <tr>
                             <th class="px-8 py-4">Role Name</th>
@@ -38,21 +38,27 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-outline-variant/10">
-                        <tr class="hover:bg-surface-bright/20 transition-colors">
+                        @forelse($roles ?? [] as $role)
+                        <tr class="hover:bg-surface-bright/20 transition-colors" onclick="selectRole({{ $role->id }})" style="cursor:pointer">
                             <td class="px-8 py-5">
                                 <div class="flex items-center gap-3">
                                     <div class="w-2 h-8 bg-primary rounded-full"></div>
                                     <div>
-                                        <p class="font-semibold text-on-surface">Project Manager</p>
-                                        <p class="text-xs text-on-surface-variant">Default administrative role</p>
+                                        <p class="font-semibold text-on-surface">{{ $role->name }}</p>
+                                        <p class="text-xs text-on-surface-variant">{{ $role->slug }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-8 py-5">
                                 <div class="flex -space-x-2">
-                                    <img class="w-8 h-8 rounded-full border-2 border-surface-container-low" alt="Team member Sarah" src="https://ui-avatars.com/api/?name=Sarah&amp;background=random&amp;size=32" />
-                                    <img class="w-8 h-8 rounded-full border-2 border-surface-container-low" alt="Team member Marcus" src="https://ui-avatars.com/api/?name=Marcus&amp;background=random&amp;size=32" />
-                                    <div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-surface-container-low flex items-center justify-center text-[10px] font-bold">+12</div>
+                                    @forelse($role->users->take(3) as $user)
+                                    <img class="w-8 h-8 rounded-full border-2 border-surface-container-low" alt="Team member {{ $user->name }}" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random&size=32" />
+                                    @empty
+                                    <span class="text-xs text-on-surface-variant">No users</span>
+                                    @endforelse
+                                    @if($role->users->count() > 3)
+                                    <div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-surface-container-low flex items-center justify-center text-[10px] font-bold">+{{ $role->users->count() - 3 }}</div>
+                                    @endif
                                 </div>
                             </td>
                             <td class="px-8 py-5">
@@ -60,39 +66,20 @@
                             </td>
                             <td class="px-8 py-5 text-right">
                                 <div class="flex justify-end gap-2">
-                                    <button class="p-2 hover:bg-surface-container rounded-lg text-slate-400 hover:text-primary transition-all">
+                                    <button onclick="event.stopPropagation(); editRole({{ $role->id }})" class="p-2 hover:bg-surface-container rounded-lg text-slate-400 hover:text-primary transition-all">
                                         <span class="material-symbols-outlined text-lg">edit</span>
                                     </button>
-                                    <button class="p-2 hover:bg-surface-container rounded-lg text-slate-400 hover:text-tertiary transition-all">
-                                        <span class="material-symbols-outlined text-lg">content_copy</span>
-                                    </button>
-                                    <button class="p-2 hover:bg-surface-container rounded-lg text-slate-400 hover:text-error transition-all">
+                                    <button onclick="event.stopPropagation(); deleteRole({{ $role->id }})" class="p-2 hover:bg-surface-container rounded-lg text-slate-400 hover:text-error transition-all">
                                         <span class="material-symbols-outlined text-lg">delete</span>
                                     </button>
                                 </div>
                             </td>
                         </tr>
-                        <tr class="bg-surface-container/30">
-                            <td class="px-8 py-5 border-l-4 border-primary">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-2 h-8 bg-tertiary rounded-full"></div>
-                                    <div>
-                                        <p class="font-semibold text-on-surface">Senior Developer</p>
-                                        <p class="text-xs text-on-surface-variant">Write access to main repository</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-8 py-5">
-                                <div class="flex -space-x-2">
-                                    <img class="w-8 h-8 rounded-full border-2 border-surface-container-low" alt="Team member David" src="https://ui-avatars.com/api/?name=David&amp;background=random&amp;size=32" />
-                                    <div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-surface-container-low flex items-center justify-center text-[10px] font-bold">+5</div>
-                                </div>
-                            </td>
-                            <td class="px-8 py-5">
-                                <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase tracking-tighter">Active</span>
-                            </td>
-                            <td class="px-8 py-5 text-right text-primary font-bold text-xs uppercase tracking-widest italic">Current View</td>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="px-8 py-8 text-center text-on-surface-variant">No roles found. Create your first role to get started.</td>
                         </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -106,89 +93,43 @@
                 <div class="flex justify-between items-center mb-10">
                     <div>
                         <h3 class="text-xl font-headline font-semibold">Permission Matrix</h3>
-                        <p class="text-sm text-on-surface-variant">Configuring: <span class="text-primary font-bold">Project Manager</span></p>
+                        <p class="text-sm text-on-surface-variant">Select a role above to configure permissions</p>
                     </div>
                     <div class="flex gap-2">
-                        <button class="text-xs font-bold text-primary px-4 py-2 bg-primary/5 rounded-lg border border-primary/10">SELECT ALL</button>
+                        <button onclick="toggleAllPermissions()" class="text-xs font-bold text-primary px-4 py-2 bg-primary/5 rounded-lg border border-primary/10">SELECT ALL</button>
                     </div>
                 </div>
+                
+                @if($permissions->count() > 0)
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-bright/10 transition-colors">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary">
-                                <span class="material-symbols-outlined">folder</span>
+                    @foreach($permissions as $module => $perms)
+                    <div class="permission-module mb-6">
+                        <h4 class="text-sm font-bold uppercase text-on-surface-variant mb-3">{{ $module }}</h4>
+                        <div class="space-y-2">
+                            @foreach($perms as $perm)
+                            <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-bright/10 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary">
+                                        <span class="material-symbols-outlined">{{ getModuleIcon($module) }}</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-sm">{{ $perm->name }}</p>
+                                        <p class="text-xs text-on-surface-variant">{{ $perm->slug }}</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="permission-toggle sr-only peer" data-permission-id="{{ $perm->id }}" />
+                                    <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
                             </div>
-                            <div>
-                                <p class="font-bold text-sm">Projects</p>
-                                <p class="text-xs text-on-surface-variant">Create, edit and archive workspace projects</p>
-                            </div>
+                            @endforeach
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input checked class="sr-only peer" type="checkbox" aria-label="Enable projects permission" />
-                            <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
                     </div>
-                    <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-bright/10 transition-colors">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary">
-                                <span class="material-symbols-outlined">assignment</span>
-                            </div>
-                            <div>
-                                <p class="font-bold text-sm">Tasks &amp; Workflows</p>
-                                <p class="text-xs text-on-surface-variant">Assign tickets and update board status</p>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input checked class="sr-only peer" type="checkbox" aria-label="Enable tasks and workflows permission" />
-                            <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-bright/10 transition-colors">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-tertiary">
-                                <span class="material-symbols-outlined">description</span>
-                            </div>
-                            <div>
-                                <p class="font-bold text-sm">File Management</p>
-                                <p class="text-xs text-on-surface-variant">Upload assets and manage storage</p>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input class="sr-only peer" type="checkbox" aria-label="Enable file management permission" />
-                            <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-bright/10 transition-colors">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary">
-                                <span class="material-symbols-outlined">forum</span>
-                            </div>
-                            <div>
-                                <p class="font-bold text-sm">Chat &amp; Comms</p>
-                                <p class="text-xs text-on-surface-variant">Access to global channels and DM history</p>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input checked class="sr-only peer" type="checkbox" aria-label="Enable chat and communications permission" />
-                            <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-bright/10 transition-colors">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-error">
-                                <span class="material-symbols-outlined">payments</span>
-                            </div>
-                            <div>
-                                <p class="font-bold text-sm">Billing &amp; Invoices</p>
-                                <p class="text-xs text-on-surface-variant">View financial statements and subscription</p>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input class="sr-only peer" type="checkbox" aria-label="Enable billing and invoices permission" />
-                            <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
-                    </div>
+                    @endforeach
                 </div>
+                @else
+                <p class="text-on-surface-variant">No permissions found. Run the permission seeder to create default permissions.</p>
+                @endif
             </div>
         </section>
 
@@ -199,33 +140,27 @@
                     Assign Users
                 </h3>
                 <div class="space-y-3 mb-6">
-                    <div class="flex items-center justify-between p-3 bg-surface-container rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <img class="w-8 h-8 rounded-full object-cover" alt="Team member Chloe Jenkins" src="https://ui-avatars.com/api/?name=Chloe+Jenkins&amp;background=random&amp;size=32" />
-                            <div>
-                                <p class="text-xs font-bold">Chloe Jenkins</p>
-                                <p class="text-[10px] text-on-surface-variant">Lead Designer</p>
+                    @if(isset($selectedRole) && $selectedRole->users->count() > 0)
+                        @foreach($selectedRole->users as $user)
+                        <div class="flex items-center justify-between p-3 bg-surface-container rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <img class="w-8 h-8 rounded-full object-cover" alt="Team member {{ $user->name }}" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random&size=32" />
+                                <div>
+                                    <p class="text-xs font-bold">{{ $user->name }}</p>
+                                    <p class="text-[10px] text-on-surface-variant">{{ $user->email }}</p>
+                                </div>
                             </div>
+                            <button onclick="removeUserFromRole({{ $user->id }})" class="text-error hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-sm">close</span>
+                            </button>
                         </div>
-                        <button class="text-error hover:scale-110 transition-transform" aria-label="Remove Chloe Jenkins">
-                            <span class="material-symbols-outlined text-sm">close</span>
-                        </button>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-surface-container rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <img class="w-8 h-8 rounded-full object-cover" alt="Team member Ryan Thornton" src="https://ui-avatars.com/api/?name=Ryan+Thornton&amp;background=random&amp;size=32" />
-                            <div>
-                                <p class="text-xs font-bold">Ryan Thornton</p>
-                                <p class="text-[10px] text-on-surface-variant">Motion Artist</p>
-                            </div>
-                        </div>
-                        <button class="text-error hover:scale-110 transition-transform" aria-label="Remove Ryan Thornton">
-                            <span class="material-symbols-outlined text-sm">close</span>
-                        </button>
-                    </div>
+                        @endforeach
+                    @else
+                    <p class="text-xs text-on-surface-variant">Select a role to see assigned users</p>
+                    @endif
                 </div>
                 <div class="relative">
-                    <input class="w-full bg-surface-container border-none rounded-xl pl-4 pr-10 py-3 text-sm focus:ring-1 focus:ring-primary/50 placeholder:text-slate-500" placeholder="Add users..." type="text" name="search_users" />
+                    <input id="user-search-input" class="w-full bg-surface-container border-none rounded-xl pl-4 pr-10 py-3 text-sm focus:ring-1 focus:ring-primary/50 placeholder:text-slate-500" placeholder="Search users to add..." type="text" />
                     <span class="material-symbols-outlined absolute right-3 top-3 text-slate-500">search</span>
                 </div>
             </div>
@@ -242,22 +177,8 @@
                     <div class="flex gap-3 relative pb-4 after:absolute after:left-[7px] after:top-5 after:bottom-0 after:w-px after:bg-outline-variant/20">
                         <div class="w-4 h-4 rounded-full bg-primary mt-1 z-10 shadow-[0_0_8px_rgba(192,193,255,0.4)]"></div>
                         <div>
-                            <p class="text-xs font-bold leading-tight">Admin granted 'Billing' to 'Project Manager'</p>
-                            <p class="text-[10px] text-on-surface-variant mt-1">2 hours ago</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-3 relative pb-4 after:absolute after:left-[7px] after:top-5 after:bottom-0 after:w-px after:bg-outline-variant/20">
-                        <div class="w-4 h-4 rounded-full bg-surface-container-highest mt-1 z-10 border border-outline-variant/30"></div>
-                        <div>
-                            <p class="text-xs font-bold leading-tight">Marcus deleted 'Junior Designer' role</p>
-                            <p class="text-[10px] text-on-surface-variant mt-1">Yesterday, 14:20</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-3 relative">
-                        <div class="w-4 h-4 rounded-full bg-surface-container-highest mt-1 z-10 border border-outline-variant/30"></div>
-                        <div>
-                            <p class="text-xs font-bold leading-tight">System audit: 4 users added to 'Team'</p>
-                            <p class="text-[10px] text-on-surface-variant mt-1">3 days ago</p>
+                            <p class="text-xs font-bold leading-tight">System initialized</p>
+                            <p class="text-[10px] text-on-surface-variant mt-1">Role permissions loaded</p>
                         </div>
                     </div>
                 </div>
@@ -265,8 +186,118 @@
         </section>
     </div>
 </div>
-@endsection
+
+<!-- Add Role Modal -->
+<div id="add-role-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center">
+    <div class="bg-surface-container-low rounded-2xl p-8 w-full max-w-md">
+        <h3 class="text-xl font-headline font-semibold mb-6">Add New Role</h3>
+        <form onsubmit="createRole(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Role Name</label>
+                <input type="text" id="role-name-input" class="w-full bg-surface-container border-none rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary/50" required />
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2">Slug</label>
+                <input type="text" id="role-slug-input" class="w-full bg-surface-container border-none rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary/50" required />
+            </div>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeAddRoleModal()" class="flex-1 py-3 bg-surface-container rounded-xl font-bold">Cancel</button>
+                <button type="submit" class="flex-1 py-3 bg-primary text-on-primary-container rounded-xl font-bold">Create Role</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@php
+function getModuleIcon($module) {
+    $icons = [
+        'user' => 'person',
+        'role' => 'groups',
+        'client' => 'business',
+        'project' => 'folder',
+        'task' => 'task_alt',
+        'file' => 'insert_drive_file',
+        'billing' => 'payments',
+        'chat' => 'chat',
+        'announcement' => 'campaign',
+        'report' => 'assessment',
+        'settings' => 'settings',
+    ];
+    return $icons[$module] ?? 'extension';
+}
+@endphp
 
 @push('scripts')
-    <script src="{{ asset('js/roles-index.js') }}"></script>
+<script src="{{ asset('js/roles-index.js') }}"></script>
+<script>
+let selectedRoleId = null;
+
+function selectRole(roleId) {
+    selectedRoleId = roleId;
+    document.querySelectorAll('tbody tr').forEach(row => {
+        row.classList.remove('bg-primary/10');
+    });
+    event.target.closest('tr').classList.add('bg-primary/10');
+}
+
+function openAddRoleModal() {
+    document.getElementById('add-role-modal').classList.remove('hidden');
+}
+
+function closeAddRoleModal() {
+    document.getElementById('add-role-modal').classList.add('hidden');
+    document.getElementById('role-name-input').value = '';
+    document.getElementById('role-slug-input').value = '';
+}
+
+async function createRole(event) {
+    event.preventDefault();
+    const name = document.getElementById('role-name-input').value;
+    const slug = document.getElementById('role-slug-input').value;
+    
+    try {
+        await API.roles.create({ name, slug });
+        closeAddRoleModal();
+        window.location.reload();
+    } catch (error) {
+        alert('Failed to create role: ' + error.message);
+    }
+}
+
+async function editRole(roleId) {
+    window.location.href = '/roles/' + roleId;
+}
+
+async function deleteRole(roleId) {
+    if (!confirm('Are you sure you want to delete this role?')) return;
+    
+    try {
+        await API.roles.delete(roleId);
+        window.location.reload();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+function toggleAllPermissions() {
+    const checkboxes = document.querySelectorAll('.permission-toggle');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    
+    checkboxes.forEach(cb => {
+        cb.checked = !allChecked;
+        if (selectedRoleId) {
+            API.roles.assignPermission(selectedRoleId, cb.dataset.permissionId);
+        }
+    });
+}
+
+async function removeUserFromRole(userId) {
+    if (!selectedRoleId) {
+        alert('Please select a role first');
+        return;
+    }
+    alert('User removal not implemented yet');
+}
+</script>
 @endpush
+@endsection

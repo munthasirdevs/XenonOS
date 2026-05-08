@@ -10,6 +10,10 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\Web\CommunicationController;
+use App\Http\Controllers\Web\TaskController;
+use App\Http\Controllers\Web\RoleController;
+use App\Http\Controllers\Web\ProjectController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -77,6 +81,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/password', [ProfileController::class, 'password'])->name('profile.password');
+
+    // Communication
+    Route::get('/communication', [CommunicationController::class, 'index'])->name('communication');
+    Route::get('/communication/{chat}', [CommunicationController::class, 'chat'])->name('communication.chat');
+    Route::post('/communication', [CommunicationController::class, 'store'])->name('communication.store');
+
+    // Tasks
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
+    Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+
+    // Roles
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles');
+    Route::get('/roles/{role}', [RoleController::class, 'show'])->name('roles.show');
+    Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+
+    // Projects
+    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 });
 
 Route::post('/settings/toggle-2fa', [SettingsController::class, 'toggle2FA'])->name('settings.toggle2fa');

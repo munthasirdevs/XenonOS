@@ -99,20 +99,20 @@
             <span class="material-symbols-outlined {{ request()->routeIs('activity*') ? 'active-icon' : '' }}">history</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Activity</span>
         </a>
-        <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined">verified_user</span>
+        <a href="{{ route('roles') }}" class="{{ request()->routeIs('roles*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ request()->routeIs('roles*') ? 'active-icon' : '' }}">verified_user</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Roles</span>
         </a>
         <a href="{{ route('clients') }}" class="{{ request()->routeIs('clients*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
             <span class="material-symbols-outlined {{ request()->routeIs('clients*') ? 'active-icon' : '' }}">person_add</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Clients</span>
         </a>
-        <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+        <a href="{{ route('projects.index') }}" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
             <span class="material-symbols-outlined">account_tree</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Projects</span>
         </a>
-        <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined">task_alt</span>
+        <a href="{{ route('tasks') }}" class="{{ request()->routeIs('tasks*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ request()->routeIs('tasks*') ? 'active-icon' : '' }}">task_alt</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Tasks</span>
         </a>
         <a href="{{ route('payments') }}" class="{{ request()->routeIs('payments*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
@@ -122,6 +122,12 @@
         <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
             <span class="material-symbols-outlined">assessment</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Reports</span>
+        </a>
+
+        <!-- Communication Link -->
+        <a href="{{ route('communication') }}" class="{{ request()->routeIs('communication*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ request()->routeIs('communication*') ? 'active-icon' : '' }}">chat</span>
+            <span class="text-[12px] font-semibold tracking-wide font-label">Chat</span>
         </a>
 
         <!-- Separator -->
