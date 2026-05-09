@@ -14,6 +14,7 @@ use App\Models\Project;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ClientController extends Controller
 {
@@ -24,11 +25,25 @@ class ClientController extends Controller
         return 'api_clients_' . md5($request->getQueryString());
     }
 
+    private function clearClientCache(?int $clientId = null): void
+    {
+        if ($clientId) {
+            Cache::forget("client_{$clientId}");
+            Cache::forget("client_{$clientId}_stats");
+            Cache::forget("client_{$clientId}_documents");
+        }
+        Cache::forget('client_stats');
+        try {
+            Cache::tags(['clients'])->flush();
+        } catch (\Exception $e) {
+        }
+    }
+
     public function index(Request $request)
     {
         $cacheKey = $this->getCacheKey($request);
         
-        $clients = Cache::remember($cacheKey, 30, function() use ($request) {
+        $clients = Cache::tags(['clients'])->remember($cacheKey, 30, function() use ($request) {
             $query = Client::select(['id', 'name', 'email', 'phone', 'company', 'company_name', 'address', 'website', 'tier', 'status', 'total_revenue', 'location', 'avatar_url', 'notes', 'created_by', 'updated_by', 'created_at', 'updated_at'])
                 ->with(['activities' => function($q) { $q->select('id', 'client_id', 'type', 'description', 'created_at')->latest()->limit(5); }])
                 ->orderBy('created_at', 'desc');
@@ -66,25 +81,28 @@ class ClientController extends Controller
 
     public function store(ClientRequest $request)
     {
-        $client = Client::create([
-            ...$request->validated(),
-            'created_by' => $request->user()->id,
-            'status' => 'active',
-        ]);
+        $client = DB::transaction(function () use ($request) {
+            $client = Client::create([
+                ...$request->validated(),
+                'created_by' => $request->user()->id,
+                'status' => 'active',
+            ]);
 
-        $this->logActivity($client, 'created', 'Client created', $request->user()->id);
+            $this->logActivity($client, 'created', 'Client created', $request->user()->id);
 
-        AuditLog::create([
-            'model_type' => Client::class,
-            'model_id' => $client->id,
-            'changes' => ['created' => $client->toArray()],
-            'created_by' => $request->user()->id,
-            'action' => 'client_created',
-            'description' => 'Client created: ' . $client->name,
-        ]);
+            AuditLog::create([
+                'model_type' => Client::class,
+                'model_id' => $client->id,
+                'changes' => ['created' => $client->toArray()],
+                'created_by' => $request->user()->id,
+                'action' => 'client_created',
+                'description' => 'Client created: ' . $client->name,
+            ]);
 
-        Cache::forget('api_clients_*');
-        Cache::forget('client_stats');
+            return $client;
+        });
+
+        $this->clearClientCache($client->id);
 
         return $this->success($client->load('activities'), 'Client created successfully', 201);
     }
@@ -128,9 +146,7 @@ class ClientController extends Controller
             'description' => 'Client updated: ' . $client->name,
         ]);
 
-        Cache::forget("client_{$client->id}");
-        Cache::forget("client_{$client->id}_stats");
-        Cache::forget('api_clients_*');
+        $this->clearClientCache($client->id);
 
         return $this->success($client->fresh()->load('activities'), 'Client updated successfully');
     }
@@ -152,10 +168,7 @@ class ClientController extends Controller
 
         $client->delete();
 
-        Cache::forget("client_{$client->id}");
-        Cache::forget("client_{$client->id}_stats");
-        Cache::forget('api_clients_*');
-        Cache::forget('client_stats');
+        $this->clearClientCache($client->id);
 
         return $this->success(null, 'Client deleted successfully');
     }

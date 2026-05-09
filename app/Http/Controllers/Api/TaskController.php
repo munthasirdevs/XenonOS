@@ -21,11 +21,23 @@ class TaskController extends Controller
         return 'api_tasks_' . md5($request->getQueryString());
     }
 
+    private function clearTaskCache(?int $taskId = null): void
+    {
+        if ($taskId) {
+            Cache::forget("task_{$taskId}");
+        }
+        Cache::forget('task_stats');
+        try {
+            Cache::tags(['tasks'])->flush();
+        } catch (\Exception $e) {
+        }
+    }
+
     public function index(Request $request)
     {
         $cacheKey = $this->getCacheKey($request);
         
-        $tasks = Cache::remember($cacheKey, 30, function() use ($request) {
+        $tasks = Cache::tags(['tasks'])->remember($cacheKey, 30, function() use ($request) {
             $query = Task::select(['id', 'project_id', 'title', 'description', 'status', 'priority', 'assigned_to', 'start_date', 'due_date', 'estimated_hours', 'actual_hours', 'created_by', 'updated_by', 'created_at', 'updated_at'])
                 ->with(['project:id,name', 'assignee:id,name,email'])
                 ->orderBy('created_at', 'desc');
@@ -83,8 +95,7 @@ class TaskController extends Controller
             'description' => 'Task created: ' . $task->title,
         ]);
 
-        Cache::forget('api_tasks_*');
-        Cache::forget('task_stats');
+        $this->clearTaskCache($task->id);
 
         return $this->success($task->load(['project:id,name', 'assignee:id,name,email']), 'Task created successfully', 201);
     }
@@ -125,32 +136,29 @@ class TaskController extends Controller
             'description' => 'Task updated: ' . $task->title,
         ]);
 
-        Cache::forget("task_{$task->id}");
-        Cache::forget('api_tasks_*');
+$this->clearTaskCache($task->id);
 
         return $this->success($task->fresh()->load(['project:id,name', 'assignee:id,name,email']), 'Task updated successfully');
     }
 
     public function destroy(Request $request, Task $task)
     {
-        $taskTitle = $task->title;
+        $taskName = $task->title;
         
         $this->logActivity($task, 'deleted', 'Task deleted', $request->user()->id);
 
         AuditLog::create([
             'model_type' => Task::class,
             'model_id' => $task->id,
-            'changes' => ['deleted' => $taskTitle],
+            'changes' => ['deleted' => $taskName],
             'created_by' => $request->user()->id,
             'action' => 'task_deleted',
-            'description' => 'Task deleted: ' . $taskTitle,
+            'description' => 'Task deleted: ' . $taskName,
         ]);
 
         $task->delete();
 
-        Cache::forget("task_{$task->id}");
-        Cache::forget('api_tasks_*');
-        Cache::forget('task_stats');
+        $this->clearTaskCache($task->id);
 
         return $this->success(null, 'Task deleted successfully');
     }
@@ -166,8 +174,7 @@ class TaskController extends Controller
 
         $this->logActivity($task, 'status_changed', 'Status changed from ' . $oldStatus . ' to ' . $request->status, $request->user()->id);
 
-        Cache::forget("task_{$task->id}");
-        Cache::forget('api_tasks_*');
+        $this->clearTaskCache($task->id);
 
         return $this->success($task, 'Task status updated successfully');
     }
@@ -182,7 +189,7 @@ class TaskController extends Controller
 
         $this->logActivity($task, 'assigned', 'Task assigned to user', $request->user()->id);
 
-        Cache::forget("task_{$task->id}");
+        $this->clearTaskCache($task->id);
 
         return $this->success($task->load('assignee:id,name,email'), 'Task assigned successfully');
     }

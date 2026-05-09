@@ -25,11 +25,27 @@ class ProjectController extends Controller
         return 'api_projects_' . md5($request->getQueryString());
     }
 
+    private function clearProjectCache(?int $projectId = null): void
+    {
+        if ($projectId) {
+            Cache::forget("project_{$projectId}");
+            Cache::forget("project_{$projectId}_stats");
+            Cache::forget("project_{$projectId}_users");
+            Cache::forget("project_{$projectId}_timeline");
+            Cache::forget("project_{$projectId}_files");
+        }
+        Cache::forget('project_stats');
+        try {
+            Cache::tags(['projects'])->flush();
+        } catch (\Exception $e) {
+        }
+    }
+
     public function index(Request $request)
     {
         $cacheKey = $this->getCacheKey($request);
         
-        $projects = Cache::remember($cacheKey, 30, function() use ($request) {
+        $projects = Cache::tags(['projects'])->remember($cacheKey, 30, function() use ($request) {
             $query = Project::select(['id', 'client_id', 'name', 'description', 'status', 'priority', 'start_date', 'end_date', 'budget', 'created_by', 'updated_by', 'created_at', 'updated_at'])
                 ->with(['client:id,name,company', 'users:id,name,email'])
                 ->orderBy('created_at', 'desc');
@@ -91,8 +107,7 @@ class ProjectController extends Controller
             'description' => 'Project created: ' . $project->name,
         ]);
 
-        Cache::forget('api_projects_*');
-        Cache::forget('project_stats');
+        $this->clearProjectCache($project->id);
 
         return $this->success($project->load(['client:id,name', 'users:id,name,email']), 'Project created successfully', 201);
     }
@@ -152,9 +167,7 @@ class ProjectController extends Controller
             'description' => 'Project updated: ' . $project->name,
         ]);
 
-        Cache::forget("project_{$project->id}");
-        Cache::forget("project_{$project->id}_stats");
-        Cache::forget('api_projects_*');
+        $this->clearProjectCache($project->id);
 
         return $this->success($project->fresh()->load(['client:id,name', 'users:id,name,email']), 'Project updated successfully');
     }
@@ -176,10 +189,7 @@ class ProjectController extends Controller
 
         $project->delete();
 
-        Cache::forget("project_{$project->id}");
-        Cache::forget("project_{$project->id}_stats");
-        Cache::forget('api_projects_*');
-        Cache::forget('project_stats');
+        $this->clearProjectCache($project->id);
 
         return $this->success(null, 'Project deleted successfully');
     }
