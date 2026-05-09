@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Traits\ApiResponse;
 use App\Events\ChatMessageSent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ChatController extends Controller
 {
@@ -35,15 +36,19 @@ class ChatController extends Controller
             'user_ids.*' => 'exists:users,id',
         ]);
 
-        $chat = Chat::create([
-            'type' => $request->type,
-            'name' => $request->name,
-            'project_id' => $request->project_id,
-            'created_by' => $request->user()->id,
-        ]);
+        $chat = DB::transaction(function () use ($request) {
+            $chat = Chat::create([
+                'type' => $request->type,
+                'name' => $request->name,
+                'project_id' => $request->project_id,
+                'created_by' => $request->user()->id,
+            ]);
 
-        $userIds = array_merge($request->user_ids, [$request->user()->id]);
-        $chat->users()->sync($userIds);
+            $userIds = array_merge($request->user_ids, [$request->user()->id]);
+            $chat->users()->sync($userIds);
+
+            return $chat;
+        });
 
         return $this->success($chat->load('users'), 'Chat created successfully', 201);
     }
