@@ -186,7 +186,7 @@ class User extends Authenticatable
 
     public function cachedPermissions(): array
     {
-        return \Cache::remember("user_permissions_{$this->id}", 3600, function () {
+        return \Cache::remember("user_permissions_{$this->id}", 900, function () {
             return $this->getAllPermissionsAttribute();
         });
     }
