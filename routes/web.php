@@ -14,6 +14,9 @@ use App\Http\Controllers\Web\CommunicationController;
 use App\Http\Controllers\Web\TaskController;
 use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\ProjectController;
+use App\Http\Controllers\Web\TeamController;
+use App\Http\Controllers\Web\AnalyticsController;
+use App\Http\Controllers\Web\ReportController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -105,6 +108,23 @@ Route::middleware('auth')->group(function () {
     // Projects
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+
+    // Team
+    Route::get('/team', [TeamController::class, 'index'])->name('team');
+    Route::get('/team/assign', [TeamController::class, 'assign'])->name('team.assign');
+
+    // Analytics
+    Route::get('/analytics/executive', [AnalyticsController::class, 'executive'])->name('analytics.executive');
+    Route::get('/analytics/marketing', [AnalyticsController::class, 'marketing'])->name('analytics.marketing');
+    Route::get('/analytics/operations', [AnalyticsController::class, 'operations'])->name('analytics.operations');
+
+    // Reports
+    Route::get('/reports/insights', [ReportController::class, 'insights'])->name('reports.insights');
+    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('/reports/financial', [ReportController::class, 'financial'])->name('reports.financial');
+    Route::get('/reports/support', [ReportController::class, 'support'])->name('reports.support');
+    Route::get('/reports/builder', [ReportController::class, 'builder'])->name('reports.builder');
+    Route::get('/reports/saved', [ReportController::class, 'saved'])->name('reports.saved');
 });
 
 Route::post('/settings/toggle-2fa', [SettingsController::class, 'toggle2FA'])->name('settings.toggle2fa');

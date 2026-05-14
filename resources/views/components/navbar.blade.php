@@ -63,6 +63,10 @@
     }
 </style>
 
+@php
+$currentRoute = request()->route()->getName();
+@endphp
+
 <!-- Sidebar -->
 <aside id="sidebar" class="sidebar fixed left-0 top-0 bottom-0 w-[260px] bg-surface-container flex flex-col z-50 py-6 border-r border-outline-variant/10 overflow-hidden transition-transform duration-300 md:translate-x-0">
     <!-- Brand Identity -->
@@ -75,70 +79,68 @@
 
     <!-- Navigation -->
     <nav class="flex-1 flex flex-col gap-0.5 px-4 overflow-y-auto custom-scrollbar">
-        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('dashboard') ? 'active-icon' : '' }}">dashboard</span>
+        <a href="{{ route('dashboard') }}" class="{{ str_starts_with($currentRoute, 'dashboard') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'dashboard') ? 'active-icon' : '' }}">dashboard</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Dashboard</span>
         </a>
-        <a href="{{ route('notifications') }}" class="{{ request()->routeIs('notifications*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('notifications*') ? 'active-icon' : '' }}">notifications</span>
+        <a href="{{ route('notifications') }}" class="{{ str_starts_with($currentRoute, 'notifications') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'notifications') ? 'active-icon' : '' }}">notifications</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Notifications</span>
         </a>
-        <a href="{{ route('files') }}" class="{{ request()->routeIs('files*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('files*') ? 'active-icon' : '' }}">folder</span>
+        <a href="{{ route('files') }}" class="{{ str_starts_with($currentRoute, 'files') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'files') ? 'active-icon' : '' }}">folder</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Files</span>
         </a>
-        <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined">group</span>
+        <a href="{{ route('team') }}" class="{{ str_starts_with($currentRoute, 'team') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'team') ? 'active-icon' : '' }}">group</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Team</span>
         </a>
-        <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined">analytics</span>
+        <a href="{{ route('analytics.executive') }}" class="{{ str_starts_with($currentRoute, 'analytics') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'analytics') ? 'active-icon' : '' }}">analytics</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Analytics</span>
         </a>
-        <a href="{{ route('activity') }}" class="{{ request()->routeIs('activity*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('activity*') ? 'active-icon' : '' }}">history</span>
+        <a href="{{ route('activity') }}" class="{{ str_starts_with($currentRoute, 'activity') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'activity') ? 'active-icon' : '' }}">history</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Activity</span>
         </a>
-        <a href="{{ route('roles') }}" class="{{ request()->routeIs('roles*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('roles*') ? 'active-icon' : '' }}">verified_user</span>
+        <a href="{{ route('roles') }}" class="{{ str_starts_with($currentRoute, 'roles') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'roles') ? 'active-icon' : '' }}">verified_user</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Roles</span>
         </a>
-        <a href="{{ route('clients') }}" class="{{ request()->routeIs('clients*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('clients*') ? 'active-icon' : '' }}">person_add</span>
+        <a href="{{ route('clients') }}" class="{{ str_starts_with($currentRoute, 'clients') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'clients') ? 'active-icon' : '' }}">person_add</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Clients</span>
         </a>
-        <a href="{{ route('projects.index') }}" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined">account_tree</span>
+        <a href="{{ route('projects.index') }}" class="{{ str_starts_with($currentRoute, 'projects') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'projects') ? 'active-icon' : '' }}">account_tree</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Projects</span>
         </a>
-        <a href="{{ route('tasks') }}" class="{{ request()->routeIs('tasks*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('tasks*') ? 'active-icon' : '' }}">task_alt</span>
+        <a href="{{ route('tasks') }}" class="{{ str_starts_with($currentRoute, 'tasks') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'tasks') ? 'active-icon' : '' }}">task_alt</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Tasks</span>
         </a>
-        <a href="{{ route('payments') }}" class="{{ request()->routeIs('payments*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('payments*') ? 'active-icon' : '' }}">payments</span>
+        <a href="{{ route('payments') }}" class="{{ str_starts_with($currentRoute, 'payments') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'payments') ? 'active-icon' : '' }}">payments</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Payments</span>
         </a>
-        <a href="#" class="text-on-surface-variant hover:text-primary hover:bg-surface-bright px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined">assessment</span>
+        <a href="{{ route('reports.insights') }}" class="{{ str_starts_with($currentRoute, 'reports') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'reports') ? 'active-icon' : '' }}">assessment</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Reports</span>
         </a>
-
-        <!-- Communication Link -->
-        <a href="{{ route('communication') }}" class="{{ request()->routeIs('communication*') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('communication*') ? 'active-icon' : '' }}">chat</span>
+        <a href="{{ route('communication') }}" class="{{ str_starts_with($currentRoute, 'communication') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'communication') ? 'active-icon' : '' }}">chat</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Chat</span>
         </a>
 
         <!-- Separator -->
         <div class="my-4 mx-4 h-px bg-outline-variant/10"></div>
 
-        <a href="{{ route('settings') }}" class="{{ request()->routeIs('settings') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('settings') ? 'active-icon' : '' }}">settings</span>
+        <a href="{{ route('settings') }}" class="{{ str_starts_with($currentRoute, 'settings') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'settings') ? 'active-icon' : '' }}">settings</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Settings</span>
         </a>
-        <a href="{{ route('profile') }}" class="{{ request()->routeIs('profile') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
-            <span class="material-symbols-outlined {{ request()->routeIs('profile') ? 'active-icon' : '' }}">account_circle</span>
+        <a href="{{ route('profile') }}" class="{{ str_starts_with($currentRoute, 'profile') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-3 flex items-center gap-4 rounded-lg transition-all cursor-pointer group">
+            <span class="material-symbols-outlined {{ str_starts_with($currentRoute, 'profile') ? 'active-icon' : '' }}">account_circle</span>
             <span class="text-[12px] font-semibold tracking-wide font-label">Profile</span>
         </a>
     </nav>
@@ -146,27 +148,27 @@
     <!-- User Footer -->
     <div class="mt-auto px-6 py-4 border-t border-outline-variant/10 bg-surface-container-low/80 backdrop-blur-xl">
         <div class="flex items-center gap-3">
-            <img alt="User" class="w-10 h-10 rounded-full border border-primary/20 object-cover shadow-lg shadow-primary/5" src="{{ Auth::user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=818cf8&color=fff&size=128' }}"
-                <div class="flex flex-col min-w-0">
-            <span class="text-[13px] font-bold text-on-surface truncate font-headline">{{ Auth::user()->name ?? 'User' }}</span>
-            <span class="text-[10px] text-on-surface-variant/70 truncate font-label">{{ Auth::user()->email ?? 'user@example.com' }}</span>
+            <img alt="User" class="w-10 h-10 rounded-full border border-primary/20 object-cover shadow-lg shadow-primary/5" src="{{ Auth::user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=818cf8&color=fff&size=128' }}">
+            <div class="flex flex-col min-w-0">
+                <span class="text-[13px] font-bold text-on-surface truncate font-headline">{{ Auth::user()->name ?? 'User' }}</span>
+                <span class="text-[10px] text-on-surface-variant/70 truncate font-label">{{ Auth::user()->email ?? 'user@example.com' }}</span>
+            </div>
         </div>
-    </div>
-    <!-- Bottom Buttons -->
-    <div class="flex items-center gap-2">
-        <a href="{{ route('profile') }}" class="flex-1 flex items-center justify-center py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-bright transition-all">
-            <span class="material-symbols-outlined text-lg">person</span>
-        </a>
-        <a href="{{ route('settings') }}" class="flex-1 flex items-center justify-center py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-bright transition-all">
-            <span class="material-symbols-outlined text-lg">settings</span>
-        </a>
-        <form method="POST" action="{{ route('logout') }}" class="flex-1">
-            @csrf
-            <button type="submit" class="w-full flex items-center justify-center py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all">
-                <span class="material-symbols-outlined text-lg">logout</span>
-            </button>
-        </form>
-    </div>
+        <!-- Bottom Buttons -->
+        <div class="flex items-center gap-2 mt-3">
+            <a href="{{ route('profile') }}" class="flex-1 flex items-center justify-center py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-bright transition-all">
+                <span class="material-symbols-outlined text-lg">person</span>
+            </a>
+            <a href="{{ route('settings') }}" class="flex-1 flex items-center justify-center py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-bright transition-all">
+                <span class="material-symbols-outlined text-lg">settings</span>
+            </a>
+            <form method="POST" action="{{ route('logout') }}" class="flex-1">
+                @csrf
+                <button type="submit" class="w-full flex items-center justify-center py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all">
+                    <span class="material-symbols-outlined text-lg">logout</span>
+                </button>
+            </form>
+        </div>
     </div>
 </aside>
 
