@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
 
     // Tasks
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
+    Route::get('/tasks/search', [TaskController::class, 'search'])->name('tasks.search');
     Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');

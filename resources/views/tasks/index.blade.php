@@ -137,7 +137,7 @@
                     </table>
                 </div>
                 @if(isset($tasks) && $tasks->hasPages())
-                <div class="px-6 py-4 bg-surface-container-high/20 border-t border-outline-variant/5 flex items-center justify-between">
+                <div class="pagination-container px-6 py-4 bg-surface-container-high/20 border-t border-outline-variant/5 flex items-center justify-between">
                     <span class="text-xs text-outline font-medium">Showing {{ $tasks->firstItem() }} to {{ $tasks->lastItem() }} of {{ $tasks->total() }} tasks</span>
                     <div class="flex items-center gap-1">
                         @if($tasks->onFirstPage())
@@ -173,7 +173,7 @@
             <div class="bg-surface-container-low p-6 rounded-xl border-l-2 border-primary">
                 <p class="font-label text-[0.6875rem] font-bold text-outline tracking-wider uppercase mb-1">Total Tasks</p>
                 <div class="flex items-end gap-3">
-                    <span class="text-3xl font-headline font-semibold text-on-surface">{{ $tasks->total() ?? 0 }}</span>
+                    <span class="text-3xl font-headline font-semibold text-on-surface task-stat-total">{{ $tasks->total() ?? 0 }}</span>
                 </div>
             </div>
             <div class="bg-surface-container-low p-6 rounded-xl border-l-2 border-tertiary">
@@ -331,38 +331,144 @@ function bulkDeleteTasks() {
     window.location.reload();
 }
 
-// Search debounce
-let searchTimeout;
-const searchInput = document.getElementById('task-search');
-if (searchInput) {
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(function() {
-            const url = new URL(window.location.href);
-            url.searchParams.set('q', searchInput.value);
-            window.location.href = url.toString();
-        }, 500);
+// ==========================================
+// REAL-TIME INSTANT SEARCH & FILTER (AJAX)
+// ==========================================
+
+const TASK_SEARCH_ENDPOINT = '{{ route("tasks.search") }}';
+let tasksDebounceTimer = null;
+let currentTasksPage = 1;
+
+// Get filter values
+function getTaskFilters() {
+    const searchInput = document.getElementById('task-search');
+    const filterProject = document.getElementById('filter-project');
+    const filterStatus = document.getElementById('filter-status');
+    const filterPriority = document.getElementById('filter-priority');
+    
+    return {
+        q: searchInput ? searchInput.value : '',
+        project_id: filterProject ? filterProject.value : '',
+        status: filterStatus ? filterStatus.value : '',
+        priority: filterPriority ? filterPriority.value : ''
+    };
+}
+
+// Fetch tasks via AJAX
+async function fetchTasks(filters, page = 1) {
+    const tbody = document.querySelector('#tasks-table tbody');
+    const paginationContainer = document.querySelector('.pagination-container');
+    
+    if (!tbody) return;
+    
+    // Show loading state
+    tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center"><div class="flex items-center justify-center gap-2"><span class="material-symbols-outlined animate-spin">sync</span> Searching...</div></td></tr>`;
+    
+    // Build query string
+    const params = new URLSearchParams();
+    if (filters.q) params.set('q', filters.q);
+    if (filters.project_id) params.set('project_id', filters.project_id);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.priority) params.set('priority', filters.priority);
+    params.set('page', page);
+    
+    try {
+        const response = await fetch(`${TASK_SEARCH_ENDPOINT}?${params.toString()}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        
+        // Update table body
+        tbody.innerHTML = data.html || '<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">No tasks found</td></tr>';
+        
+        // Update pagination
+        if (paginationContainer && data.pagination) {
+            paginationContainer.innerHTML = data.pagination;
+        }
+        
+        // Update stats
+        updateTaskStats(data.total);
+        
+    } catch (error) {
+        console.error('Search error:', error);
+        tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-error">Error: ${error.message}</td></tr>`;
+    }
+}
+
+// Update task statistics
+function updateTaskStats(total) {
+    const statElements = document.querySelectorAll('.task-stat-total');
+    statElements.forEach(el => {
+        el.textContent = total || 0;
     });
 }
 
-// Filter changes
+// Load page from pagination click
+function loadTasksPage(url) {
+    const params = new URLSearchParams(url.split('?')[1] || '');
+    const filters = getTaskFilters();
+    const page = params.get('page') || 1;
+    fetchTasks(filters, page);
+}
+
+// Real-time search handler - INSTANT (no debounce or minimal)
+const searchInput = document.getElementById('task-search');
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        // TRULY INSTANT - no delay at all
+        fetchTasks(getTaskFilters(), 1);
+    });
+}
+
+// Filter handlers - instant update
 const filterProject = document.getElementById('filter-project');
 const filterStatus = document.getElementById('filter-status');
 const filterPriority = document.getElementById('filter-priority');
 
-function applyFilter(id, value) {
-    const url = new URL(window.location.href);
-    if (value) {
-        url.searchParams.set(id, value);
-    } else {
-        url.searchParams.delete(id);
-    }
-    window.location.href = url.toString();
+if (filterProject) {
+    filterProject.addEventListener('change', function() {
+        fetchTasks(getTaskFilters(), 1);
+    });
 }
 
-if (filterProject) filterProject.addEventListener('change', function() { applyFilter('project_id', this.value); });
-if (filterStatus) filterStatus.addEventListener('change', function() { applyFilter('status', this.value); });
-if (filterPriority) filterPriority.addEventListener('change', function() { applyFilter('priority', this.value); });
+if (filterStatus) {
+    filterStatus.addEventListener('change', function() {
+        fetchTasks(getTaskFilters(), 1);
+    });
+}
+
+if (filterPriority) {
+    filterPriority.addEventListener('change', function() {
+        fetchTasks(getTaskFilters(), 1);
+    });
+}
+
+// Clear all filters
+function clearTaskFilters() {
+    const searchInput = document.getElementById('task-search');
+    const filterProject = document.getElementById('filter-project');
+    const filterStatus = document.getElementById('filter-status');
+    const filterPriority = document.getElementById('filter-priority');
+    
+    if (searchInput) searchInput.value = '';
+    if (filterProject) filterProject.value = '';
+    if (filterStatus) filterStatus.value = '';
+    if (filterPriority) filterPriority.value = '';
+    
+    fetchTasks({ q: '', project_id: '', status: '', priority: '' }, 1);
+}
+
+// Add clear button functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const clearBtn = document.querySelector('.clear-filters-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearTaskFilters);
+    }
+});
 </script>
 @endpush
 @endsection
