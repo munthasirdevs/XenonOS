@@ -17,6 +17,7 @@ use App\Http\Controllers\Web\ProjectController;
 use App\Http\Controllers\Web\TeamController;
 use App\Http\Controllers\Web\AnalyticsController;
 use App\Http\Controllers\Web\ReportController;
+use App\Http\Controllers\Web\BillingController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -125,6 +126,37 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/support', [ReportController::class, 'support'])->name('reports.support');
     Route::get('/reports/builder', [ReportController::class, 'builder'])->name('reports.builder');
     Route::get('/reports/saved', [ReportController::class, 'saved'])->name('reports.saved');
+
+    // Billing
+    Route::get('/billing', [BillingController::class, 'index'])->name('billing');
+    Route::get('/billing/invoices', [BillingController::class, 'invoices'])->name('billing.invoices');
+    Route::get('/billing/invoices/{invoice}', [BillingController::class, 'invoiceDetails'])->name('billing.invoice.details');
+    Route::get('/billing/transactions', [BillingController::class, 'transactions'])->name('billing.transactions');
+
+    // Project Sub-pages
+    Route::get('/projects/hub', [ProjectController::class, 'hub'])->name('projects.hub');
+    Route::get('/projects/assigned', [ProjectController::class, 'assigned'])->name('projects.assigned');
+    Route::get('/projects/my-assigned', [ProjectController::class, 'myAssigned'])->name('projects.my-assigned');
+    Route::get('/projects/team', [ProjectController::class, 'team'])->name('projects.team');
+    Route::get('/projects/overview', [ProjectController::class, 'overview'])->name('projects.overview');
+    Route::get('/projects/timeline', [ProjectController::class, 'timeline'])->name('projects.timeline');
+    Route::get('/projects/tasks-workspace', [ProjectController::class, 'tasksWorkspace'])->name('projects.tasks-workspace');
+    Route::get('/projects/files-workspace', [ProjectController::class, 'filesWorkspace'])->name('projects.files-workspace');
+
+    // Task Sub-pages
+    Route::get('/tasks/hub', [TaskController::class, 'hub'])->name('tasks.hub');
+    Route::get('/tasks/calendar', [TaskController::class, 'calendar'])->name('tasks.calendar');
+    Route::get('/tasks/analytics', [TaskController::class, 'analytics'])->name('tasks.analytics');
+    Route::get('/tasks/assign', [TaskController::class, 'assign'])->name('tasks.assign');
+    Route::get('/tasks/manage', [TaskController::class, 'manage'])->name('tasks.manage');
+
+    // Communication Sub-pages
+    Route::get('/communication/monitor', [CommunicationController::class, 'monitor'])->name('communication.monitor');
+    Route::get('/communication/control', [CommunicationController::class, 'control'])->name('communication.control');
+    Route::get('/communication/create', [CommunicationController::class, 'create'])->name('communication.create');
+
+    // Activity Sub-pages
+    Route::get('/activity/admin', [ActivityController::class, 'admin'])->name('activity.admin');
 });
 
 Route::post('/settings/toggle-2fa', [SettingsController::class, 'toggle2FA'])->name('settings.toggle2fa');

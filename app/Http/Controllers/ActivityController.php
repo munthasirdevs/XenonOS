@@ -216,6 +216,26 @@ class ActivityController extends Controller
         ]);
     }
 
+    public function admin()
+    {
+        $logs = ActivityLog::with('user:id,name')
+            ->where(function($q) {
+                $q->where('severity', 'critical')
+                    ->orWhere('action', 'like', 'role%')
+                    ->orWhere('action', 'like', 'permission%');
+            })
+            ->latest()
+            ->paginate(15);
+
+        $stats = [
+            'total' => ActivityLog::count(),
+            'security' => SecurityLog::count(),
+            'recent' => ActivityLog::where('created_at', '>=', now()->subHours(24))->count(),
+        ];
+
+        return view('activity.admin', compact('logs', 'stats'));
+    }
+
     protected function getActivityStats(): array
     {
         return Cache::remember('activity_stats', 60, function () {

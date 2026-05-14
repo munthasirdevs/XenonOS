@@ -48,4 +48,34 @@ class CommunicationController extends Controller
 
         return redirect()->route('communication.chat', $chat->id)->with('success', 'Chat created successfully');
     }
+
+    public function monitor()
+    {
+        $chats = Chat::with(['users', 'messages'])
+            ->withCount('messages')
+            ->orderBy('messages_count', 'desc')
+            ->get();
+
+        $stats = [
+            'total' => Chat::count(),
+            'private' => Chat::where('type', 'private')->count(),
+            'group' => Chat::where('type', 'group')->count(),
+        ];
+
+        return view('communication.messaging-monitor', compact('chats', 'stats'));
+    }
+
+    public function control()
+    {
+        $chats = Chat::with(['users'])->get();
+
+        return view('communication.message-control', compact('chats'));
+    }
+
+    public function create()
+    {
+        $users = User::where('id', '!=', auth()->id())->get();
+
+        return view('communication.create-conversation', compact('users'));
+    }
 }

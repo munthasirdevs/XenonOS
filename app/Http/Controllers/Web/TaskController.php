@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -31,10 +32,8 @@ class TaskController extends Controller
         }
 
         $tasks = $query->orderBy('created_at', 'desc')->paginate(15);
-
         $projects = Project::select('id', 'name')->get();
 
-        // Check if AJAX request
         if ($request->ajax() || $request->wantsJson()) {
             return view('tasks.partials.task-table', compact('tasks'))->render();
         }
@@ -42,9 +41,6 @@ class TaskController extends Controller
         return view('tasks.index', compact('tasks', 'projects'));
     }
 
-    /**
-     * AJAX endpoint for instant search
-     */
     public function search(Request $request)
     {
         $query = Task::with(['project:id,name', 'assignee:id,name,avatar_url']);
@@ -125,5 +121,91 @@ class TaskController extends Controller
         $task->delete();
 
         return redirect()->route('tasks')->with('success', 'Task deleted successfully');
+    }
+
+    public function hub()
+    {
+        $stats = [
+            'total' => Task::count(),
+            'todo' => Task::where('status', 'todo')->count(),
+            'inProgress' => Task::where('status', 'in_progress')->count(),
+            'review' => Task::where('status', 'review')->count(),
+            'done' => Task::where('status', 'done')->count(),
+            'overdue' => Task::where('due_date', '<', now())->whereNot('status', 'done')->count(),
+        ];
+
+        $recentTasks = Task::with(['project', 'assignee'])
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('tasks.hub', compact('stats', 'recentTasks'));
+    }
+
+    public function calendar(Request $request)
+    {
+        $tasks = Task::with(['project', 'assignee'])
+            ->whereNotNull('due_date')
+            ->when($request->month, function ($query) use ($request) {
+                $query->whereMonth('due_date', $request->month ?? now()->month);
+            })
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        return view('tasks.calendar', compact('tasks'));
+    }
+
+    public function analytics()
+    {
+        $stats = [
+            'total' => Task::count(),
+            'completed' => Task::where('status', 'done')->count(),
+            'inProgress' => Task::where('status', 'in_progress')->count(),
+            'overdue' => Task::where('due_date', '<', now())->whereNot('status', 'done')->count(),
+        ];
+
+        $byPriority = Task::selectRaw('priority, count(*) as count')
+            ->groupBy('priority')
+            ->pluck('count', 'priority');
+
+        $byStatus = Task::selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        $topAssignees = User::withCount(['assignedTasks' => function ($q) {
+            $q->where('status', 'done');
+        }])
+        ->orderBy('assigned_tasks_count', 'desc')
+        ->take(5)
+        ->get();
+
+        return view('tasks.analytics', compact('stats', 'byPriority', 'byStatus', 'topAssignees'));
+    }
+
+    public function assign()
+    {
+        $tasks = Task::with(['project', 'assignee'])
+            ->whereNull('assignee_id')
+            ->orWhere('status', 'todo')
+            ->get();
+
+        $users = User::with(['roles'])->get();
+
+        $projects = Project::with(['tasks'])->get();
+
+        return view('tasks.assign', compact('tasks', 'users', 'projects'));
+    }
+
+    public function manage(Request $request)
+    {
+        $query = Task::with(['project', 'assignee']);
+
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        $tasks = $query->orderBy('updated_at', 'desc')->paginate(20);
+
+        return view('tasks.manage', compact('tasks'));
     }
 }
