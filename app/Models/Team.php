@@ -14,6 +14,9 @@ class Team extends Model
 
     protected $fillable = [
         'name',
+    ];
+
+    protected $guarded = [
         'owner_id',
     ];
 

@@ -14,11 +14,21 @@ class Setting extends Model
         'description',
     ];
 
-    protected function casts(): array
+    protected function getValueAttribute($value)
     {
-        return [
-            'value' => $this->type === 'boolean' ? 'boolean' : 'string',
-        ];
+        if ($this->type === 'boolean') {
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        if ($this->type === 'integer' || $this->type === 'number') {
+            return is_numeric($value) ? (int) $value : $value;
+        }
+
+        if ($this->type === 'json') {
+            return json_decode($value, true);
+        }
+
+        return $value;
     }
 
     public static function get(string $key, $default = null)
@@ -29,6 +39,10 @@ class Setting extends Model
 
     public static function set(string $key, $value, string $type = 'string', string $group = 'general'): void
     {
+        if ($type === 'json' && is_array($value)) {
+            $value = json_encode($value);
+        }
+
         static::updateOrCreate(
             ['key' => $key],
             ['value' => $value, 'type' => $type, 'group' => $group]

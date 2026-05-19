@@ -53,22 +53,34 @@ class ChatController extends Controller
         return $this->success($chat->load('users'), 'Chat created successfully', 201);
     }
 
-    public function show(Chat $chat)
+    public function show(Request $request, Chat $chat)
     {
+        if (!$chat->users()->where('user_id', $request->user()->id)->exists()) {
+            return $this->error('Unauthorized. You are not a member of this chat.', 403);
+        }
+
         $chat->load(['users', 'messages' => function($q) {
             $q->latest()->limit(50);
         }]);
         return $this->success($chat);
     }
 
-    public function destroy(Chat $chat)
+    public function destroy(Request $request, Chat $chat)
     {
+        if ($chat->created_by !== $request->user()->id) {
+            return $this->error('Unauthorized. Only the creator can delete this chat.', 403);
+        }
+
         $chat->delete();
         return $this->success(null, 'Chat deleted successfully');
     }
 
     public function messages(Request $request, Chat $chat)
     {
+        if (!$chat->users()->where('user_id', $request->user()->id)->exists()) {
+            return $this->error('Unauthorized. You are not a member of this chat.', 403);
+        }
+
         $messages = $chat->messages()
             ->with('sender:id,name')
             ->orderBy('created_at', 'desc')
@@ -79,6 +91,10 @@ class ChatController extends Controller
 
     public function sendMessage(Request $request, Chat $chat)
     {
+        if (!$chat->users()->where('user_id', $request->user()->id)->exists()) {
+            return $this->error('Unauthorized. You are not a member of this chat.', 403);
+        }
+
         $request->validate([
             'message' => 'required|string',
         ]);

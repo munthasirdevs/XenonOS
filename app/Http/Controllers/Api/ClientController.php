@@ -118,7 +118,9 @@ class ClientController extends Controller
         $stats = Cache::remember("client_{$client->id}_stats", 60, function() use ($client) {
             return [
                 'projects_count' => Project::where('client_id', $client->id)->count(),
-                'active_tasks' => Project::where('client_id', $client->id)->withCount('tasks')->get()->sum('tasks_count'),
+                'active_tasks' => Task::whereHas('project', function($q) use ($client) {
+                    $q->where('client_id', $client->id);
+                })->whereNotIn('status', ['done'])->count(),
                 'pending_invoices' => Invoice::where('client_id', $client->id)->where('status', 'pending')->count(),
             ];
         });

@@ -10,6 +10,7 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SystemController extends Controller
@@ -103,21 +104,31 @@ class SystemController extends Controller
         ]);
     }
 
-    public function routes()
+    public function routes(Request $request)
     {
-        $routes = collect(app('router')->getRoutes())->map(function ($route) {
-            return [
-                'uri' => $route->uri(),
-                'methods' => $route->methods(),
-                'name' => $route->getName(),
-            ];
-        });
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
+        $routes = collect(app('router')->getRoutes())
+            ->filter(fn($route) => in_array('GET', $route->methods()))
+            ->map(function ($route) {
+                return [
+                    'uri' => $route->uri(),
+                    'name' => $route->getName(),
+                ];
+            })
+            ->values();
 
         return $this->success($routes);
     }
 
-    public function services()
+    public function services(Request $request)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         $services = [
             'database' => DB::connection()->getPdo() ? 'connected' : 'disconnected',
             'cache' => config('cache.default'),

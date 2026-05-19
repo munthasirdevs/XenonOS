@@ -185,7 +185,7 @@ class TaskController extends Controller
     public function assign()
     {
         $tasks = Task::with(['project', 'assignee'])
-            ->whereNull('assignee_id')
+            ->whereNull('assigned_to')
             ->orWhere('status', 'todo')
             ->get();
 

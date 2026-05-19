@@ -52,7 +52,7 @@ class SettingsController extends Controller
             return back()->with('error', 'Current password is incorrect.');
         }
 
-        $user->update(['password' => $request->new_password]);
+        $user->update(['password' => bcrypt($request->new_password)]);
         
         return back()->with('success', 'Password updated successfully.');
     }

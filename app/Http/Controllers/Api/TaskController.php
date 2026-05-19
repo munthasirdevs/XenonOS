@@ -194,7 +194,7 @@ $this->clearTaskCache($task->id);
         return $this->success($task->load('assignee:id,name,email'), 'Task assigned successfully');
     }
 
-    public function logs(Task $task)
+    public function logs(Request $request, Task $task)
     {
         $cacheKey = "task_{$task->id}_logs_" . ($request->get('page', 1) ?? 1);
         

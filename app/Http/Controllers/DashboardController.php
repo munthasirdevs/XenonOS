@@ -34,10 +34,10 @@ class DashboardController extends Controller
                 'receivedThisMonth' => Payment::where('status', 'completed')->whereMonth('created_at', now()->month)->sum('amount'),
                 'pendingAmount' => Invoice::where('status', 'pending')->sum('amount'),
                 'totalTasks' => Task::count(),
-                'openTasks' => Task::where('status', 'pending')->count(),
-                'highPriorityTasks' => Task::where('priority', 'high')->where('status', 'pending')->count(),
-                'overdueTasks' => Task::where('due_date', '<', now()->toDateString())->where('status', 'pending')->count(),
-                'completedTasksToday' => Task::where('status', 'completed')->whereDate('updated_at', now()->toDateString())->count(),
+                'openTasks' => Task::whereIn('status', ['todo', 'in_progress', 'review'])->count(),
+                'highPriorityTasks' => Task::where('priority', 'high')->whereIn('status', ['todo', 'in_progress', 'review'])->count(),
+                'overdueTasks' => Task::where('due_date', '<', now()->toDateString())->where('status', '!=', 'done')->count(),
+                'completedTasksToday' => Task::where('status', 'done')->whereDate('updated_at', now()->toDateString())->count(),
             ];
         });
 
@@ -54,8 +54,8 @@ class DashboardController extends Controller
         });
 
         $tasks = Task::select('id', 'title', 'status', 'priority', 'due_date')
-            ->where('status', 'pending')
-            ->orderByRaw("FIELD(priority, 'high', 'medium', 'low')")
+            ->whereIn('status', ['todo', 'in_progress', 'review'])
+            ->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")
             ->limit(5)
             ->get();
 

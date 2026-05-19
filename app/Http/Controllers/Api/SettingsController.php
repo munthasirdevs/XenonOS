@@ -30,6 +30,10 @@ class SettingsController extends Controller
 
     public function store(Request $request)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         $request->validate([
             'key' => 'required|string|unique:settings,key',
             'value' => 'required',
@@ -44,6 +48,10 @@ class SettingsController extends Controller
 
     public function update(Request $request, Setting $setting)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         $request->validate([
             'value' => 'required',
             'description' => 'nullable|string',
@@ -53,8 +61,12 @@ class SettingsController extends Controller
         return $this->success($setting, 'Setting updated');
     }
 
-    public function destroy(Setting $setting)
+    public function destroy(Request $request, Setting $setting)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         $setting->delete();
         return $this->success(null, 'Setting deleted');
     }
@@ -71,6 +83,10 @@ class SettingsController extends Controller
 
     public function setValue(Request $request)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         $request->validate([
             'key' => 'required|string',
             'value' => 'required',

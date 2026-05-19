@@ -22,8 +22,8 @@ class Note extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function related(): BelongsTo
+    public function related(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
-        return $this->morphTo('related', 'related_type', 'related_id');
+        return $this->morphTo();
     }
 }

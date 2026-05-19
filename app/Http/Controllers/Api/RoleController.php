@@ -15,12 +15,20 @@ class RoleController extends Controller
 
     public function index(Request $request)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         $roles = Role::with('permissions')->get();
         return $this->success($roles);
     }
 
     public function store(RoleRequest $request)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         $role = Role::create($request->validated());
 
         AuditLog::create([
@@ -37,13 +45,21 @@ class RoleController extends Controller
 
     public function show(Request $request, Role $role)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         return $this->success($role->load('permissions'));
     }
 
     public function update(RoleRequest $request, Role $role)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         $oldData = $role->toArray();
-        
+
         $role->update($request->validated());
 
         AuditLog::create([
@@ -60,6 +76,10 @@ class RoleController extends Controller
 
     public function destroy(Request $request, Role $role)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         if ($role->users()->count() > 0) {
             return $this->error('Cannot delete role with assigned users.', 400);
         }

@@ -87,6 +87,10 @@ class NotificationController extends Controller
 
 public function send(Request $request)
     {
+        if (!$request->user()->hasRole('admin') && !$request->user()->hasRole('superadmin')) {
+            return $this->error('Unauthorized. Admin role required.', 403);
+        }
+
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'type' => 'required|string|max:100',
@@ -95,8 +99,15 @@ public function send(Request $request)
             'data' => 'nullable|array',
         ]);
 
-        $notification = UserNotification::create($request->all());
-        
+        $notification = UserNotification::create([
+            'user_id' => $request->user_id,
+            'type' => $request->type,
+            'title' => $request->title,
+            'message' => $request->message,
+            'data' => $request->data,
+            'created_by' => $request->user()->id,
+        ]);
+
         return $this->success($notification, 'Notification sent', 201);
     }
 }

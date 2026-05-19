@@ -22,6 +22,9 @@ class Project extends Model
         'end_date',
         'priority',
         'budget',
+    ];
+
+    protected $guarded = [
         'created_by',
         'updated_by',
     ];
@@ -78,5 +81,10 @@ class Project extends Model
     public function chats(): HasMany
     {
         return $this->hasMany(Chat::class);
+    }
+
+    public function teamMembers()
+    {
+        return $this->hasMany(TeamMember::class, 'project_id');
     }
 }

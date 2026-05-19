@@ -68,6 +68,13 @@ class FileController extends Controller
 
     public function destroy(Request $request, File $file)
     {
+        $isAdmin = $request->user()->hasRole('admin') || $request->user()->hasRole('superadmin');
+        $isOwner = $file->uploaded_by === $request->user()->id;
+
+        if (!$isOwner && !$isAdmin) {
+            return $this->error('Unauthorized. Only the file owner can delete this file.', 403);
+        }
+
         if ($file->path && Storage::disk('public')->exists($file->path)) {
             Storage::disk('public')->delete($file->path);
         }
@@ -85,6 +92,13 @@ class FileController extends Controller
 
     public function download(Request $request, File $file)
     {
+        $isAdmin = $request->user()->hasRole('admin') || $request->user()->hasRole('superadmin');
+        $isOwner = $file->uploaded_by === $request->user()->id;
+
+        if (!$isOwner && !$isAdmin) {
+            return $this->error('Unauthorized. You do not have access to this file.', 403);
+        }
+
         FileLog::create([
             'file_id' => $file->id,
             'action' => 'downloaded',

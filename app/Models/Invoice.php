@@ -24,6 +24,9 @@ class Invoice extends Model
         'sent_at',
         'paid_at',
         'notes',
+    ];
+
+    protected $guarded = [
         'created_by',
     ];
 

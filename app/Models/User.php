@@ -30,6 +30,12 @@ class User extends Authenticatable
         'quiet_hours_start',
         'quiet_hours_end',
         'plan_type',
+        'two_factor_secret',
+        'security_score',
+        'chat_channels',
+        'notification_matrix',
+        'auth_rules',
+        'last_export_at',
     ];
 
     protected $hidden = [
@@ -45,6 +51,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'timezone' => 'string',
             'date_format' => 'string',
+            'security_score' => 'integer',
+            'chat_channels' => 'array',
+            'notification_matrix' => 'array',
+            'auth_rules' => 'array',
+            'last_export_at' => 'datetime',
         ];
     }
 
@@ -56,18 +67,28 @@ class User extends Authenticatable
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user')
-                    ->withTimestamps()
-                    ->withPivot('user_id');
+                    ->withTimestamps();
     }
 
     public function permissions(): BelongsToMany
     {
-        return $this->roles()
+        return $this->belongsToMany(Permission::class, 'permission_role')
+            ->using(\App\Models\Role::class)
+            ->withTimestamps();
+    }
+
+    public function getAllPermissions(): array
+    {
+        $rolePermissions = $this->roles()
             ->with('permissions')
             ->get()
-            ->pluck('permissions')
+            ->pluck('permissions.*.slug')
             ->flatten()
-            ->unique('id');
+            ->unique()
+            ->values()
+            ->toArray();
+
+        return array_unique($rolePermissions);
     }
 
     public function sessions(): HasMany
@@ -156,14 +177,19 @@ class User extends Authenticatable
 
     public function getRoleAttribute(): string
     {
-        return $this->roles()->first()?->name ?? 'User';
+        return \Cache::remember("user_role_{$this->id}", 3600, function () {
+            return $this->roles()->first()?->name ?? 'User';
+        });
+    }
+
+    public function clearRoleCache(): void
+    {
+        \Cache::forget("user_role_{$this->id}");
     }
 
     public function hasPermission(string $permission): bool
     {
-        return $this->roles()
-            ->whereHas('permissions', fn($q) => $q->where('slug', $permission))
-            ->exists();
+        return in_array($permission, $this->cachedPermissions());
     }
 
     public function hasAllPermissions(array $permissions): bool
@@ -177,23 +203,21 @@ class User extends Authenticatable
         return true;
     }
 
-    public function getAllPermissionsAttribute(): array
-    {
-        return $this->roles()
-            ->with('permissions')
-            ->get()
-            ->pluck('permissions.*.slug')
-            ->flatten()
-            ->unique()
-            ->values()
-            ->toArray();
-    }
-
     public function cachedPermissions(): array
     {
         return \Cache::remember("user_permissions_{$this->id}", 900, function () {
-            return $this->getAllPermissionsAttribute();
+            return $this->getAllPermissions();
         });
+    }
+
+    public function clearPermissionCache(): void
+    {
+        \Cache::forget("user_permissions_{$this->id}");
+    }
+
+    public function getAllPermissionsAttribute(): array
+    {
+        return $this->getAllPermissions();
     }
 
     public function isActive(): bool

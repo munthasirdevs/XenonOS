@@ -42,8 +42,8 @@ class TaskPolicy
         if ($task->project) {
             return $task->project->created_by === $user->id || 
                    $task->project->teamMembers()->where('user_id', $user->id)->exists() ||
-                   $task->assignee_id === $user->id;
+                   $task->assigned_to === $user->id;
         }
-        return $task->assignee_id === $user->id;
+        return $task->assigned_to === $user->id;
     }
 }

@@ -26,6 +26,9 @@ class Client extends Model
         'avatar_url',
         'status',
         'notes',
+    ];
+
+    protected $guarded = [
         'created_by',
         'updated_by',
     ];
@@ -75,5 +78,10 @@ class Client extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
+    }
+
+    public function teamMembers()
+    {
+        return $this->hasMany(TeamMember::class, 'client_id');
     }
 }

@@ -58,7 +58,7 @@ class PaymentController extends Controller
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'amount' => 'required|numeric|min:0.01',
-            'method' => 'required|in:card,bank_transfer,paypal,bank_transfer,cash',
+            'method' => 'required|in:card,bank_transfer,paypal,cash',
         ]);
 
         $invoice = Invoice::create([

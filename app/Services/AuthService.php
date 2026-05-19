@@ -27,8 +27,8 @@ class AuthService
             return null;
         }
         
-        if (!$user->is_active) {
-            $this->logFailedAttempt($user->id, $ip, 'inactive_account', $email);
+        if ($user->status === 'banned') {
+            $this->logFailedAttempt($user->id, $ip, 'banned_account', $email);
             return null;
         }
         
@@ -46,7 +46,7 @@ class AuthService
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'is_active' => true,
+            'status' => 'active',
         ]);
         
         return $user;
