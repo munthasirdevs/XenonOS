@@ -21,7 +21,7 @@ class DashboardController extends Controller
     {
         $userId = auth()->id();
 
-        $stats = Cache::remember('dashboard_stats', 60, function() {
+        $stats = Cache::remember("dashboard_stats_{$userId}", 60, function() {
             return [
                 'totalClients' => Client::count(),
                 'activeClients' => Client::where('status', 'active')->count(),
@@ -41,15 +41,15 @@ class DashboardController extends Controller
             ];
         });
 
-        $recentActivity = Cache::remember('recent_activity', 30, function() {
+        $recentActivity = Cache::remember("recent_activity_{$userId}", 30, function() {
             return ActivityLog::with('user:id,name')->latest()->limit(5)->get();
         });
 
-        $recentPayments = Cache::remember('recent_payments', 30, function() {
+        $recentPayments = Cache::remember("recent_payments_{$userId}", 30, function() {
             return Payment::with('invoice.client:id,name')->where('status', 'completed')->latest()->limit(5)->get();
         });
 
-        $recentClients = Cache::remember('recent_clients', 60, function() {
+        $recentClients = Cache::remember("recent_clients_{$userId}", 60, function() {
             return Client::select('id', 'name', 'email', 'company', 'status', 'created_at')->latest()->limit(5)->get();
         });
 
@@ -59,7 +59,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        $alerts = Cache::remember('security_alerts', 30, function() {
+        $alerts = Cache::remember("security_alerts_{$userId}", 30, function() {
             return SecurityLog::whereIn('event', ['failed_login', 'suspicious_activity'])->latest()->limit(3)->get();
         });
 
@@ -69,7 +69,7 @@ class DashboardController extends Controller
             ->limit(3)
             ->get();
 
-        $recentProjects = Cache::remember('recent_projects', 30, function() {
+        $recentProjects = Cache::remember("recent_projects_{$userId}", 30, function() {
             return Project::select('id', 'name', 'status', 'priority', 'end_date')->where('status', 'active')->latest()->limit(3)->get();
         });
 
@@ -89,13 +89,21 @@ class DashboardController extends Controller
             ->latest()
             ->first();
 
-        $weeklyBilling = Cache::remember('weekly_billing', 60, function() {
+        $weeklyBilling = Cache::remember("weekly_billing_{$userId}", 60, function() {
+            $results = Payment::selectRaw('DATE(created_at) as date, SUM(amount) as total')
+                ->where('status', 'completed')
+                ->where('created_at', '>=', now()->subDays(6))
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get()
+                ->keyBy('date');
+
             $data = [];
             for ($i = 6; $i >= 0; $i--) {
                 $date = now()->subDays($i)->toDateString();
                 $data[] = [
                     'day' => now()->subDays($i)->format('D'),
-                    'amount' => Payment::where('status', 'completed')->whereDate('created_at', $date)->sum('amount') ?? 0,
+                    'amount' => $results[$date]->total ?? 0,
                 ];
             }
             return $data;

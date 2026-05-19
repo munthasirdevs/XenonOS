@@ -28,9 +28,11 @@ use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\IntegrationController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('v1')->group(function () {
+
 Route::prefix('auth')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -286,12 +288,14 @@ Route::prefix('api-keys')->group(function () {
     });
 });
 
-// System routes (can remain public for health checks)
+// System routes
 Route::get('/system/health', [SystemController::class, 'health']);
-Route::get('/system/stats', [SystemController::class, 'stats']);
-Route::get('/system/info', [SystemController::class, 'info']);
-Route::get('/system/routes', [SystemController::class, 'routes']);
-Route::get('/system/services', [SystemController::class, 'services']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/system/stats', [SystemController::class, 'stats']);
+    Route::get('/system/info', [SystemController::class, 'info']);
+    Route::get('/system/routes', [SystemController::class, 'routes']);
+    Route::get('/system/services', [SystemController::class, 'services']);
+});
 
 // Subscription routes
 Route::prefix('subscriptions')->group(function () {
@@ -347,3 +351,5 @@ Route::prefix('integrations')->group(function () {
         Route::post('/{integration}/test', [IntegrationController::class, 'test']);
     });
 });
+
+}); // End v1 prefix

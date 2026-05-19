@@ -62,8 +62,12 @@ class User extends Authenticatable
 
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class, 'permission_role')
-                    ->withTimestamps();
+        return $this->roles()
+            ->with('permissions')
+            ->get()
+            ->pluck('permissions')
+            ->flatten()
+            ->unique('id');
     }
 
     public function sessions(): HasMany
@@ -164,8 +168,9 @@ class User extends Authenticatable
 
     public function hasAllPermissions(array $permissions): bool
     {
+        $userPermissions = $this->cachedPermissions();
         foreach ($permissions as $permission) {
-            if (!$this->hasPermission($permission)) {
+            if (!in_array($permission, $userPermissions)) {
                 return false;
             }
         }

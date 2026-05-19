@@ -33,11 +33,9 @@ return new class extends Migration
         });
 
         Schema::create('team_members', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('role_in_team')->nullable();
-            $table->timestamps();
             
             $table->unique(['team_id', 'user_id']);
             $table->index('team_id');

@@ -88,8 +88,9 @@ class Task extends Model
     public function scopeSearch($query, $term)
     {
         return $query->where(function($q) use ($term) {
-            $q->where('title', 'like', '%' . $term . '%')
-              ->orWhere('description', 'like', '%' . $term . '%');
+            $q->where('title', 'like', $term . '%')
+              ->orWhere('title', 'like', '% ' . $term . '%')
+              ->orWhere('description', 'like', $term . '%');
         });
     }
 }

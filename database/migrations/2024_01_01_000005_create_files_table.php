@@ -23,11 +23,9 @@ return new class extends Migration
         });
 
         Schema::create('file_shares', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('file_id')->constrained('files')->onDelete('cascade');
             $table->foreignId('shared_with_user_id')->constrained('users')->onDelete('cascade');
             $table->enum('permission', ['view', 'edit'])->default('view');
-            $table->timestamps();
             
             $table->unique(['file_id', 'shared_with_user_id']);
             $table->index('file_id');
