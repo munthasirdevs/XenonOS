@@ -99,11 +99,6 @@
 @php
     $currentRoute = request()->route()->getName();
     $currentPath = request()->path();
-
-    function isActive($pattern, $current)
-    {
-        return preg_match($pattern, $current) ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright';
-    }
 @endphp
 
 <!-- Sidebar -->

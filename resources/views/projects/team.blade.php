@@ -1,9 +1,104 @@
 ﻿@extends('layouts.app')
 
-@section('title', 'XenonOS | Project Alpha - Team')
-
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/projects-team.css') }}">
+<link rel="stylesheet" href="{{ asset('css/projects-team.css') }}">
+@endpush
+
+@section('title', 'Project Teams - XenonOS')
+
+@section('content')
+<x-navbar />
+
+<main class="flex-1 md:ml-[260px] min-h-screen p-6 md:p-8 space-y-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div class="space-y-2">
+            <h1 class="text-4xl md:text-5xl font-headline font-light tracking-tight text-on-surface">Project Teams</h1>
+            <p class="text-on-surface-variant font-body">Manage team members across all projects.</p>
+        </div>
+        <button class="bg-primary text-on-primary-container px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-primary-container transition-colors shadow-lg shadow-primary/10">
+            <span class="material-symbols-outlined">person_add</span>
+            Add Team Member
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        @forelse($users->take(6) as $user)
+        @php
+            $userProjects = \App\Models\TeamMember::where('user_id', $user->id)->count();
+            $userTasks = \App\Models\Task::where('assigned_to', $user->id)->whereIn('status', ['pending', 'in_progress'])->count();
+        @endphp
+        <div class="bg-surface-container rounded-2xl p-6 hover:scale-[1.02] transition-all duration-400" onclick="window.location='#'">
+            <div class="flex items-center gap-4 mb-4">
+                <img alt="Team member" class="w-16 h-16 rounded-full object-cover" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=818cf8&color=fff" />
+                <div>
+                    <h3 class="font-headline font-bold text-lg text-on-surface">{{ $user->name }}</h3>
+                    <p class="text-sm text-on-surface-variant">{{ $user->roles->first()?->name ?? 'Team Member' }}</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-4">
+                @foreach(\App\Models\TeamMember::where('user_id', $user->id)->with('project')->limit(2)->get() as $tm)
+                    @if($tm->project)
+                    <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">{{ $tm->project->name }}</span>
+                    @endif
+                @endforeach
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-on-surface-variant">{{ $userProjects }} Active Projects</span>
+                <button class="text-primary hover:text-primary-container"><span class="material-symbols-outlined">chevron_right</span></button>
+            </div>
+        </div>
+        @empty
+        <div class="col-span-full text-center py-12">
+            <p class="text-on-surface-variant">No team members found.</p>
+        </div>
+        @endforelse
+    </div>
+
+    <div class="bg-surface-container-low rounded-2xl p-6">
+        <h3 class="text-xl font-headline font-semibold text-on-surface mb-6">All Team Members</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-outline-variant/20">
+                        <th class="pb-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Member</th>
+                        <th class="pb-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Role</th>
+                        <th class="pb-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Projects</th>
+                        <th class="pb-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Tasks</th>
+                        <th class="pb-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/10">
+                    @forelse($users as $user)
+                    @php
+                        $userProjects = \App\Models\TeamMember::where('user_id', $user->id)->count();
+                        $userTasks = \App\Models\Task::where('assigned_to', $user->id)->whereIn('status', ['pending', 'in_progress'])->count();
+                    @endphp
+                    <tr class="hover:bg-surface-container transition-colors cursor-pointer" onclick="window.location='#'">
+                        <td class="py-4">
+                            <div class="flex items-center gap-3">
+                                <img alt="User" class="w-10 h-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=818cf8&color=fff" />
+                                <span class="font-medium text-on-surface">{{ $user->name }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 text-on-surface-variant">{{ $user->roles->first()?->name ?? 'Team Member' }}</td>
+                        <td class="py-4 text-on-surface-variant">{{ $userProjects }}</td>
+                        <td class="py-4 text-on-surface-variant">{{ $userTasks }}</td>
+                        <td class="py-4"><span class="px-3 py-1 bg-success/10 text-success text-xs font-bold rounded-full">Active</span></td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-on-surface-variant">No team members found.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+@endsection
+
+@push('scripts')
+<script src="{{ asset('js/projects-team.js') }}"></script>
 @endpush
 
 @section('content')

@@ -50,6 +50,11 @@ class Project extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
@@ -84,6 +89,11 @@ class Project extends Model
     }
 
     public function teamMembers()
+    {
+        return $this->hasMany(TeamMember::class, 'project_id');
+    }
+
+    public function team()
     {
         return $this->hasMany(TeamMember::class, 'project_id');
     }

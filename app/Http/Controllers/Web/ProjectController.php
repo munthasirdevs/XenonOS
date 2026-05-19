@@ -12,7 +12,7 @@ class ProjectController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Project::with(['owner:id,name', 'client:id,name']);
+        $query = Project::with(['owner:id,name', 'client:id,name', 'team.user']);
 
         if ($request->has('status') && $request->status) {
             $query->where('status', $request->status);
