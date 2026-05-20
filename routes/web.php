@@ -108,6 +108,9 @@ Route::middleware('auth')->group(function () {
 
     // Projects
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/filter', [ProjectController::class, 'filterJson'])->name('projects.filter');
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 
     // Team
