@@ -1,101 +1,3 @@
-<script>
-    tailwind.config = {
-        darkMode: 'class',
-        theme: {
-            extend: {
-                colors: {
-                    'surface-container-highest': '#1a1d26',
-                    'surface-bright': '#1e222c',
-                    'surface-container': '#12151e',
-                    'surface-container-low': '#0f121a',
-                    'surface-container-high': '#161922',
-                    'surface-container-lowest': '#06080c',
-                    'background': '#0b0e14',
-                    'primary': '#818cf8',
-                    'on-primary': '#1e1b4b',
-                    'on-surface': '#dfe2f1',
-                    'on-surface-variant': '#94a3b8',
-                    'outline': '#475569',
-                    'outline-variant': '#464554',
-                    'error': '#ffb4ab',
-                },
-                fontFamily: {
-                    headline: ['Syne', 'sans-serif'],
-                    body: ['Outfit', 'sans-serif'],
-                    label: ['Outfit', 'sans-serif'],
-                }
-            }
-        }
-    }
-</script>
-
-<style>
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-        font-size: 20px;
-    }
-
-    .active-icon {
-        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #1e222c;
-        border-radius: 10px;
-    }
-
-    .section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 16px;
-        margin-bottom: 4px;
-        cursor: pointer;
-        user-select: none;
-    }
-
-    .section-header:hover {
-        background: rgba(129, 140, 248, 0.05);
-    }
-
-    .section-content {
-        overflow: hidden;
-        max-height: 0;
-        transition: max-height 0.3s ease-out;
-    }
-
-    .section-content.open {
-        max-height: 500px;
-    }
-
-    .chevron-icon {
-        transition: transform 0.2s ease;
-        font-size: 16px;
-    }
-
-    .chevron-icon.rotated {
-        transform: rotate(180deg);
-    }
-
-    @media (max-width: 768px) {
-        .sidebar {
-            transform: translateX(-100%);
-        }
-
-        .sidebar.open {
-            transform: translateX(0);
-        }
-    }
-</style>
-
 @php
     $currentRoute = request()->route()->getName();
     $currentPath = request()->path();
@@ -129,7 +31,7 @@
 
         <!-- WORKSPACE Section -->
         <div class="sidebar-section">
-            <div class="section-header" onclick="toggleSection('workspace')">
+            <div class="section-header" data-section="workspace">
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-primary/70">grid_view</span>
                     <span
@@ -138,7 +40,7 @@
                 <span class="material-symbols-outlined text-[14px] text-on-surface-variant/50 chevron-icon"
                     id="chevron-workspace">expand_more</span>
             </div>
-            <div class="section-content" id="section-workspace">
+            <div class="section-content" id="section-content-workspace">
                 <!-- Projects -->
                 <div class="ml-3 my-1">
                     <div
@@ -196,7 +98,7 @@
 
         <!-- MANAGEMENT Section -->
         <div class="sidebar-section">
-            <div class="section-header" onclick="toggleSection('management')">
+            <div class="section-header" data-section="management">
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-primary/70">folder_shared</span>
                     <span
@@ -205,7 +107,7 @@
                 <span class="material-symbols-outlined text-[14px] text-on-surface-variant/50 chevron-icon"
                     id="chevron-management">expand_more</span>
             </div>
-            <div class="section-content" id="section-management">
+            <div class="section-content" id="section-content-management">
                 <a href="{{ route('clients') }}"
                     class="{{ str_starts_with($currentPath, 'clients') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-2.5 flex items-center gap-3 rounded-lg text-[12px] transition-all">
                     <span
@@ -229,7 +131,7 @@
 
         <!-- FINANCE Section -->
         <div class="sidebar-section">
-            <div class="section-header" onclick="toggleSection('finance')">
+            <div class="section-header" data-section="finance">
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-primary/70">payments</span>
                     <span
@@ -238,7 +140,7 @@
                 <span class="material-symbols-outlined text-[14px] text-on-surface-variant/50 chevron-icon"
                     id="chevron-finance">expand_more</span>
             </div>
-            <div class="section-content" id="section-finance">
+            <div class="section-content" id="section-content-finance">
                 <a href="{{ route('billing') }}"
                     class="{{ str_starts_with($currentPath, 'billing') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-2.5 flex items-center gap-3 rounded-lg text-[12px] transition-all">
                     <span
@@ -256,7 +158,7 @@
 
         <!-- INSIGHTS Section -->
         <div class="sidebar-section">
-            <div class="section-header" onclick="toggleSection('insights')">
+            <div class="section-header" data-section="insights">
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-primary/70">insights</span>
                     <span
@@ -265,7 +167,7 @@
                 <span class="material-symbols-outlined text-[14px] text-on-surface-variant/50 chevron-icon"
                     id="chevron-insights">expand_more</span>
             </div>
-            <div class="section-content" id="section-insights">
+            <div class="section-content" id="section-content-insights">
                 <div class="ml-3 my-1">
                     <div
                         class="text-[10px] font-semibold text-on-surface-variant/40 uppercase tracking-wider px-4 py-1">
@@ -306,7 +208,7 @@
 
         <!-- SYSTEM Section -->
         <div class="sidebar-section">
-            <div class="section-header" onclick="toggleSection('system')">
+            <div class="section-header" data-section="system">
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-primary/70">monitor_heart</span>
                     <span
@@ -315,7 +217,7 @@
                 <span class="material-symbols-outlined text-[14px] text-on-surface-variant/50 chevron-icon"
                     id="chevron-system">expand_more</span>
             </div>
-            <div class="section-content" id="section-system">
+            <div class="section-content" id="section-content-system">
                 <a href="{{ route('files') }}"
                     class="{{ str_starts_with($currentPath, 'files') ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:text-primary hover:bg-surface-bright' }} px-4 py-2.5 flex items-center gap-3 rounded-lg text-[12px] transition-all">
                     <span
@@ -379,42 +281,15 @@
 </aside>
 
 <!-- Mobile Overlay -->
-<div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
 
 <!-- Mobile Toggle Button -->
-<button id="mobile-toggle" class="fixed top-4 left-4 z-50 p-2 rounded-lg bg-surface-container md:hidden"
-    onclick="toggleSidebar()">
+<button id="mobile-toggle" class="fixed top-4 left-4 z-50 p-2 rounded-lg bg-surface-container md:hidden">
     <span class="material-symbols-outlined text-white">menu</span>
 </button>
 
-<script>
-    const SIDEBAR_STORAGE_KEY = 'xenonos_sidebar_state';
-    
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        if (!sidebar) return;
-        
-        const isOpen = sidebar.classList.contains('open');
-        
-        if (isOpen) {
-            sidebar.classList.remove('open');
-            document.body.classList.remove('sidebar-open');
-            overlay.classList.add('hidden');
-            localStorage.setItem(SIDEBAR_STORAGE_KEY, 'closed');
-        } else {
-            sidebar.classList.add('open');
-            document.body.classList.add('sidebar-open');
-            overlay.classList.remove('hidden');
-            localStorage.setItem(SIDEBAR_STORAGE_KEY, 'open');
-        }
-    }
+<!-- Load Navbar CSS -->
+<link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 
-    function toggleSection(sectionId) {
-        const content = document.getElementById('section-' + sectionId);
-        const chevron = document.getElementById('chevron-' + sectionId);
-
-        content.classList.toggle('open');
-        chevron.classList.toggle('rotated');
-    }
-</script>
+<!-- Load Navbar JS -->
+<script src="{{ asset('js/navbar.js') }}"></script>

@@ -7,42 +7,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'XenonOS')</title>
 
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        'surface-container-highest': '#1a1d26',
-                        'surface-bright': '#1e222c',
-                        'surface-container': '#12151e',
-                        'surface-container-low': '#0f121a',
-                        'surface-container-high': '#161922',
-                        'background': '#0b0e14',
-                        'primary': '#818cf8',
-                        'on-primary': '#1e1b4b',
-                        'on-primary-container': '#1e1b4b',
-                        'on-surface': '#dfe2f1',
-                        'on-surface-variant': '#94a3b8',
-                        'error': '#f87171',
-                        'success': '#34d399',
-                        'tertiary': '#c084fc',
-                        'secondary': '#818cf8',
-                        'on-secondary': '#1e1b4b',
-                        'outline-variant': '#334155',
-                        'primary-container': '#312e81',
-                    },
-                    fontFamily: {
-                        headline: ['Syne', 'sans-serif'],
-                        body: ['Outfit', 'sans-serif'],
-                        label: ['Outfit', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Syne:wght@400..800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     @stack('styles')
 </head>

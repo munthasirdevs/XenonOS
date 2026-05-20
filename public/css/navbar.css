@@ -1,13 +1,98 @@
-/* Navbar CSS */
+/* Navbar Component CSS */
 .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
     font-size: 20px;
 }
+
 .active-icon {
-    font-variation-settings: 'FILL' 1, 'wght' 400;
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-@media (max-width: 768px) {
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.open { transform: translateX(0); }
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Sidebar Styles */
+#sidebar {
+    transform: translateX(-100%);
+}
+
+#sidebar.open {
+    transform: translateX(0);
+}
+
+@media (min-width: 768px) {
+    #sidebar {
+        transform: translateX(0);
+    }
+    
+    #sidebar:not(.open) {
+        transform: translateX(-100%);
+    }
+}
+
+/* Sidebar Section Toggle */
+.sidebar-section-toggle {
+    cursor: pointer;
+}
+
+.sidebar-section-toggle .chevron {
+    transition: transform 0.2s ease;
+}
+
+.sidebar-section-toggle.open .chevron {
+    transform: rotate(180deg);
+}
+
+.sidebar-section-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.sidebar-section-content.open {
+    max-height: 500px;
+}
+
+/* Nav Link Styles */
+.nav-link {
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    background-color: var(--surface-bright);
+    color: var(--primary);
+}
+
+.nav-link.active {
+    background-color: rgba(129, 140, 248, 0.1);
+    color: var(--primary);
+    border-left: 4px solid var(--primary);
+}
+
+/* Sidebar Toggle Button */
+#mobile-toggle {
+    z-index: 50;
+}
+
+#mobile-toggle:hover {
+    background-color: var(--surface-container-high);
+}
+
+/* Sidebar Overlay */
+#sidebar-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
 }
