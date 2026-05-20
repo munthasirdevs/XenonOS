@@ -87,6 +87,51 @@ class ProjectController extends Controller
         return $this->success($projects);
     }
 
+    public function filter(Request $request)
+    {
+        $query = Project::select(['id', 'client_id', 'name', 'description', 'status', 'priority', 'start_date', 'end_date', 'budget', 'created_by', 'updated_by', 'created_at', 'updated_at'])
+            ->with(['client:id,name', 'owner:id,name', 'team']);
+
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('client', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('client') && $request->client) {
+            $query->where('client_id', $request->client);
+        }
+
+        if ($request->has('priority') && $request->priority) {
+            $query->where('priority', $request->priority);
+        }
+
+        $sort = $request->get('sort', 'newest');
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'deadline':
+                $query->orderBy('end_date', 'asc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+        }
+
+        $projects = $query->paginate(15);
+
+        return $this->success($projects);
+    }
+
     public function store(ProjectRequest $request)
     {
         $project = Project::create([

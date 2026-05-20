@@ -99,10 +99,12 @@ Route::prefix('clients')->group(function () {
 
 // Project routes
 Route::prefix('projects')->group(function () {
+    Route::get('/', [ProjectController::class, 'index']);
+    Route::get('/filter', [ProjectController::class, 'filter']);
+    Route::get('/{project}', [ProjectController::class, 'show']);
+    
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/', [ProjectController::class, 'index']);
         Route::post('/', [ProjectController::class, 'store'])->middleware('permission:project.create');
-        Route::get('/{project}', [ProjectController::class, 'show']);
         Route::put('/{project}', [ProjectController::class, 'update'])->middleware('permission:project.update');
         Route::delete('/{project}', [ProjectController::class, 'destroy'])->middleware('permission:project.delete');
 
