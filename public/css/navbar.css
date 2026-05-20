@@ -17,15 +17,48 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    background: #1e222c;
+    border-radius: 10px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.section-header:hover {
+    background: rgba(129, 140, 248, 0.05);
+}
+
+.section-content {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease-out;
+}
+
+.section-content.open {
+    max-height: 500px;
+}
+
+.chevron-icon {
+    transition: transform 0.2s ease;
+    font-size: 16px;
+}
+
+.chevron-icon.rotated {
+    transform: rotate(180deg);
 }
 
 /* Sidebar Styles */
+.sidebar {
+    transition: transform 0.3s ease;
+}
+
 #sidebar {
     transform: translateX(-100%);
 }
@@ -36,51 +69,12 @@
 
 @media (min-width: 768px) {
     #sidebar {
-        transform: translateX(0);
+        transform: translateX(0) !important;
     }
     
     #sidebar:not(.open) {
-        transform: translateX(-100%);
+        transform: translateX(-100%) !important;
     }
-}
-
-/* Sidebar Section Toggle */
-.sidebar-section-toggle {
-    cursor: pointer;
-}
-
-.sidebar-section-toggle .chevron {
-    transition: transform 0.2s ease;
-}
-
-.sidebar-section-toggle.open .chevron {
-    transform: rotate(180deg);
-}
-
-.sidebar-section-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-}
-
-.sidebar-section-content.open {
-    max-height: 500px;
-}
-
-/* Nav Link Styles */
-.nav-link {
-    transition: all 0.2s ease;
-}
-
-.nav-link:hover {
-    background-color: var(--surface-bright);
-    color: var(--primary);
-}
-
-.nav-link.active {
-    background-color: rgba(129, 140, 248, 0.1);
-    color: var(--primary);
-    border-left: 4px solid var(--primary);
 }
 
 /* Sidebar Toggle Button */
@@ -89,10 +83,15 @@
 }
 
 #mobile-toggle:hover {
-    background-color: var(--surface-container-high);
+    background-color: #161922;
 }
 
 /* Sidebar Overlay */
 #sidebar-overlay {
     background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Sidebar Section Toggle */
+.sidebar-section {
+    margin-bottom: 4px;
 }

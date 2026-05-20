@@ -85,11 +85,14 @@
     }
     
     function initSectionToggles() {
-        const toggles = document.querySelectorAll('.sidebar-section-toggle');
+        const toggles = document.querySelectorAll('.section-header');
         
         toggles.forEach(function(toggle) {
             const sectionId = toggle.dataset.section;
+            if (!sectionId) return;
+            
             const content = document.getElementById('section-content-' + sectionId);
+            const chevron = document.getElementById('chevron-' + sectionId);
             
             if (!content) return;
             
@@ -99,9 +102,11 @@
                 if (isOpen) {
                     content.classList.remove('open');
                     toggle.classList.remove('open');
+                    if (chevron) chevron.classList.remove('rotated');
                 } else {
                     content.classList.add('open');
                     toggle.classList.add('open');
+                    if (chevron) chevron.classList.add('rotated');
                 }
             });
         });
@@ -128,6 +133,7 @@
     window.toggleSection = function(sectionId) {
         const content = document.getElementById('section-content-' + sectionId);
         const toggle = document.querySelector(`[data-section="${sectionId}"]`);
+        const chevron = document.getElementById('chevron-' + sectionId);
         
         if (!content) return;
         
@@ -136,9 +142,11 @@
         if (isOpen) {
             content.classList.remove('open');
             if (toggle) toggle.classList.remove('open');
+            if (chevron) chevron.classList.remove('rotated');
         } else {
             content.classList.add('open');
             if (toggle) toggle.classList.add('open');
+            if (chevron) chevron.classList.add('rotated');
         }
     };
     
