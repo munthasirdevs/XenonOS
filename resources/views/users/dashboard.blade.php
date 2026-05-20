@@ -7,8 +7,6 @@
 @section('title', 'Dashboard - XenonOS')
 
 @section('content')
-<x-navbar />
-
 <main class="flex-1 md:ml-[260px] min-h-screen">
         .bg-rose-500\/10 { background-color: rgba(244,63,94,0.1); }
         .text-rose-400 { color: #F43F5E; }

@@ -7,7 +7,6 @@
 @endpush
 
 @section('content')
-<x-navbar />
 <main class="flex-1 min-h-screen flex flex-col">
     <div class="p-8">
         <div class="max-w-7xl mx-auto">

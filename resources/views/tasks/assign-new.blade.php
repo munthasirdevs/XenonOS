@@ -1,7 +1,5 @@
 ﻿@extends("layouts.app")
 
-<x-navbar />
-
 @section("content")
 <main class="min-h-screen pb-12 px-8 bg-surface text-on-surface font-body">
     <div class="max-w-7xl mx-auto pt-8">

@@ -7,7 +7,6 @@
 @endpush
 
 @section('content')
-<x-navbar />
 <main class="p-8 min-h-[calc(100vh-4rem)] flex flex-col">
     <section class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>

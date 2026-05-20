@@ -7,7 +7,6 @@
 @endpush
 
 @section('content')
-<x-navbar />
 <div class="p-8">
     <section class="mb-12 flex justify-between items-end">
         <div>

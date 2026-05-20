@@ -7,7 +7,6 @@
 @section('title', 'Active Tasks - XenonOS')
 
 @section('content')
-<x-navbar />
 
 <div class="p-6 lg:p-10">
     <header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">

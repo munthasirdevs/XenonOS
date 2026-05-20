@@ -7,7 +7,6 @@
 @endpush
 
 @section('content')
-<x-navbar />
 <main class="min-h-screen grid grid-cols-12 gap-0 overflow-hidden">
     <aside class="col-span-12 md:col-span-3 bg-surface-container-low p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar border-r border-outline-variant/10">
         <div>

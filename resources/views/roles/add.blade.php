@@ -7,7 +7,6 @@
 @endpush
 
 @section('content')
-<x-navbar />
 <main class="flex-1 min-h-screen flex flex-col">
     <div class="py-8 max-w-7xl mx-auto">
         <header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">

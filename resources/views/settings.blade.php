@@ -20,7 +20,6 @@ $surveyInvites = $user->survey_invites ?? false;
 $quietHoursStart = $user->quiet_hours_start ?? '22:00';
 $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
 @endphp
-<x-navbar />
 <div class="space-y-8 md:space-y-10 lg:space-y-12">
     <section class="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
         <div>

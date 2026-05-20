@@ -1,7 +1,5 @@
 ﻿@extends("layouts.app")
 
-<x-navbar />
-
 @section("content")
 <main class="flex-1 min-h-screen flex flex-col">
     <div class="pt-24 pb-12 px-12 min-h-screen">

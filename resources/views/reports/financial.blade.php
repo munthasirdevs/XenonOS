@@ -7,7 +7,6 @@
 @endpush
 
 @section('content')
-<x-navbar />
 <div class="space-y-12">
     <!-- Header -->
     <div class="mb-10">

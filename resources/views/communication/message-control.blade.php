@@ -1,7 +1,5 @@
 ﻿@extends("layouts.app")
 
-<x-navbar />
-
 @section("content")
 <main class="flex-1 min-h-screen flex flex-col bg-surface">
     <div class="pt-24 px-8 pb-12 overflow-y-auto flex flex-col gap-8">

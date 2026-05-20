@@ -7,7 +7,6 @@
 @section('title', 'Task Details - XenonOS')
 
 @section('content')
-<x-navbar />
 
 <div class="p-8">
     <div class="max-w-7xl mx-auto">

@@ -7,7 +7,6 @@
 @section('title', 'Task Calendar - XenonOS')
 
 @section('content')
-<x-navbar />
 
 <div class="p-8">
     <div class="max-w-[1600px] mx-auto">
