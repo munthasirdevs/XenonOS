@@ -103,7 +103,7 @@
 
 <!-- Sidebar -->
 <aside id="sidebar"
-    class="sidebar fixed left-0 top-0 bottom-0 w-[260px] bg-surface-container flex flex-col z-50 pt-6 border-r border-outline-variant/10 overflow-hidden transition-transform duration-300 md:translate-x-0">
+    class="sidebar fixed left-0 top-0 bottom-0 w-[260px] bg-surface-container flex flex-col z-50 pt-6 border-r border-outline-variant/10 overflow-hidden transition-transform duration-300 -translate-x-full md:translate-x-0 open:-translate-x-0">
     <!-- Brand Identity -->
     <div class="px-8 mb-6 flex flex-col">
         <a href="{{ route('dashboard') }}" class="text-2xl font-bold tracking-tight text-on-surface font-headline">
@@ -388,11 +388,26 @@
 </button>
 
 <script>
+    const SIDEBAR_STORAGE_KEY = 'xenonos_sidebar_state';
+    
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('hidden');
+        if (!sidebar) return;
+        
+        const isOpen = sidebar.classList.contains('open');
+        
+        if (isOpen) {
+            sidebar.classList.remove('open');
+            document.body.classList.remove('sidebar-open');
+            overlay.classList.add('hidden');
+            localStorage.setItem(SIDEBAR_STORAGE_KEY, 'closed');
+        } else {
+            sidebar.classList.add('open');
+            document.body.classList.add('sidebar-open');
+            overlay.classList.remove('hidden');
+            localStorage.setItem(SIDEBAR_STORAGE_KEY, 'open');
+        }
     }
 
     function toggleSection(sectionId) {

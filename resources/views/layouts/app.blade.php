@@ -50,7 +50,7 @@
 <body class="flex min-h-screen bg-background text-on-surface antialiased">
     <x-navbar />
 
-    <main class="flex-1 md:ml-[260px] min-h-screen transition-all duration-300">
+    <main id="main-content" class="flex-1 min-h-screen transition-all duration-300">
         <div class="h-16 md:h-0"></div>
         <div class="p-6 md:p-8">
             @yield('content')

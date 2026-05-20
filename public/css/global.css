@@ -25,6 +25,19 @@ body {
     color: var(--on-surface);
 }
 
+body.sidebar-open main {
+    margin-left: 260px;
+}
+
+@media (min-width: 768px) {
+    body.sidebar-open main {
+        margin-left: 260px;
+    }
+    body:not(.sidebar-open) main {
+        margin-left: 0;
+    }
+}
+
 .font-headline { font-family: 'Syne', sans-serif; }
 .font-label { font-family: 'Outfit', sans-serif; }
 
