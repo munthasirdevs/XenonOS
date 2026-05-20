@@ -7,8 +7,6 @@
 @section('title', 'Projects - XenonOS')
 
 @section('content')
-<x-navbar />
-
 <main>
     <div class="pt-2 px-6 md:px-8 pb-12 overflow-y-auto flex flex-col gap-8">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">

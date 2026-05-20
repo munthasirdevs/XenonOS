@@ -7,7 +7,6 @@
 @section('title', 'Project Teams - XenonOS')
 
 @section('content')
-<x-navbar />
 
 <main class="flex-1 md:ml-[260px] min-h-screen p-6 md:p-8 space-y-8">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">

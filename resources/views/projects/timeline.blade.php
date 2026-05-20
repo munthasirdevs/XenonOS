@@ -1,8 +1,6 @@
 ﻿@extends('layouts.app')
 
 @section('content')
-<x-navbar />
-
 <main class="min-h-screen relative flex flex-col">
     <div class="mt-20 p-8 flex-1">
         <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">

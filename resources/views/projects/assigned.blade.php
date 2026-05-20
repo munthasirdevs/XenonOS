@@ -7,7 +7,6 @@
 @section('title', 'Assigned Projects - XenonOS')
 
 @section('content')
-<x-navbar />
 
 <main class="flex-1 md:ml-[260px] min-h-screen">
     <div class="px-4 md:px-10 p-8 md:p-12 space-y-10">
