@@ -122,7 +122,7 @@
                         <div class="flex items-center justify-between">
                             <div class="flex -space-x-2">
                                 @foreach($project->team()->limit(3)->get() as $member)
-                                    <img alt="Team" class="w-8 h-8 rounded-full border-2 border-surface-container object-cover" src="https://ui-avatars.com/api/?name={{ urlencode($member->user?->name ?? 'U') }}&background=818cf8&color=fff" />
+                                    <img alt="Team" class="w-8 h-8 rounded-full border-2 border-surface-container object-cover" src="https://ui-avatars.com/api/?name={{ urlencode($member->name ?? 'U') }}&background=818cf8&color=fff" />
                                 @endforeach
                                 @php $moreCount = $project->team()->count() - 3; @endphp
                                 @if($moreCount > 0)
