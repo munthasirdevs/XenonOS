@@ -31,9 +31,23 @@
                 setTimeout(function() { alert.remove(); }, 300);
             });
         }, 5000);
+        
+        // Flash messages (show on page load after redirect)
+        if (typeof Swal !== 'undefined' && typeof SwalCustom !== 'undefined') {
+            var flashSuccess = document.querySelector('[data-flash-success]');
+            var flashError = document.querySelector('[data-flash-error]');
+            var flashWarning = document.querySelector('[data-flash-warning]');
+            
+            if (flashSuccess) {
+                SwalCustom.toast('success', flashSuccess.dataset.flashSuccess, 3000);
+            }
+            if (flashError) {
+                SwalCustom.toast('error', flashError.dataset.flashError, 4000);
+            }
+            if (flashWarning) {
+                SwalCustom.toast('warning', flashWarning.dataset.flashWarning, 3500);
+            }
+        }
     });
     
 })();
-
-/* Page-specific scripts */
-@stack('scripts')

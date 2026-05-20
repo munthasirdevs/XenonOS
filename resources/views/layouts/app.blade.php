@@ -22,11 +22,16 @@
                         'background': '#0b0e14',
                         'primary': '#818cf8',
                         'on-primary': '#1e1b4b',
+                        'on-primary-container': '#1e1b4b',
                         'on-surface': '#dfe2f1',
                         'on-surface-variant': '#94a3b8',
                         'error': '#f87171',
                         'success': '#34d399',
                         'tertiary': '#c084fc',
+                        'secondary': '#818cf8',
+                        'on-secondary': '#1e1b4b',
+                        'outline-variant': '#334155',
+                        'primary-container': '#312e81',
                     },
                     fontFamily: {
                         headline: ['Syne', 'sans-serif'],
@@ -62,9 +67,23 @@
         </footer>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/swal-custom.js') }}"></script>
     <script src="{{ asset('js/api.js') }}"></script>
     <script src="{{ asset('js/global.js') }}"></script>
     @stack('scripts')
+    
+    @if(session('success'))
+    <div data-flash-success="{{ session('success') }}"></div>
+    @endif
+    
+    @if(session('error'))
+    <div data-flash-error="{{ session('error') }}"></div>
+    @endif
+    
+    @if(session('warning'))
+    <div data-flash-warning="{{ session('warning') }}"></div>
+    @endif
 </body>
 
 </html>
