@@ -107,7 +107,7 @@
                 <span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-4 block">Assigned Team</span>
                 <div class="flex -space-x-3 items-center flex-wrap">
                     @forelse($project->team()->limit(4)->get() as $member)
-                        <img alt="Team" class="w-10 h-10 rounded-full border-2 border-surface-container-low object-cover" src="https://ui-avatars.com/api/?name={{ urlencode($member->user?->name ?? 'U') }}&background=818cf8&color=fff" />
+                        <img alt="Team" class="w-10 h-10 rounded-full border-2 border-surface-container-low object-cover" src="https://ui-avatars.com/api/?name={{ urlencode($member->name ?? 'U') }}&background=818cf8&color=fff" />
                     @empty
                         <span class="text-xs text-on-surface-variant">No team members</span>
                     @endforelse
@@ -215,7 +215,7 @@
                                 <img alt="User" class="w-8 h-8 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($activity->user?->name ?? 'U') }}&background=818cf8&color=fff" />
                                 <div>
                                     <p class="text-sm text-on-surface"><span class="font-semibold">{{ $activity->user?->name ?? 'System' }}</span> {{ $activity->action }}</p>
-                                    <p class="text-xs text-on-surface-variant">{{ $activity->created_at->diffForHumans() }}</p>
+                                    <p class="text-xs text-on-surface-variant">{{ $activity->created_at?->diffForHumans() ?? 'Just now' }}</p>
                                 </div>
                             </div>
                         @empty
