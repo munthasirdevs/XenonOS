@@ -11,4 +11,44 @@
         "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
+
+    --color-surface-container-highest: #1a1d26;
+    --color-surface-bright: #1e222c;
+    --color-surface-container: #12151e;
+    --color-surface-container-low: #0f121a;
+    --color-surface-container-high: #161922;
+    --color-surface: #161922;
+    --color-background: #0b0e14;
+    --color-primary: #818cf8;
+    --color-on-primary: #1e1b4b;
+    --color-on-primary-container: #1e1b4b;
+    --color-on-surface: #dfe2f1;
+    --color-on-surface-variant: #94a3b8;
+    --color-error: #f87171;
+    --color-success: #34d399;
+    --color-tertiary: #c084fc;
+    --color-secondary: #818cf8;
+    --color-on-secondary: #1e1b4b;
+    --color-outline-variant: #334155;
+    --color-primary-container: #312e81;
+
+    --font-headline: 'Syne', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    --font-label: 'Outfit', sans-serif;
+}
+
+@layer base {
+    .bg-surface { background-color: var(--color-surface); }
+    .bg-background { background-color: var(--color-background); }
+    .bg-surface-container { background-color: var(--color-surface-container); }
+    .bg-surface-container-low { background-color: var(--color-surface-container-low); }
+    .bg-surface-container-high { background-color: var(--color-surface-container-high); }
+    .bg-surface-container-highest { background-color: var(--color-surface-container-highest); }
+    .bg-primary { background-color: var(--color-primary); }
+    .bg-primary-container { background-color: var(--color-primary-container); }
+    .text-on-surface { color: var(--color-on-surface); }
+    .text-on-surface-variant { color: var(--color-on-surface-variant); }
+    .text-on-primary-container { color: var(--color-on-primary-container); }
+    .text-primary { color: var(--color-primary); }
+    .border-outline-variant { border-color: var(--color-outline-variant); }
 }
