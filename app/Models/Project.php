@@ -90,11 +90,15 @@ class Project extends Model
 
     public function teamMembers()
     {
-        return $this->hasMany(TeamMember::class, 'project_id');
+        return $this->belongsToMany(User::class, 'project_users')
+                    ->withPivot('role', 'assigned_at')
+                    ->withTimestamps();
     }
 
     public function team()
     {
-        return $this->hasMany(TeamMember::class, 'project_id');
+        return $this->belongsToMany(User::class, 'project_users')
+                    ->withPivot('role', 'assigned_at')
+                    ->withTimestamps();
     }
 }

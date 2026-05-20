@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('client_id')->nullable()->constrained('clients')->nullOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->enum('status', ['active', 'completed', 'paused', 'cancelled'])->default('active');
+            $table->enum('status', ['active', 'completed', 'pending', 'on_hold', 'paused', 'cancelled'])->default('active');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
