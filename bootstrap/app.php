@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         
         $middleware->alias([
             'role' => CheckRole::class,

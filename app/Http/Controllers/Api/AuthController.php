@@ -14,6 +14,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -61,14 +62,14 @@ class AuthController extends Controller
             ]);
         }
         
-        // Clear lock on successful login
-        LoginAttempt::clearLock($ip);
-
         if ($user->status === 'banned') {
             return $this->error('Your account has been banned.', 403);
         }
 
-        $user->update(['last_login_at' => now()]);
+        DB::transaction(function () use ($user, $ip) {
+            LoginAttempt::clearLock($ip);
+            $user->update(['last_login_at' => now()]);
+        });
 
         event(new UserLoggedIn($user, $request->ip(), $request->userAgent()));
 
@@ -82,22 +83,26 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-            'status' => 'active',
-        ]);
+        $user = DB::transaction(function () use ($request) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $request->password,
+                'status' => 'active',
+            ]);
 
-        Profile::create([
-            'user_id' => $user->id,
-            'timezone' => 'UTC',
-        ]);
+            Profile::create([
+                'user_id' => $user->id,
+                'timezone' => 'UTC',
+            ]);
 
-        $defaultRole = Role::where('slug', 'user')->first();
-        if ($defaultRole) {
-            $user->roles()->attach($defaultRole->id);
-        }
+            $defaultRole = Role::where('slug', 'staff')->first();
+            if ($defaultRole) {
+                $user->roles()->attach($defaultRole->id);
+            }
+
+            return $user;
+        });
 
         event(new UserRegistered($user));
 
@@ -133,9 +138,18 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        $ip = $request->ip();
+
+        // Check if IP is locked (same brute force protection as API)
+        if (LoginAttempt::isLocked($ip)) {
+            return back()->withErrors(['email' => 'Too many failed login attempts. Please try again later.']);
+        }
+
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            // Record failed attempt
+            LoginAttempt::recordFailedAttempt($ip, $request->email);
             return back()->withErrors(['email' => 'The provided credentials are incorrect.'])->withInput();
         }
 
@@ -152,13 +166,16 @@ class AuthController extends Controller
             session()->put('remember', true);
         }
 
-        $user->update(['last_login_at' => now()]);
+        DB::transaction(function () use ($user, $ip, $request) {
+            LoginAttempt::clearLock($ip);
+            $user->update(['last_login_at' => now()]);
 
-        \App\Models\SecurityLog::create([
-            'user_id' => $user->id,
-            'event' => 'web_login',
-            'ip_address' => $request->ip(),
-        ]);
+            \App\Models\SecurityLog::create([
+                'user_id' => $user->id,
+                'event' => 'web_login',
+                'ip_address' => $request->ip(),
+            ]);
+        });
 
         event(new UserLoggedIn($user, $request->ip(), $request->userAgent()));
 
