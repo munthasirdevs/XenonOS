@@ -45,27 +45,55 @@ class PermissionSeeder extends Seeder
             // File Management
             ['name' => 'View Files', 'slug' => 'file.view'],
             ['name' => 'Upload Files', 'slug' => 'file.upload'],
+            ['name' => 'Update Files', 'slug' => 'file.update'],
             ['name' => 'Delete Files', 'slug' => 'file.delete'],
             
             // Billing
             ['name' => 'View Billing', 'slug' => 'billing.view'],
             ['name' => 'Create Invoices', 'slug' => 'invoice.create'],
-            ['name' => 'Process Payments', 'slug' => 'payment.process'],
+            ['name' => 'Update Invoices', 'slug' => 'invoice.update'],
+            ['name' => 'Delete Invoices', 'slug' => 'invoice.delete'],
+            ['name' => 'Send Invoices', 'slug' => 'invoice.send'],
+            ['name' => 'View Payments', 'slug' => 'payment.view'],
+            ['name' => 'Create Payments', 'slug' => 'payment.create'],
+            ['name' => 'Refund Payments', 'slug' => 'payment.refund'],
             
             // Communication
             ['name' => 'View Chat', 'slug' => 'chat.view'],
+            ['name' => 'Create Chat', 'slug' => 'chat.create'],
             ['name' => 'Send Messages', 'slug' => 'chat.send'],
             ['name' => 'View Announcements', 'slug' => 'announcement.view'],
             ['name' => 'Create Announcements', 'slug' => 'announcement.create'],
+            ['name' => 'Update Announcements', 'slug' => 'announcement.update'],
+            ['name' => 'Delete Announcements', 'slug' => 'announcement.delete'],
             
             // Reports
             ['name' => 'View Reports', 'slug' => 'report.view'],
             ['name' => 'Create Reports', 'slug' => 'report.create'],
             ['name' => 'Export Reports', 'slug' => 'report.export'],
+
+            // Subscriptions
+            ['name' => 'View Subscriptions', 'slug' => 'subscription.view'],
+            ['name' => 'Create Subscriptions', 'slug' => 'subscription.create'],
+            ['name' => 'Manage Subscriptions', 'slug' => 'subscription.manage'],
+
+            // API Keys
+            ['name' => 'View API Keys', 'slug' => 'api_key.view'],
+            ['name' => 'Create API Keys', 'slug' => 'api_key.create'],
+
+            // Alert Rules
+            ['name' => 'View Alert Rules', 'slug' => 'alert_rule.view'],
+            ['name' => 'Create Alert Rules', 'slug' => 'alert_rule.create'],
+            ['name' => 'Update Alert Rules', 'slug' => 'alert_rule.update'],
+            ['name' => 'Delete Alert Rules', 'slug' => 'alert_rule.delete'],
+            ['name' => 'Execute Alert Rules', 'slug' => 'alert_rule.execute'],
             
             // Settings
-            ['name' => 'View Settings', 'slug' => 'settings.view'],
-            ['name' => 'Update Settings', 'slug' => 'settings.update'],
+            ['name' => 'View Settings', 'slug' => 'setting.view'],
+            ['name' => 'Create Settings', 'slug' => 'setting.create'],
+            ['name' => 'Update Settings', 'slug' => 'setting.update'],
+            ['name' => 'Delete Settings', 'slug' => 'setting.delete'],
+            ['name' => 'System Settings', 'slug' => 'setting.system'],
         ];
 
         foreach ($permissions as $perm) {
