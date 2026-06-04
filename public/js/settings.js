@@ -51,15 +51,17 @@
     };
     
     document.addEventListener('DOMContentLoaded', function() {
+        var csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        
         document.querySelectorAll('.toggle-channel-form').forEach(function(form) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
-                fetch('', {
+                fetch(this.action, {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '' },
+                    headers: { 'X-CSRF-TOKEN': csrfToken },
                     body: formData
-                }).then(function() { this.submit(); });
+                });
             });
         });
 
@@ -67,9 +69,9 @@
             toggle.addEventListener('change', function() {
                 var setting = this.dataset.setting;
                 var value = this.checked ? 1 : 0;
-                fetch('', {
+                fetch(this.dataset.url || '/api/v1/settings/notification', {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '', 'Content-Type': 'application/json' },
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ setting: setting, value: value })
                 });
             });
@@ -80,9 +82,9 @@
             quietHoursForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
-                fetch('', {
+                fetch(this.action, {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '' },
+                    headers: { 'X-CSRF-TOKEN': csrfToken },
                     body: formData
                 }).then(function() { window.location.reload(); });
             });
@@ -91,7 +93,7 @@
         var exportJsonBtn = document.getElementById('export-json');
         if (exportJsonBtn) {
             exportJsonBtn.addEventListener('click', function() {
-                window.location.href = '';
+                window.location.href = this.dataset.url || '/settings/export';
             });
         }
 

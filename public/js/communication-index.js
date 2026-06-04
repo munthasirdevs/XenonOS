@@ -48,7 +48,7 @@ function renderChatList(chats) {
         
         return `
             <tr class="group hover:bg-surface-bright/30 transition-colors cursor-pointer" 
-                onclick="window.location.href='/communication/${chat.id}'">
+                onclick="window.location.href=window.chatRouteTemplate ? window.chatRouteTemplate.replace('__ID__', chat.id) : '/communication/' + chat.id">
                 <td class="px-8 py-5">
                     <div class="flex -space-x-2">
                         ${participantHtml}

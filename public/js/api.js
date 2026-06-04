@@ -1,5 +1,5 @@
 const API = {
-    baseUrl: '/api',
+    baseUrl: '/api/v1',
 
     async request(endpoint, options = {}) {
         const token = document.querySelector('meta[name="csrf-token"]')?.content;

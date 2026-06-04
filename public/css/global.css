@@ -63,5 +63,3 @@ body.sidebar-open main {
 .d-flex { display: flex !important; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .transition-all { transition: all 0.2s ease; }
-
-@stack('styles')
