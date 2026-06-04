@@ -87,19 +87,21 @@ class PaymentController extends Controller
             'reason' => 'required|string',
         ]);
 
-        $payment->update([
-            'status' => 'refunded',
-            'refund_reason' => $request->reason,
-            'refunded_by' => $request->user()->id,
-            'refunded_at' => now(),
-        ]);
+        DB::transaction(function () use ($payment, $request) {
+            $payment->update([
+                'status' => 'refunded',
+                'refund_reason' => $request->reason,
+                'refunded_by' => $request->user()->id,
+                'refunded_at' => now(),
+            ]);
 
-        $invoice = $payment->invoice;
-        $totalPaid = $invoice->payments()->where('status', 'completed')->sum('amount');
-        
-        if ($totalPaid < $invoice->total) {
-            $invoice->update(['status' => 'sent']);
-        }
+            $invoice = $payment->invoice;
+            $totalPaid = $invoice->payments()->where('status', 'completed')->sum('amount');
+            
+            if ($totalPaid < $invoice->total) {
+                $invoice->update(['status' => 'sent']);
+            }
+        });
 
         return $this->success(null, 'Payment refunded');
     }

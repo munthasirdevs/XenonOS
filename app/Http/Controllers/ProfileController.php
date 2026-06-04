@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Project;
@@ -63,8 +64,6 @@ class ProfileController extends Controller
             $updateData['name'] = trim($firstName . ' ' . $lastName);
         }
 
-        $user->update($updateData);
-
         $profileData = [
             'phone' => $request->phone,
             'bio' => $request->bio,
@@ -78,12 +77,16 @@ class ProfileController extends Controller
             'country' => $request->country,
             'payment_method' => $request->payment_method,
         ];
-        
-        if ($user->profile) {
-            $user->profile->update($profileData);
-        } else {
-            $user->profile()->create($profileData);
-        }
+
+        DB::transaction(function () use ($user, $updateData, $profileData) {
+            $user->update($updateData);
+
+            if ($user->profile) {
+                $user->profile->update($profileData);
+            } else {
+                $user->profile()->create($profileData);
+            }
+        });
 
         return back()->with('success', 'Profile updated successfully');
     }

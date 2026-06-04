@@ -170,16 +170,18 @@ class ActivityController extends Controller
 
         $userName = $session->user?->name ?? 'Unknown';
 
-        ActivityLog::create([
-            'user_id' => Auth::id(),
-            'action' => 'force_logout',
-            'description' => "Force logged out user: {$userName}",
-            'module' => 'Security',
-            'severity' => 'critical',
-            'ip_address' => request()->ip(),
-        ]);
+        DB::transaction(function () use ($session, $userName) {
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'force_logout',
+                'description' => "Force logged out user: {$userName}",
+                'module' => 'Security',
+                'severity' => 'critical',
+                'ip_address' => request()->ip(),
+            ]);
 
-        $session->delete();
+            $session->delete();
+        });
 
         return back()->with('success', 'Session terminated successfully');
     }

@@ -48,7 +48,7 @@ class NotificationController extends Controller
             return $this->error('Unauthorized', 403);
         }
 
-        $notification->markAsRead($request->user()->id);
+        $notification->markAsRead();
         return $this->success(null, 'Notification marked as read');
     }
 
@@ -101,6 +101,7 @@ public function send(Request $request)
 
         $notification = UserNotification::create([
             'user_id' => $request->user_id,
+            'notification_id' => null,
             'type' => $request->type,
             'title' => $request->title,
             'message' => $request->message,

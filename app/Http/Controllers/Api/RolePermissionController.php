@@ -8,6 +8,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RolePermissionController extends Controller
 {
@@ -31,20 +32,22 @@ class RolePermissionController extends Controller
         }
 
         $oldPermissions = $role->permissions()->pluck('permissions.slug')->toArray();
-        
-        $role->permissions()->attach($permission->id);
 
-        AuditLog::create([
-            'model_type' => Role::class,
-            'model_id' => $role->id,
-            'changes' => [
-                'before' => $oldPermissions,
-                'after' => array_merge($oldPermissions, [$permission->slug])
-            ],
-            'created_by' => $request->user()->id,
-            'action' => 'permission_assigned',
-            'description' => "Permission '{$permission->name}' assigned to role '{$role->name}'",
-        ]);
+        DB::transaction(function () use ($role, $permission, $oldPermissions, $request) {
+            $role->permissions()->attach($permission->id);
+
+            AuditLog::create([
+                'model_type' => Role::class,
+                'model_id' => $role->id,
+                'changes' => [
+                    'before' => $oldPermissions,
+                    'after' => array_merge($oldPermissions, [$permission->slug])
+                ],
+                'created_by' => $request->user()->id,
+                'action' => 'permission_assigned',
+                'description' => "Permission '{$permission->name}' assigned to role '{$role->name}'",
+            ]);
+        });
 
         return $this->success($role->load('permissions'), 'Permission assigned successfully');
     }
@@ -56,20 +59,22 @@ class RolePermissionController extends Controller
         }
 
         $oldPermissions = $role->permissions()->pluck('permissions.slug')->toArray();
-        
-        $role->permissions()->detach($permission->id);
 
-        AuditLog::create([
-            'model_type' => Role::class,
-            'model_id' => $role->id,
-            'changes' => [
-                'before' => $oldPermissions,
-                'after' => array_diff($oldPermissions, [$permission->slug])
-            ],
-            'created_by' => $request->user()->id,
-            'action' => 'permission_removed',
-            'description' => "Permission '{$permission->name}' removed from role '{$role->name}'",
-        ]);
+        DB::transaction(function () use ($role, $permission, $oldPermissions, $request) {
+            $role->permissions()->detach($permission->id);
+
+            AuditLog::create([
+                'model_type' => Role::class,
+                'model_id' => $role->id,
+                'changes' => [
+                    'before' => $oldPermissions,
+                    'after' => array_diff($oldPermissions, [$permission->slug])
+                ],
+                'created_by' => $request->user()->id,
+                'action' => 'permission_removed',
+                'description' => "Permission '{$permission->name}' removed from role '{$role->name}'",
+            ]);
+        });
 
         return $this->success($role->load('permissions'), 'Permission removed successfully');
     }
@@ -82,19 +87,21 @@ class RolePermissionController extends Controller
         ]);
 
         $oldPermissions = $role->permissions()->pluck('permissions.slug')->toArray();
-        
-        $role->permissions()->sync($request->permission_ids);
 
-        $newPermissions = Permission::whereIn('id', $request->permission_ids)->pluck('slug')->toArray();
+        DB::transaction(function () use ($role, $request, $oldPermissions) {
+            $role->permissions()->sync($request->permission_ids);
 
-        AuditLog::create([
-            'model_type' => Role::class,
-            'model_id' => $role->id,
-            'changes' => ['before' => $oldPermissions, 'after' => $newPermissions],
-            'created_by' => $request->user()->id,
-            'action' => 'permissions_synced',
-            'description' => "Permissions synced for role '{$role->name}'",
-        ]);
+            $newPermissions = Permission::whereIn('id', $request->permission_ids)->pluck('slug')->toArray();
+
+            AuditLog::create([
+                'model_type' => Role::class,
+                'model_id' => $role->id,
+                'changes' => ['before' => $oldPermissions, 'after' => $newPermissions],
+                'created_by' => $request->user()->id,
+                'action' => 'permissions_synced',
+                'description' => "Permissions synced for role '{$role->name}'",
+            ]);
+        });
 
         return $this->success($role->load('permissions'), 'Permissions synced successfully');
     }

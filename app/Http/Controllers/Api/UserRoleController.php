@@ -9,14 +9,18 @@ use App\Models\Role;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserRoleController extends Controller
 {
     use ApiResponse;
 
-    public function index(Request $request, User $user)
+    public function index(Request $request, ?User $user = null)
     {
-        return $this->success($user->load('roles'));
+        if ($user) {
+            return $this->success($user->load('roles'));
+        }
+        return $this->success(User::with('roles')->paginate(15));
     }
 
     public function assignRole(AssignRoleRequest $request, User $user)
@@ -28,17 +32,19 @@ class UserRoleController extends Controller
         }
 
         $oldRoles = $user->roles()->pluck('roles.slug')->toArray();
-        
-        $user->roles()->attach($role->id);
 
-        AuditLog::create([
-            'model_type' => User::class,
-            'model_id' => $user->id,
-            'changes' => ['before' => $oldRoles, 'after' => array_merge($oldRoles, [$role->slug])],
-            'created_by' => $request->user()->id,
-            'action' => 'role_assigned',
-            'description' => "Role '{$role->name}' assigned to user '{$user->name}'",
-        ]);
+        DB::transaction(function () use ($user, $role, $oldRoles, $request) {
+            $user->roles()->attach($role->id);
+
+            AuditLog::create([
+                'model_type' => User::class,
+                'model_id' => $user->id,
+                'changes' => ['before' => $oldRoles, 'after' => array_merge($oldRoles, [$role->slug])],
+                'created_by' => $request->user()->id,
+                'action' => 'role_assigned',
+                'description' => "Role '{$role->name}' assigned to user '{$user->name}'",
+            ]);
+        });
 
         \Cache::forget("user_permissions_{$user->id}");
 
@@ -52,17 +58,19 @@ class UserRoleController extends Controller
         }
 
         $oldRoles = $user->roles()->pluck('roles.slug')->toArray();
-        
-        $user->roles()->detach($role->id);
 
-        AuditLog::create([
-            'model_type' => User::class,
-            'model_id' => $user->id,
-            'changes' => ['before' => $oldRoles, 'after' => array_diff($oldRoles, [$role->slug])],
-            'created_by' => $request->user()->id,
-            'action' => 'role_removed',
-            'description' => "Role '{$role->name}' removed from user '{$user->name}'",
-        ]);
+        DB::transaction(function () use ($user, $role, $oldRoles, $request) {
+            $user->roles()->detach($role->id);
+
+            AuditLog::create([
+                'model_type' => User::class,
+                'model_id' => $user->id,
+                'changes' => ['before' => $oldRoles, 'after' => array_diff($oldRoles, [$role->slug])],
+                'created_by' => $request->user()->id,
+                'action' => 'role_removed',
+                'description' => "Role '{$role->name}' removed from user '{$user->name}'",
+            ]);
+        });
 
         \Cache::forget("user_permissions_{$user->id}");
 
@@ -77,19 +85,21 @@ class UserRoleController extends Controller
         ]);
 
         $oldRoles = $user->roles()->pluck('roles.slug')->toArray();
-        
-        $user->roles()->sync($request->role_ids);
 
-        $newRoles = Role::whereIn('id', $request->role_ids)->pluck('slug')->toArray();
+        DB::transaction(function () use ($user, $request, $oldRoles) {
+            $user->roles()->sync($request->role_ids);
 
-        AuditLog::create([
-            'model_type' => User::class,
-            'model_id' => $user->id,
-            'changes' => ['before' => $oldRoles, 'after' => $newRoles],
-            'created_by' => $request->user()->id,
-            'action' => 'roles_synced',
-            'description' => "Roles synced for user '{$user->name}'",
-        ]);
+            $newRoles = Role::whereIn('id', $request->role_ids)->pluck('slug')->toArray();
+
+            AuditLog::create([
+                'model_type' => User::class,
+                'model_id' => $user->id,
+                'changes' => ['before' => $oldRoles, 'after' => $newRoles],
+                'created_by' => $request->user()->id,
+                'action' => 'roles_synced',
+                'description' => "Roles synced for user '{$user->name}'",
+            ]);
+        });
 
         \Cache::forget("user_permissions_{$user->id}");
 

@@ -15,6 +15,7 @@ use App\Models\ProjectFile;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ProjectController extends Controller
 {
@@ -134,23 +135,27 @@ class ProjectController extends Controller
 
     public function store(ProjectRequest $request)
     {
-        $project = Project::create([
-            ...$request->validated(),
-            'created_by' => $request->user()->id,
-            'status' => $request->status ?? 'active',
-            'priority' => $request->priority ?? 'medium',
-        ]);
+        $project = DB::transaction(function () use ($request) {
+            $project = Project::create([
+                ...$request->validated(),
+                'created_by' => $request->user()->id,
+                'status' => $request->status ?? 'active',
+                'priority' => $request->priority ?? 'medium',
+            ]);
 
-        $this->logTimeline($project, 'created', 'Project created', $request->user()->id);
+            $this->logTimeline($project, 'created', 'Project created', $request->user()->id);
 
-        AuditLog::create([
-            'model_type' => Project::class,
-            'model_id' => $project->id,
-            'changes' => ['created' => $project->toArray()],
-            'created_by' => $request->user()->id,
-            'action' => 'project_created',
-            'description' => 'Project created: ' . $project->name,
-        ]);
+            AuditLog::create([
+                'model_type' => Project::class,
+                'model_id' => $project->id,
+                'changes' => ['created' => $project->toArray()],
+                'created_by' => $request->user()->id,
+                'action' => 'project_created',
+                'description' => 'Project created: ' . $project->name,
+            ]);
+
+            return $project;
+        });
 
         $this->clearProjectCache($project->id);
 
@@ -191,26 +196,28 @@ class ProjectController extends Controller
     {
         $oldData = $project->toArray();
         $oldStatus = $project->status;
-        
-        $project->update([
-            ...$request->validated(),
-            'updated_by' => $request->user()->id,
-        ]);
 
-        if ($oldStatus !== $project->status) {
-            $this->logTimeline($project, 'status_change', 'Status changed from ' . $oldStatus . ' to ' . $project->status, $request->user()->id);
-        }
+        DB::transaction(function () use ($project, $request, $oldData, $oldStatus) {
+            $project->update([
+                ...$request->validated(),
+                'updated_by' => $request->user()->id,
+            ]);
 
-        $this->logTimeline($project, 'updated', 'Project updated', $request->user()->id);
+            if ($oldStatus !== $project->status) {
+                $this->logTimeline($project, 'status_change', 'Status changed from ' . $oldStatus . ' to ' . $project->status, $request->user()->id);
+            }
 
-        AuditLog::create([
-            'model_type' => Project::class,
-            'model_id' => $project->id,
-            'changes' => ['before' => $oldData, 'after' => $project->fresh()->toArray()],
-            'created_by' => $request->user()->id,
-            'action' => 'project_updated',
-            'description' => 'Project updated: ' . $project->name,
-        ]);
+            $this->logTimeline($project, 'updated', 'Project updated', $request->user()->id);
+
+            AuditLog::create([
+                'model_type' => Project::class,
+                'model_id' => $project->id,
+                'changes' => ['before' => $oldData, 'after' => $project->fresh()->toArray()],
+                'created_by' => $request->user()->id,
+                'action' => 'project_updated',
+                'description' => 'Project updated: ' . $project->name,
+            ]);
+        });
 
         $this->clearProjectCache($project->id);
 
@@ -220,23 +227,21 @@ class ProjectController extends Controller
     public function destroy(Request $request, Project $project)
     {
         $projectName = $project->name;
-        
-        $this->logTimeline($project, 'deleted', 'Project deleted', $request->user()->id);
 
-        AuditLog::create([
-            'model_type' => Project::class,
-            'model_id' => $project->id,
-            'changes' => ['deleted' => $projectName],
-            'created_by' => $request->user()->id,
-            'action' => 'project_deleted',
-            'description' => 'Project deleted: ' . $projectName,
-        ]);
+        DB::transaction(function () use ($project, $projectName, $request) {
+            $this->logTimeline($project, 'deleted', 'Project deleted', $request->user()->id);
 
-        $project->delete();
+            AuditLog::create([
+                'model_type' => Project::class,
+                'model_id' => $project->id,
+                'changes' => ['deleted' => $projectName],
+                'created_by' => $request->user()->id,
+                'action' => 'project_deleted',
+                'description' => 'Project deleted: ' . $projectName,
+            ]);
 
-        $this->clearProjectCache($project->id);
-
-        return $this->success(null, 'Project deleted successfully');
+            $project->delete();
+        });
     }
 
     public function users(Request $request, Project $project)
@@ -268,18 +273,20 @@ class ProjectController extends Controller
             ];
         }
         
-        $project->users()->sync($syncData);
+        DB::transaction(function () use ($project, $syncData, $request, $oldUsers) {
+            $project->users()->sync($syncData);
 
-        AuditLog::create([
-            'model_type' => Project::class,
-            'model_id' => $project->id,
-            'changes' => ['before' => $oldUsers, 'after' => $request->user_ids],
-            'created_by' => $request->user()->id,
-            'action' => 'users_assigned',
-            'description' => 'Users assigned to project: ' . $project->name,
-        ]);
+            AuditLog::create([
+                'model_type' => Project::class,
+                'model_id' => $project->id,
+                'changes' => ['before' => $oldUsers, 'after' => $request->user_ids],
+                'created_by' => $request->user()->id,
+                'action' => 'users_assigned',
+                'description' => 'Users assigned to project: ' . $project->name,
+            ]);
 
-        $this->logTimeline($project, 'user_assigned', 'Team members updated', $request->user()->id);
+            $this->logTimeline($project, 'user_assigned', 'Team members updated', $request->user()->id);
+        });
 
         Cache::forget("project_{$project->id}_users");
         
@@ -288,16 +295,18 @@ class ProjectController extends Controller
 
     public function removeUser(Request $request, Project $project, User $user)
     {
-        $project->users()->detach($user->id);
+        DB::transaction(function () use ($project, $user, $request) {
+            $project->users()->detach($user->id);
 
-        AuditLog::create([
-            'model_type' => Project::class,
-            'model_id' => $project->id,
-            'changes' => ['removed_user' => $user->id],
-            'created_by' => $request->user()->id,
-            'action' => 'user_removed',
-            'description' => 'User removed from project: ' . $project->name,
-        ]);
+            AuditLog::create([
+                'model_type' => Project::class,
+                'model_id' => $project->id,
+                'changes' => ['removed_user' => $user->id],
+                'created_by' => $request->user()->id,
+                'action' => 'user_removed',
+                'description' => 'User removed from project: ' . $project->name,
+            ]);
+        });
 
         Cache::forget("project_{$project->id}_users");
 
@@ -347,7 +356,7 @@ class ProjectController extends Controller
         
         $files = Cache::remember($cacheKey, 60, function() use ($project) {
             return File::whereIn('id', ProjectFile::where('project_id', $project->id)->pluck('file_id'))
-                ->select('id', 'name', 'size', 'type', 'mime_type')
+                ->select('id', 'name', 'size', 'mime_type')
                 ->get();
         });
 
@@ -363,9 +372,11 @@ class ProjectController extends Controller
             return $this->error('File already linked to this project', 400);
         }
 
-        $project->files()->attach($request->file_id);
+        DB::transaction(function () use ($project, $request) {
+            $project->files()->attach($request->file_id);
 
-        $this->logTimeline($project, 'file_added', 'File linked to project', $request->user()->id);
+            $this->logTimeline($project, 'file_added', 'File linked to project', $request->user()->id);
+        });
 
         Cache::forget("project_{$project->id}_files");
 
@@ -391,7 +402,7 @@ class ProjectController extends Controller
                 'project' => $project->only(['id', 'name', 'description', 'status', 'priority']),
                 'client' => $project->client ? $project->client->only(['id', 'name', 'company']) : null,
                 'tasks' => $project->tasks()->select('id', 'title', 'status', 'priority', 'due_date')->get(),
-                'files' => $project->files()->select('id', 'name', 'type')->get(),
+                'files' => $project->files()->select('id', 'name', 'mime_type')->get(),
                 'team' => $project->users()->select('users.id', 'users.name', 'users.email')->get(),
             ];
         });

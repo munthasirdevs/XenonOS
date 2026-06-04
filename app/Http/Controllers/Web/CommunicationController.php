@@ -7,6 +7,7 @@ use App\Models\Chat;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CommunicationController extends Controller
 {
@@ -14,22 +15,39 @@ class CommunicationController extends Controller
     {
         $chats = Chat::with(['users:id,name', 'messages' => function($q) {
             $q->latest()->limit(1);
-        }])->get();
+        }, 'project:id,name'])->get();
 
         return view('communication.index', compact('chats'));
     }
 
     public function chat($chatId)
     {
-        $chat = Chat::with(['users', 'messages' => function($q) {
-            $q->latest()->limit(50);
-        }])->findOrFail($chatId);
+        $chat = Chat::with(['users', 'messages.sender:id,name,avatar_url'])
+            ->withCount('messages', 'users')
+            ->findOrFail($chatId);
 
         return view('communication.chat-details', compact('chat'));
     }
 
     public function store(Request $request)
     {
+        if ($request->has('chat_id')) {
+            $request->validate([
+                'chat_id' => 'required|exists:chats,id',
+                'message' => 'required|string',
+            ]);
+
+            $chat = Chat::findOrFail($request->chat_id);
+
+            Message::create([
+                'chat_id' => $chat->id,
+                'sender_id' => auth()->id(),
+                'message' => $request->message,
+            ]);
+
+            return redirect()->route('communication.chat', $chat->id)->with('success', 'Message sent');
+        }
+
         $request->validate([
             'type' => 'required|in:private,group',
             'name' => 'nullable|string|max:255',
@@ -37,14 +55,18 @@ class CommunicationController extends Controller
             'user_ids.*' => 'exists:users,id',
         ]);
 
-        $chat = Chat::create([
-            'type' => $request->type,
-            'name' => $request->name,
-            'created_by' => auth()->id(),
-        ]);
+        $chat = DB::transaction(function () use ($request) {
+            $chat = Chat::create([
+                'type' => $request->type,
+                'name' => $request->name,
+                'created_by' => auth()->id(),
+            ]);
 
-        $userIds = array_merge($request->user_ids, [auth()->id()]);
-        $chat->users()->sync($userIds);
+            $userIds = array_merge($request->user_ids, [auth()->id()]);
+            $chat->users()->sync($userIds);
+
+            return $chat;
+        });
 
         return redirect()->route('communication.chat', $chat->id)->with('success', 'Chat created successfully');
     }

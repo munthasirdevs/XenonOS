@@ -32,6 +32,14 @@ class ClientController extends Controller
             'newThisMonth' => Client::whereMonth('created_at', now()->month)->count(),
         ]);
 
+        $totalProjects = Cache::remember('client_total_projects', 60, fn() =>
+            Project::count()
+        );
+
+        $totalRevenue = Cache::remember('client_total_revenue', 60, fn() =>
+            \App\Models\Payment::where('status', 'completed')->sum('amount')
+        );
+
         $recentActivities = Cache::remember('recent_activities', 30, fn() =>
             ClientActivity::select('id', 'client_id', 'description', 'type', 'created_at')
                 ->with('client:id,name')
@@ -55,18 +63,18 @@ class ClientController extends Controller
                 ->count(),
         ]);
 
-        return view('clients.index', compact('clients', 'recentActivities', 'inviteStats') + $stats);
+        return view('clients.index', array_merge(compact('clients', 'recentActivities', 'inviteStats', 'totalProjects', 'totalRevenue'), $stats));
     }
 
     public function show($id)
     {
-        $client = Client::withCount(['projects' => fn($q) => $q->where('status', 'active'), 'projects' => fn($q) => $q->where('status', 'completed')])
+        $client = Client::withCount(['projects as active_projects_count' => fn($q) => $q->where('status', 'active'), 'projects as completed_projects_count' => fn($q) => $q->where('status', 'completed')])
             ->findOrFail($id);
 
         $stats = [
-            'total_projects' => $client->projects_count,
-            'active_projects' => $client->projects_active_count ?? 0,
-            'completed_projects' => $client->projects_completed_count ?? 0,
+            'total_projects' => $client->projects_count ?? 0,
+            'active_projects' => $client->active_projects_count ?? 0,
+            'completed_projects' => $client->completed_projects_count ?? 0,
         ];
 
         $recentProjects = Cache::remember("client_{$id}_projects", 60, fn() => 
@@ -361,8 +369,9 @@ public function generateInvite(Request $request)
             'company' => $validated['company'] ?? null,
             'status' => 'active',
             'total_revenue' => 0,
-            'created_by' => $invite->invited_by,
         ]);
+        $client->created_by = $invite->invited_by;
+        $client->save();
 
         DB::table('client_invites')
             ->where('code', $code)

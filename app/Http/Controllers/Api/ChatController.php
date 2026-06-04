@@ -122,13 +122,15 @@ class ChatController extends Controller
 
     public function flagMessage(Request $request, Message $message)
     {
-        $message->update(['is_flagged' => true]);
-        
-        \App\Models\ActivityLog::create([
-            'user_id' => $request->user()->id,
-            'action' => 'message_flagged',
-            'description' => 'Message flagged in chat ' . $message->chat_id,
-        ]);
+        DB::transaction(function () use ($message, $request) {
+            $message->update(['is_flagged' => true]);
+
+            \App\Models\ActivityLog::create([
+                'user_id' => $request->user()->id,
+                'action' => 'message_flagged',
+                'description' => 'Message flagged in chat ' . $message->chat_id,
+            ]);
+        });
 
         return $this->success(null, 'Message flagged successfully');
     }

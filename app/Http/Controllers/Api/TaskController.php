@@ -11,6 +11,7 @@ use App\Models\Project;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
@@ -77,23 +78,27 @@ class TaskController extends Controller
 
     public function store(TaskRequest $request)
     {
-        $task = Task::create([
-            ...$request->validated(),
-            'created_by' => $request->user()->id,
-            'status' => $request->status ?? 'todo',
-            'priority' => $request->priority ?? 'medium',
-        ]);
+        $task = DB::transaction(function () use ($request) {
+            $task = Task::create([
+                ...$request->validated(),
+                'created_by' => $request->user()->id,
+                'status' => $request->status ?? 'todo',
+                'priority' => $request->priority ?? 'medium',
+            ]);
 
-        $this->logActivity($task, 'created', 'Task created', $request->user()->id);
+            $this->logActivity($task, 'created', 'Task created', $request->user()->id);
 
-        AuditLog::create([
-            'model_type' => Task::class,
-            'model_id' => $task->id,
-            'changes' => ['created' => $task->toArray()],
-            'created_by' => $request->user()->id,
-            'action' => 'task_created',
-            'description' => 'Task created: ' . $task->title,
-        ]);
+            AuditLog::create([
+                'model_type' => Task::class,
+                'model_id' => $task->id,
+                'changes' => ['created' => $task->toArray()],
+                'created_by' => $request->user()->id,
+                'action' => 'task_created',
+                'description' => 'Task created: ' . $task->title,
+            ]);
+
+            return $task;
+        });
 
         $this->clearTaskCache($task->id);
 
@@ -118,25 +123,27 @@ class TaskController extends Controller
     {
         $oldData = $task->toArray();
         $oldStatus = $task->status;
-        
-        $task->update($request->validated());
 
-        if ($oldStatus !== $task->status) {
-            $this->logActivity($task, 'status_changed', 'Status changed from ' . $oldStatus . ' to ' . $task->status, $request->user()->id);
-        }
+        DB::transaction(function () use ($task, $request, $oldData, $oldStatus) {
+            $task->update($request->validated());
 
-        $this->logActivity($task, 'updated', 'Task updated', $request->user()->id);
+            if ($oldStatus !== $task->status) {
+                $this->logActivity($task, 'status_changed', 'Status changed from ' . $oldStatus . ' to ' . $task->status, $request->user()->id);
+            }
 
-        AuditLog::create([
-            'model_type' => Task::class,
-            'model_id' => $task->id,
-            'changes' => ['before' => $oldData, 'after' => $task->fresh()->toArray()],
-            'created_by' => $request->user()->id,
-            'action' => 'task_updated',
-            'description' => 'Task updated: ' . $task->title,
-        ]);
+            $this->logActivity($task, 'updated', 'Task updated', $request->user()->id);
 
-$this->clearTaskCache($task->id);
+            AuditLog::create([
+                'model_type' => Task::class,
+                'model_id' => $task->id,
+                'changes' => ['before' => $oldData, 'after' => $task->fresh()->toArray()],
+                'created_by' => $request->user()->id,
+                'action' => 'task_updated',
+                'description' => 'Task updated: ' . $task->title,
+            ]);
+        });
+
+        $this->clearTaskCache($task->id);
 
         return $this->success($task->fresh()->load(['project:id,name', 'assignee:id,name,email']), 'Task updated successfully');
     }
@@ -144,19 +151,21 @@ $this->clearTaskCache($task->id);
     public function destroy(Request $request, Task $task)
     {
         $taskName = $task->title;
-        
-        $this->logActivity($task, 'deleted', 'Task deleted', $request->user()->id);
 
-        AuditLog::create([
-            'model_type' => Task::class,
-            'model_id' => $task->id,
-            'changes' => ['deleted' => $taskName],
-            'created_by' => $request->user()->id,
-            'action' => 'task_deleted',
-            'description' => 'Task deleted: ' . $taskName,
-        ]);
+        DB::transaction(function () use ($task, $taskName, $request) {
+            $this->logActivity($task, 'deleted', 'Task deleted', $request->user()->id);
 
-        $task->delete();
+            AuditLog::create([
+                'model_type' => Task::class,
+                'model_id' => $task->id,
+                'changes' => ['deleted' => $taskName],
+                'created_by' => $request->user()->id,
+                'action' => 'task_deleted',
+                'description' => 'Task deleted: ' . $taskName,
+            ]);
+
+            $task->delete();
+        });
 
         $this->clearTaskCache($task->id);
 
@@ -170,9 +179,11 @@ $this->clearTaskCache($task->id);
         ]);
 
         $oldStatus = $task->status;
-        $task->update(['status' => $request->status]);
 
-        $this->logActivity($task, 'status_changed', 'Status changed from ' . $oldStatus . ' to ' . $request->status, $request->user()->id);
+        DB::transaction(function () use ($task, $request, $oldStatus) {
+            $task->update(['status' => $request->status]);
+            $this->logActivity($task, 'status_changed', 'Status changed from ' . $oldStatus . ' to ' . $request->status, $request->user()->id);
+        });
 
         $this->clearTaskCache($task->id);
 
@@ -185,9 +196,10 @@ $this->clearTaskCache($task->id);
             'user_id' => 'required|exists:users,id',
         ]);
 
-        $task->update(['assigned_to' => $request->user_id]);
-
-        $this->logActivity($task, 'assigned', 'Task assigned to user', $request->user()->id);
+        DB::transaction(function () use ($task, $request) {
+            $task->update(['assigned_to' => $request->user_id]);
+            $this->logActivity($task, 'assigned', 'Task assigned to user', $request->user()->id);
+        });
 
         $this->clearTaskCache($task->id);
 
@@ -298,8 +310,10 @@ $this->clearTaskCache($task->id);
         }
 
         if (!empty($changes)) {
-            $task->update($request->only(['start_date', 'due_date']));
-            $this->logActivity($task, 'rescheduled', implode(', ', $changes), $request->user()->id);
+            DB::transaction(function () use ($task, $request, $changes) {
+                $task->update($request->only(['start_date', 'due_date']));
+                $this->logActivity($task, 'rescheduled', implode(', ', $changes), $request->user()->id);
+            });
             
             Cache::forget("task_{$task->id}");
         }

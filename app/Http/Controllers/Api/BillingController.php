@@ -89,18 +89,19 @@ class BillingController extends Controller
 
     public function agingReport(Request $request)
     {
-        $days = $request->get('days', 30);
+        $days = (int) $request->get('days', 30);
+        $doubleDays = $days * 2;
         $cacheKey = "billing_aging_{$days}";
         
-        $aging = Cache::remember($cacheKey, 60, function() use ($days) {
+        $aging = Cache::remember($cacheKey, 60, function() use ($days, $doubleDays) {
             return Invoice::where('status', 'sent')
                 ->whereNotNull('due_date')
                 ->selectRaw('
-                    SUM(CASE WHEN due_date < DATE_SUB(NOW(), INTERVAL ? DAY) THEN total ELSE 0 END) as overdue_30,
-                    SUM(CASE WHEN due_date BETWEEN DATE_SUB(NOW(), INTERVAL ? DAY) AND DATE_SUB(NOW(), INTERVAL 60 DAY) THEN total ELSE 0 END) as overdue_60,
-                    SUM(CASE WHEN due_date > DATE_SUB(NOW(), INTERVAL 60 DAY) THEN total ELSE 0 END) as current,
+                    SUM(CASE WHEN due_date > DATE_SUB(NOW(), INTERVAL ? DAY) THEN total ELSE 0 END) as current,
+                    SUM(CASE WHEN due_date BETWEEN DATE_SUB(NOW(), INTERVAL ? DAY) AND DATE_SUB(NOW(), INTERVAL ? DAY) THEN total ELSE 0 END) as overdue_31_60,
+                    SUM(CASE WHEN due_date < DATE_SUB(NOW(), INTERVAL ? DAY) THEN total ELSE 0 END) as overdue_60_plus,
                     SUM(total) as total
-                ', [$days, $days])
+                ', [$days, $doubleDays, $days, $doubleDays])
                 ->first();
         });
 

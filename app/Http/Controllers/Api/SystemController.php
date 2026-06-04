@@ -50,10 +50,10 @@ class SystemController extends Controller
         $activeClients = Client::where('status', 'active')->count();
         
         $totalProjects = Project::count();
-        $activeProjects = Project::whereIn('status', ['active', 'in_progress'])->count();
+        $activeProjects = Project::where('status', 'active')->count();
         
         $totalTasks = Task::count();
-        $completedTasks = Task::where('status', 'completed')->count();
+        $completedTasks = Task::where('status', 'done')->count();
         
         $totalInvoices = Invoice::count();
         $totalRevenue = Payment::where('status', 'completed')->sum('amount');

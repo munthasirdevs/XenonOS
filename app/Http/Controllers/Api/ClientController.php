@@ -11,6 +11,7 @@ use App\Models\ClientDocument;
 use App\Models\ClientSession;
 use App\Models\Invoice;
 use App\Models\Project;
+use App\Models\Task;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -121,7 +122,7 @@ class ClientController extends Controller
                 'active_tasks' => Task::whereHas('project', function($q) use ($client) {
                     $q->where('client_id', $client->id);
                 })->whereNotIn('status', ['done'])->count(),
-                'pending_invoices' => Invoice::where('client_id', $client->id)->where('status', 'pending')->count(),
+                'pending_invoices' => Invoice::where('client_id', $client->id)->whereIn('status', ['draft', 'sent'])->count(),
             ];
         });
 
@@ -197,7 +198,7 @@ class ClientController extends Controller
         $documents = Cache::remember($cacheKey, 60, function() use ($client) {
             return ClientDocument::where('client_id', $client->id)
                 ->select('id', 'client_id', 'file_id', 'title', 'description', 'uploaded_by', 'created_at')
-                ->with('file:id,name,size,type')
+                ->with('file:id,name,size,mime_type')
                 ->get();
         });
 

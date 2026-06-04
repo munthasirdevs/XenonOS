@@ -58,23 +58,25 @@ class PaymentController extends Controller
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'amount' => 'required|numeric|min:0.01',
-            'method' => 'required|in:card,bank_transfer,paypal,cash',
+            'method' => 'required|in:cash,bank_transfer,check,other',
         ]);
 
-        $invoice = Invoice::create([
-            'client_id' => $validated['client_id'],
-            'invoice_number' => 'INV-' . time() . rand(100, 999),
-            'status' => 'pending',
-            'due_date' => now()->addDays(30),
-        ]);
+        $payment = DB::transaction(function () use ($validated) {
+            $invoice = Invoice::create([
+                'client_id' => $validated['client_id'],
+                'invoice_number' => 'INV-' . time() . rand(100, 999),
+                'status' => 'pending',
+                'due_date' => now()->addDays(30),
+            ]);
 
-        $payment = Payment::create([
-            'invoice_id' => $invoice->id,
-            'amount' => $validated['amount'],
-            'method' => $validated['method'],
-            'status' => 'pending',
-            'transaction_ref' => 'TXN-' . strtoupper(uniqid()),
-        ]);
+            return Payment::create([
+                'invoice_id' => $invoice->id,
+                'amount' => $validated['amount'],
+                'method' => $validated['method'],
+                'status' => 'pending',
+                'transaction_ref' => 'TXN-' . strtoupper(uniqid()),
+            ]);
+        });
 
         return redirect()->route('payments.show', $payment->id)
             ->with('success', 'Payment request created');
@@ -96,17 +98,19 @@ class PaymentController extends Controller
             'status' => 'required|in:completed,pending,failed,refunded',
         ]);
 
-        $payment->update([
-            'status' => $request->status,
-            'received_at' => $request->status === 'completed' ? now() : null,
-            'received_by' => $request->status === 'completed' ? auth()->id() : null,
-        ]);
-
-        if ($payment->invoice) {
-            $payment->invoice->update([
-                'status' => $request->status === 'completed' ? 'paid' : 'pending',
+        DB::transaction(function () use ($payment, $request) {
+            $payment->update([
+                'status' => $request->status,
+                'received_at' => $request->status === 'completed' ? now() : null,
+                'received_by' => $request->status === 'completed' ? auth()->id() : null,
             ]);
-        }
+
+            if ($payment->invoice) {
+                $payment->invoice->update([
+                    'status' => $request->status === 'completed' ? 'paid' : 'pending',
+                ]);
+            }
+        });
 
         Cache::forget('payments_total_revenue');
         Cache::forget('payments_pending');

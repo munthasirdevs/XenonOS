@@ -8,6 +8,7 @@ use App\Models\Profile;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
@@ -25,19 +26,21 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         
-        $user->update($request->only('name'));
+        DB::transaction(function () use ($user, $request) {
+            $user->update($request->only('name'));
 
-        if ($user->profile) {
-            $user->profile->update($request->only('phone', 'bio', 'timezone', 'address'));
-        } else {
-            Profile::create([
-                'user_id' => $user->id,
-                'phone' => $request->phone,
-                'bio' => $request->bio,
-                'timezone' => $request->timezone ?? 'UTC',
-                'address' => $request->address,
-            ]);
-        }
+            if ($user->profile) {
+                $user->profile->update($request->only('phone', 'bio', 'timezone', 'address'));
+            } else {
+                Profile::create([
+                    'user_id' => $user->id,
+                    'phone' => $request->phone,
+                    'bio' => $request->bio,
+                    'timezone' => $request->timezone ?? 'UTC',
+                    'address' => $request->address,
+                ]);
+            }
+        });
 
         return $this->success(
             $user->load('profile'),
@@ -59,15 +62,17 @@ class ProfileController extends Controller
 
         $path = $request->file('avatar')->store('avatars', 'public');
 
-        if (!$user->profile) {
-            Profile::create([
-                'user_id' => $user->id,
-                'avatar' => $path,
-                'timezone' => 'UTC',
-            ]);
-        } else {
-            $user->profile->update(['avatar' => $path]);
-        }
+        DB::transaction(function () use ($user, $path) {
+            if (!$user->profile) {
+                Profile::create([
+                    'user_id' => $user->id,
+                    'avatar' => $path,
+                    'timezone' => 'UTC',
+                ]);
+            } else {
+                $user->profile->update(['avatar' => $path]);
+            }
+        });
 
         return $this->success(['avatar' => $path], 'Avatar updated successfully');
     }
