@@ -14,6 +14,7 @@ class Chat extends Model
 
     protected $fillable = [
         'type',
+        'name',
         'project_id',
         'created_by',
     ];
@@ -38,5 +39,12 @@ class Chat extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class);
+    }
+
+    public function mutedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'chat_user_mutes')
+                    ->withPivot('muted_by', 'muted_at', 'expires_at')
+                    ->withTimestamps();
     }
 }

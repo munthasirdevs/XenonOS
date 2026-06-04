@@ -20,6 +20,7 @@ class User extends Authenticatable
         'email',
         'password',
         'status',
+        'avatar_url',
         'last_login_at',
         'timezone',
         'date_format',
@@ -72,8 +73,7 @@ class User extends Authenticatable
 
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class, 'permission_role')
-            ->using(\App\Models\Role::class)
+        return $this->belongsToMany(Permission::class, 'permission_user')
             ->withTimestamps();
     }
 
@@ -88,7 +88,9 @@ class User extends Authenticatable
             ->values()
             ->toArray();
 
-        return array_unique($rolePermissions);
+        $directPermissions = $this->permissions()->pluck('slug')->toArray();
+
+        return array_unique(array_merge($rolePermissions, $directPermissions));
     }
 
     public function sessions(): HasMany

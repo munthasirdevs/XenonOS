@@ -15,7 +15,15 @@ class Message extends Model
         'message',
         'type',
         'file_id',
+        'is_flagged',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_flagged' => 'boolean',
+        ];
+    }
 
     public function chat(): BelongsTo
     {

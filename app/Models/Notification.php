@@ -12,8 +12,16 @@ class Notification extends Model
         'title',
         'message',
         'type',
+        'data',
         'created_by',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+        ];
+    }
 
     public function creator(): BelongsTo
     {

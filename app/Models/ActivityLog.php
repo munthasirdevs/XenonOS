@@ -25,7 +25,8 @@ class ActivityLog extends Model
         ];
     }
 
-    protected $appends = ['computed_severity', 'computed_module'];
+    // Appends disabled to prevent N+1 — compute in controller/cache instead
+    // protected $appends = ['computed_severity', 'computed_module'];
 
     public function user(): BelongsTo
     {

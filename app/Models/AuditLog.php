@@ -20,6 +20,7 @@ class AuditLog extends Model
         'action',
         'ip_address',
         'user_agent',
+        'created_by',
     ];
 
     protected function casts(): array
