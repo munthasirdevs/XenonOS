@@ -24,7 +24,7 @@ class SettingPolicy
 
     public function update(User $user, Setting $setting): bool
     {
-        if ($setting->key === 'system.*') {
+        if (str_starts_with($setting->key, 'system.')) {
             return $user->hasPermission('setting.system');
         }
         return $user->hasPermission('setting.update');
@@ -32,7 +32,7 @@ class SettingPolicy
 
     public function delete(User $user, Setting $setting): bool
     {
-        if ($setting->key === 'system.*') {
+        if (str_starts_with($setting->key, 'system.')) {
             return $user->hasPermission('setting.system');
         }
         return $user->hasPermission('setting.delete');

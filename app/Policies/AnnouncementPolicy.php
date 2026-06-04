@@ -24,7 +24,7 @@ class AnnouncementPolicy
 
     public function update(User $user, Announcement $announcement): bool
     {
-        return $user->hasPermission('announcement.create') && $announcement->created_by === $user->id;
+        return $user->hasPermission('announcement.update') && $announcement->created_by === $user->id;
     }
 
     public function delete(User $user, Announcement $announcement): bool

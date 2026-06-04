@@ -44,7 +44,7 @@ class FilePolicy
 
     private function isOwner(User $user, File $file): bool
     {
-        return $file->created_by === $user->id;
+        return $file->uploaded_by === $user->id;
     }
 
     private function isOwnerOrShared(User $user, File $file): bool
