@@ -211,7 +211,7 @@
                             <span class="material-symbols-outlined text-on-surface-variant text-sm" aria-hidden="true">account_balance</span>
                         </div>
                         <div>
-                            <p class="text-xs sm:text-sm font-medium text-on-surface">Stripe Payout: Q2 Retail</p>
+                            <p class="text-xs sm:text-sm font-medium text-on-surface">Manual Payment: Q2 Retail</p>
                             <p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Today, 10:42 AM</p>
                         </div>
                     </div>

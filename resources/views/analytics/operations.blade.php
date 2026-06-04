@@ -175,7 +175,7 @@
                             <span class="material-symbols-outlined text-xl" aria-hidden="true">error</span>
                         </div>
                         <div class="min-w-0">
-                            <p class="text-xs sm:text-sm font-semibold text-on-surface">API Timeout: Payment Gateway</p>
+                            <p class="text-xs sm:text-sm font-semibold text-on-surface">API Timeout: Billing Service</p>
                             <p class="text-[10px] text-on-surface-variant">System: checkout-api-v2 &bull; 2 mins ago</p>
                         </div>
                     </div>

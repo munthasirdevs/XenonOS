@@ -56,14 +56,14 @@
                 <h3 class="text-2xl sm:text-3xl font-headline font-bold text-on-surface">$8,120.40</h3>
                 <p class="text-xs text-on-surface-variant mt-2">4 active transactions</p>
             </div>
-            <!-- Primary Gateway -->
+            <!-- Total Transactions -->
             <div class="sm:col-span-2 bg-surface-container-low rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-outline-variant/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:scale-[1.02] transition-transform duration-400">
                 <div>
-                    <p class="text-on-surface-variant text-[10px] uppercase tracking-widest mb-1">Primary Gateway</p>
-                    <h3 class="text-lg sm:text-xl font-headline font-bold text-on-surface">Stripe Connect &bull; USD</h3>
+                    <p class="text-on-surface-variant text-[10px] uppercase tracking-widest mb-1">Total Transactions</p>
+                    <h3 class="text-lg sm:text-xl font-headline font-bold text-on-surface">1,240 &bull; All Manual</h3>
                 </div>
                 <div class="h-12 w-24 bg-surface-container rounded-lg flex items-center justify-center opacity-40 shrink-0" aria-hidden="true">
-                    <span class="material-symbols-outlined text-3xl text-on-surface">account_balance</span>
+                    <span class="material-symbols-outlined text-3xl text-on-surface">receipt_long</span>
                 </div>
             </div>
         </section>
@@ -87,9 +87,9 @@
                 <span class="material-symbols-outlined text-sm text-on-surface-variant flex-shrink-0" aria-hidden="true">filter_list</span>
                 <select id="txn-method" class="bg-transparent border-none text-xs sm:text-sm text-on-surface focus:ring-0 cursor-pointer pr-4" aria-label="Filter by payment method">
                     <option>All Methods</option>
-                    <option>Wire Transfer</option>
-                    <option>Credit Card</option>
-                    <option>Crypto (USDC)</option>
+                    <option>Cash</option>
+                    <option>Bank Transfer</option>
+                    <option>Check</option>
                 </select>
             </div>
             <!-- Status -->
@@ -137,8 +137,8 @@
                             </td>
                             <td class="px-4 sm:px-6 py-4 sm:py-5 hidden sm:table-cell">
                                 <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-sm text-on-surface-variant flex-shrink-0" aria-hidden="true">credit_card</span>
-                                    <span class="text-xs sm:text-sm">Credit Card</span>
+                                    <span class="material-symbols-outlined text-sm text-on-surface-variant flex-shrink-0" aria-hidden="true">payments</span>
+                                    <span class="text-xs sm:text-sm">Bank Transfer</span>
                                 </div>
                             </td>
                             <td class="px-4 sm:px-6 py-4 sm:py-5">
@@ -185,8 +185,8 @@
                             </td>
                             <td class="px-4 sm:px-6 py-4 sm:py-5 hidden sm:table-cell">
                                 <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-sm text-on-surface-variant flex-shrink-0" aria-hidden="true">currency_bitcoin</span>
-                                    <span class="text-xs sm:text-sm">USDC (Polygon)</span>
+                                    <span class="material-symbols-outlined text-sm text-on-surface-variant flex-shrink-0" aria-hidden="true">checkbook</span>
+                                    <span class="text-xs sm:text-sm">Check</span>
                                 </div>
                             </td>
                             <td class="px-4 sm:px-6 py-4 sm:py-5">
@@ -209,8 +209,8 @@
                             </td>
                             <td class="px-4 sm:px-6 py-4 sm:py-5 hidden sm:table-cell">
                                 <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-sm text-on-surface-variant flex-shrink-0" aria-hidden="true">credit_card</span>
-                                    <span class="text-xs sm:text-sm">Credit Card</span>
+                                    <span class="material-symbols-outlined text-sm text-on-surface-variant flex-shrink-0" aria-hidden="true">payments</span>
+                                    <span class="text-xs sm:text-sm">Cash</span>
                                 </div>
                             </td>
                             <td class="px-4 sm:px-6 py-4 sm:py-5">

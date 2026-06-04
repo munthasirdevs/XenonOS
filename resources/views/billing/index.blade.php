@@ -295,15 +295,15 @@
                             <!-- Background circle -->
                             <circle cx="60" cy="60" r="45" fill="none"
                                 stroke="var(--color-surface-container-highest, #475569)" stroke-width="16" />
-                            <!-- Credit Card 72% -->
+                            <!-- Bank Transfer 72% -->
                             <circle cx="60" cy="60" r="45" fill="none" stroke="var(--color-primary, #c0c1ff)"
                                 stroke-width="16" stroke-dasharray="203.6 282.7" stroke-dashoffset="0"
                                 transform="rotate(-90 60 60)" class="transition-all duration-700" />
-                            <!-- Bank Transfer 18% -->
+                            <!-- Cash 18% -->
                             <circle cx="60" cy="60" r="45" fill="none" stroke="var(--color-secondary, #a8b4ff)"
                                 stroke-width="16" stroke-dasharray="50.9 282.7" stroke-dashoffset="-203.6"
                                 transform="rotate(-90 60 60)" class="transition-all duration-700" />
-                            <!-- Crypto 6% -->
+                            <!-- Check 6% -->
                             <circle cx="60" cy="60" r="45" fill="none" stroke="var(--color-tertiary, #ffb787)"
                                 stroke-width="16" stroke-dasharray="17.0 282.7" stroke-dashoffset="-254.4"
                                 transform="rotate(-90 60 60)" class="transition-all duration-700" />
@@ -311,7 +311,7 @@
                             <text x="60" y="55" text-anchor="middle" fill="var(--color-on-surface, #f8fafc)"
                                 font-size="18" font-weight="700">72%</text>
                             <text x="60" y="72" text-anchor="middle" fill="var(--color-on-surface-variant, #94a3b8)"
-                                font-size="8" font-weight="600" letter-spacing="1">DIGITAL</text>
+                                font-size="8" font-weight="600" letter-spacing="1">MANUAL</text>
                         </svg>
                     </div>
                 </div>
@@ -319,15 +319,15 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4 sm:mt-6">
                     <div class="flex items-center gap-2 min-h-[44px]">
                         <div class="w-3 h-3 rounded-full bg-primary shrink-0" aria-hidden="true"></div>
-                        <span class="text-xs text-on-surface-variant truncate">Credit Card (72%)</span>
+                        <span class="text-xs text-on-surface-variant truncate">Bank Transfer (72%)</span>
                     </div>
                     <div class="flex items-center gap-2 min-h-[44px]">
                         <div class="w-3 h-3 rounded-full bg-secondary opacity-50 shrink-0" aria-hidden="true"></div>
-                        <span class="text-xs text-on-surface-variant truncate">Bank Transfer (18%)</span>
+                        <span class="text-xs text-on-surface-variant truncate">Cash (18%)</span>
                     </div>
                     <div class="flex items-center gap-2 min-h-[44px]">
                         <div class="w-3 h-3 rounded-full bg-tertiary shrink-0" aria-hidden="true"></div>
-                        <span class="text-xs text-on-surface-variant truncate">Crypto (6%)</span>
+                        <span class="text-xs text-on-surface-variant truncate">Check (6%)</span>
                     </div>
                     <div class="flex items-center gap-2 min-h-[44px]">
                         <div class="w-3 h-3 rounded-full bg-outline-variant shrink-0" aria-hidden="true"></div>

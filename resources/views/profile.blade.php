@@ -141,13 +141,13 @@
                     class="w-full bg-[#1F2937] border border-white/5 rounded-xl px-5 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/50 transition-all" />
             </div>
             <div class="space-y-2">
-                <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ml-1">Payment Method</label>
+                <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ml-1">Preferred Payment Method</label>
                 <select name="payment_method"
                     class="w-full bg-[#1F2937] border border-white/5 rounded-xl px-5 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/50 transition-all appearance-none cursor-pointer">
                     <option value="">Select payment method</option>
-                    <option value="visa" {{ (auth()->user()?->profile?->payment_method ?? '') === 'visa' ? 'selected' : '' }}>Visa</option>
-                    <option value="mastercard" {{ (auth()->user()?->profile?->payment_method ?? '') === 'mastercard' ? 'selected' : '' }}>Mastercard</option>
-                    <option value="paypal" {{ (auth()->user()?->profile?->payment_method ?? '') === 'paypal' ? 'selected' : '' }}>PayPal</option>
+                    <option value="cash" {{ (auth()->user()?->profile?->payment_method ?? '') === 'cash' ? 'selected' : '' }}>Cash</option>
+                    <option value="bank_transfer" {{ (auth()->user()?->profile?->payment_method ?? '') === 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
+                    <option value="check" {{ (auth()->user()?->profile?->payment_method ?? '') === 'check' ? 'selected' : '' }}>Check</option>
                 </select>
             </div>
         </div>
