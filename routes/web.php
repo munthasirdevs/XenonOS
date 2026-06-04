@@ -42,10 +42,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/clients', [ClientController::class, 'index'])->name('clients');
         Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
         Route::post('/clients/invite', [ClientController::class, 'generateInvite'])->name('clients.invite');
+        Route::get('/clients/activity', [ClientController::class, 'allActivity'])->name('clients.activity.all');
         Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');
+        Route::get('/clients/{id}/projects', [ClientController::class, 'projects'])->name('clients.projects');
+        Route::get('/clients/{id}/activity', [ClientController::class, 'activity'])->name('clients.activity');
+        Route::get('/clients/{id}/documents', [ClientController::class, 'documents'])->name('clients.documents');
         Route::delete('/clients/{id}', [ClientController::class, 'destroy'])->name('clients.destroy');
         Route::post('/clients/{id}/documents', [ClientController::class, 'uploadDocument'])->name('clients.uploadDocument');
-        Route::get('/clients/activity', [ClientController::class, 'allActivity'])->name('clients.activity.all');
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/files', [FileController::class, 'index'])->name('files');
@@ -57,10 +60,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/files/share/{hash}/verify', [FileController::class, 'verifyPassword'])->name('files.share.verify');
         Route::get('/files/share/{hash}/download', [FileController::class, 'downloadShared'])->name('files.share.download');
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments');
+        Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');
+        Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+        Route::get('/payments/{id}', [PaymentController::class, 'show'])->name('payments.show');
+        Route::post('/payments/{id}/status', [PaymentController::class, 'updateStatus'])->name('payments.updateStatus');
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
         Route::get('/notifications/{notification}', [NotificationController::class, 'details'])->name('notifications.details');
         Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
         Route::put('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password');
         Route::put('/settings/preferences', [SettingsController::class, 'updatePreferences'])->name('settings.preferences');
@@ -88,16 +95,7 @@ Route::middleware('auth')->group(function () {
 
     // Communication
     Route::get('/communication', [CommunicationController::class, 'index'])->name('communication');
-    Route::get('/communication/{chat}', [CommunicationController::class, 'chat'])->name('communication.chat');
     Route::post('/communication', [CommunicationController::class, 'store'])->name('communication.store');
-
-    // Tasks
-    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
-    Route::get('/tasks/search', [TaskController::class, 'search'])->name('tasks.search');
-    Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
-    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
     // Roles
     Route::get('/roles', [RoleController::class, 'index'])->name('roles');
@@ -106,12 +104,39 @@ Route::middleware('auth')->group(function () {
     Route::put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
     Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
 
-    // Projects
+    // Project routes - literal routes BEFORE wildcard
+    Route::get('/projects/hub', [ProjectController::class, 'hub'])->name('projects.hub');
+    Route::get('/projects/assigned', [ProjectController::class, 'assigned'])->name('projects.assigned');
+    Route::get('/projects/my-assigned', [ProjectController::class, 'myAssigned'])->name('projects.my-assigned');
+    Route::get('/projects/team', [ProjectController::class, 'team'])->name('projects.team');
+    Route::get('/projects/overview', [ProjectController::class, 'overview'])->name('projects.overview');
+    Route::get('/projects/timeline', [ProjectController::class, 'timeline'])->name('projects.timeline');
+    Route::get('/projects/tasks-workspace', [ProjectController::class, 'tasksWorkspace'])->name('projects.tasks-workspace');
+    Route::get('/projects/files-workspace', [ProjectController::class, 'filesWorkspace'])->name('projects.files-workspace');
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/filter', [ProjectController::class, 'filterJson'])->name('projects.filter');
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+
+    // Task routes - literal routes BEFORE wildcard
+    Route::get('/tasks/hub', [TaskController::class, 'hub'])->name('tasks.hub');
+    Route::get('/tasks/calendar', [TaskController::class, 'calendar'])->name('tasks.calendar');
+    Route::get('/tasks/analytics', [TaskController::class, 'analytics'])->name('tasks.analytics');
+    Route::get('/tasks/assign', [TaskController::class, 'assign'])->name('tasks.assign');
+    Route::get('/tasks/manage', [TaskController::class, 'manage'])->name('tasks.manage');
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
+    Route::get('/tasks/search', [TaskController::class, 'search'])->name('tasks.search');
+    Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+
+    // Communication routes - literal routes BEFORE wildcard
+    Route::get('/communication/monitor', [CommunicationController::class, 'monitor'])->name('communication.monitor');
+    Route::get('/communication/control', [CommunicationController::class, 'control'])->name('communication.control');
+    Route::get('/communication/create', [CommunicationController::class, 'create'])->name('communication.create');
+    Route::get('/communication/{chat}', [CommunicationController::class, 'chat'])->name('communication.chat');
 
     // Team
     Route::get('/team', [TeamController::class, 'index'])->name('team');
@@ -136,32 +161,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/billing/invoices/{invoice}', [BillingController::class, 'invoiceDetails'])->name('billing.invoice.details');
     Route::get('/billing/transactions', [BillingController::class, 'transactions'])->name('billing.transactions');
 
-    // Project Sub-pages
-    Route::get('/projects/hub', [ProjectController::class, 'hub'])->name('projects.hub');
-    Route::get('/projects/assigned', [ProjectController::class, 'assigned'])->name('projects.assigned');
-    Route::get('/projects/my-assigned', [ProjectController::class, 'myAssigned'])->name('projects.my-assigned');
-    Route::get('/projects/team', [ProjectController::class, 'team'])->name('projects.team');
-    Route::get('/projects/overview', [ProjectController::class, 'overview'])->name('projects.overview');
-    Route::get('/projects/timeline', [ProjectController::class, 'timeline'])->name('projects.timeline');
-    Route::get('/projects/tasks-workspace', [ProjectController::class, 'tasksWorkspace'])->name('projects.tasks-workspace');
-    Route::get('/projects/files-workspace', [ProjectController::class, 'filesWorkspace'])->name('projects.files-workspace');
-
-    // Task Sub-pages
-    Route::get('/tasks/hub', [TaskController::class, 'hub'])->name('tasks.hub');
-    Route::get('/tasks/calendar', [TaskController::class, 'calendar'])->name('tasks.calendar');
-    Route::get('/tasks/analytics', [TaskController::class, 'analytics'])->name('tasks.analytics');
-    Route::get('/tasks/assign', [TaskController::class, 'assign'])->name('tasks.assign');
-    Route::get('/tasks/manage', [TaskController::class, 'manage'])->name('tasks.manage');
-
-    // Communication Sub-pages
-    Route::get('/communication/monitor', [CommunicationController::class, 'monitor'])->name('communication.monitor');
-    Route::get('/communication/control', [CommunicationController::class, 'control'])->name('communication.control');
-    Route::get('/communication/create', [CommunicationController::class, 'create'])->name('communication.create');
-
     // Activity Sub-pages
     Route::get('/activity/admin', [ActivityController::class, 'admin'])->name('activity.admin');
-});
 
-Route::post('/settings/toggle-2fa', [SettingsController::class, 'toggle2FA'])->name('settings.toggle2fa');
+    // 2FA
+    Route::post('/settings/toggle-2fa', [SettingsController::class, 'toggle2FA'])->name('settings.toggle2fa');
+});
 
 Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');

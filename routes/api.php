@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('users')->group(function () {
+        Route::get('/', [UserRoleController::class, 'index']);
         Route::get('/{user}/roles', [UserRoleController::class, 'index']);
         Route::post('/{user}/roles', [UserRoleController::class, 'assignRole'])
             ->middleware('permission:role.update');
@@ -97,13 +98,12 @@ Route::prefix('clients')->group(function () {
     });
 });
 
-// Project routes
+// Project routes (all require auth)
 Route::prefix('projects')->group(function () {
-    Route::get('/', [ProjectController::class, 'index']);
-    Route::get('/filter', [ProjectController::class, 'filter']);
-    Route::get('/{project}', [ProjectController::class, 'show']);
-    
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/', [ProjectController::class, 'index']);
+        Route::get('/filter', [ProjectController::class, 'filter']);
+        Route::get('/{project}', [ProjectController::class, 'show']);
         Route::post('/', [ProjectController::class, 'store'])->middleware('permission:project.create');
         Route::put('/{project}', [ProjectController::class, 'update'])->middleware('permission:project.update');
         Route::delete('/{project}', [ProjectController::class, 'destroy'])->middleware('permission:project.delete');
