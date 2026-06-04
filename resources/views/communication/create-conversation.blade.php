@@ -2,15 +2,17 @@
 
 @section("content")
 <main class="flex-1 min-h-screen flex flex-col bg-surface text-on-surface font-body selection:bg-primary/30">
-    <div class="pt-24 px-8 pb-12 overflow-y-auto flex flex-col gap-8">
+<div class="pt-24 px-8 pb-12 overflow-y-auto flex flex-col gap-8">
+        <form id="create-conversation-form" method="POST" action="{{ route('communication.store') }}" class="contents">
+            @csrf
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
                 <h1 class="font-headline font-extrabold text-4xl tracking-tighter text-on-surface mb-2">Create Conversation</h1>
                 <p class="text-on-surface-variant max-w-xl">Architect a new communication hub.</p>
             </div>
-            <div class="flex items-center gap-4 bg-surface-container-low p-1.5 rounded-2xl border border-outline-variant/10">
-                <button class="px-6 py-2.5 rounded-xl text-sm font-semibold bg-primary text-on-primary shadow-lg">Create</button>
-                <button class="px-6 py-2.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-highest">Edit Existing</button>
+        <div class="flex items-center gap-4 bg-surface-container-low p-1.5 rounded-2xl border border-outline-variant/10">
+                <button type="submit" form="create-conversation-form" class="px-6 py-2.5 rounded-xl text-sm font-semibold bg-primary text-on-primary shadow-lg">Create</button>
+                <a href="{{ route('communication') }}" class="px-6 py-2.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-highest">Cancel</a>
             </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -191,11 +193,11 @@
                                 Public
                             </li>
                         </ul>
-                        <button class="w-full bg-primary text-on-primary font-bold p-4 rounded-xl">Create</button>
+                        <button type="submit" class="w-full bg-primary text-on-primary font-bold p-4 rounded-xl">Create</button>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </main>
 @endsection

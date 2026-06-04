@@ -44,28 +44,28 @@
                 <div class="flex items-start justify-between">
                     <div class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase">Total Clients</div>
                 </div>
-                <div class="text-2xl sm:text-3xl font-headline font-semibold text-on-surface">{{ $stats['total'] }}</div>
+                <div class="text-2xl sm:text-3xl font-headline font-semibold text-on-surface">{{ $totalClients }}</div>
             </div>
             <div class="stat-card">
                 <div class="flex items-start justify-between">
                     <div class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase">Active</div>
                     <span class="w-2 h-2 rounded-full bg-success status-active-dot"></span>
                 </div>
-                <div class="text-2xl sm:text-3xl font-headline font-semibold text-on-surface">{{ $stats['active'] }}</div>
+                <div class="text-2xl sm:text-3xl font-headline font-semibold text-on-surface">{{ $activeClients }}</div>
             </div>
             <div class="stat-card">
                 <div class="flex items-start justify-between">
                     <div class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase">Projects</div>
                     <span class="material-symbols-outlined text-primary">folder</span>
                 </div>
-                <div class="text-2xl sm:text-3xl font-headline font-semibold text-on-surface">{{ $projectsCount }}</div>
+                <div class="text-2xl sm:text-3xl font-headline font-semibold text-on-surface">{{ $totalProjects ?? 0 }}</div>
             </div>
             <div class="stat-card stat-accent-tertiary">
                 <div class="flex items-start justify-between">
                     <div class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase">Revenue</div>
                     <span class="material-symbols-outlined text-tertiary">payments</span>
                 </div>
-                <div class="text-2xl sm:text-3xl font-headline font-semibold text-on-surface">${{ number_format($revenue) }}</div>
+                <div class="text-2xl sm:text-3xl font-headline font-semibold text-on-surface">${{ number_format($totalRevenue ?? 0) }}</div>
             </div>
         </section>
 
@@ -103,7 +103,7 @@
                                 </span>
                             </td>
                             <td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-on-surface-variant">{{ $client->projects_count }}</td>
-                            <td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-on-surface font-medium">${{ number_format($client->revenue) }}</td>
+                            <td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-on-surface font-medium">${{ number_format($client->total_revenue) }}</td>
                             <td class="px-4 sm:px-6 py-3 sm:py-4 text-right">
                                 <button type="button" class="client-action-btn p-2 rounded-lg hover:bg-surface-container-high" onclick="toggleActionMenu(this)">
                                     <span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
@@ -132,8 +132,8 @@
         <div class="bg-surface-container-low rounded-2xl sm:rounded-3xl p-4 sm:p-6">
             <h3 class="text-xs sm:text-sm font-bold text-on-surface uppercase tracking-widest mb-4">Quick Stats</h3>
             <div class="space-y-4">
-                <div class="flex justify-between text-xs"><span class="text-on-surface-variant">Total Revenue</span><span class="text-on-surface font-semibold">${{ number_format($revenue) }}</span></div>
-                <div class="flex justify-between text-xs"><span class="text-on-surface-variant">Active Projects</span><span class="text-on-surface font-semibold">{{ $projectsCount }}</span></div>
+                <div class="flex justify-between text-xs"><span class="text-on-surface-variant">Total Revenue</span><span class="text-on-surface font-semibold">${{ number_format($totalRevenue ?? 0) }}</span></div>
+                <div class="flex justify-between text-xs"><span class="text-on-surface-variant">Active Projects</span><span class="text-on-surface font-semibold">{{ $totalProjects ?? 0 }}</span></div>
             </div>
         </div>
     </div>
@@ -148,6 +148,16 @@
             <button type="button" onclick="closeInviteModal()" class="p-2 hover:bg-surface-container-high rounded-xl"><span class="material-symbols-outlined text-on-surface">close</span></button>
         </div>
         <button type="button" id="generate-btn" onclick="generateInviteLink()" class="w-full bg-primary hover:bg-primary/90 text-on-primary font-semibold py-3 rounded-xl transition-all">Generate Invite Link</button>
+        <div id="invite-result" class="mt-4 hidden">
+            <label class="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-wider block mb-1.5">Invite Link</label>
+            <div class="flex gap-2">
+                <input type="text" id="invite-link" readonly class="flex-1 bg-surface-bright border border-outline-variant/20 rounded-xl px-4 py-2.5 text-sm text-on-surface">
+                <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('invite-link').value)" class="bg-surface-bright hover:bg-surface-container-high border border-outline-variant/20 rounded-xl px-3 py-2.5 transition-all">
+                    <span class="material-symbols-outlined text-sm text-on-surface-variant">content_copy</span>
+                </button>
+            </div>
+            <p id="invite-expiry" class="text-xs text-on-surface-variant mt-2"></p>
+        </div>
     </div>
 </div>
 @endsection
@@ -183,7 +193,8 @@
                 return res.json();
             })
             .then(function(data) {
-                if (data.success) {
+                    if (data.success) {
+                    document.getElementById('invite-result').classList.remove('hidden');
                     document.getElementById('invite-link').value = data.link;
                     document.getElementById('invite-expiry').textContent = 'Expires: ' + data.expires_at;
                     SwalCustom.success('Link Generated!', 'Your invite link is ready.');

@@ -210,6 +210,9 @@
 </div>
 
 @push('scripts')
+<script>
+    window.chatRouteTemplate = '/communication/__ID__';
+</script>
 <script src="{{ asset('js/communication-index.js') }}"></script>
 <script>
 function openNewChatModal() {

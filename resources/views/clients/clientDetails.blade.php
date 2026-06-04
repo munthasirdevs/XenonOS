@@ -8,7 +8,7 @@
 
 @section('content')
 
-<main class="flex-1 md:ml-[260px] min-h-screen">
+<main class="flex-1 md:ml-[260px] min-h-screen" data-client-id="{{ $client->id }}">
     <div class="p-6 md:p-8">
 
             <!-- MASTER HEADER -->
