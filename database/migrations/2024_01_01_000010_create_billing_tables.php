@@ -11,10 +11,16 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
-            $table->decimal('amount', 15, 2);
-            $table->enum('status', ['pending', 'paid', 'overdue', 'cancelled'])->default('pending');
+            $table->string('invoice_number')->nullable()->unique();
+            $table->decimal('total', 15, 2)->default(0);
+            $table->decimal('subtotal', 15, 2)->default(0);
+            $table->decimal('tax', 15, 2)->default(0);
+            $table->decimal('discount', 15, 2)->default(0);
+            $table->enum('status', ['draft', 'sent', 'paid', 'overdue', 'cancelled'])->default('draft');
             $table->date('due_date')->nullable();
-            $table->text('description')->nullable();
+            $table->timestamp('sent_at')->nullable();
+            $table->timestamp('paid_at')->nullable();
+            $table->text('notes')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
@@ -23,6 +29,18 @@ return new class extends Migration
             $table->index('status');
             $table->index('due_date');
             $table->index('created_by');
+        });
+
+        Schema::create('invoice_items', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('invoice_id')->constrained('invoices')->onDelete('cascade');
+            $table->string('description');
+            $table->integer('quantity');
+            $table->decimal('unit_price', 15, 2);
+            $table->decimal('total', 15, 2);
+            $table->timestamps();
+            
+            $table->index('invoice_id');
         });
 
         Schema::create('transactions', function (Blueprint $table) {
@@ -62,6 +80,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('subscriptions');
         Schema::dropIfExists('transactions');
+        Schema::dropIfExists('invoice_items');
         Schema::dropIfExists('invoices');
     }
 };

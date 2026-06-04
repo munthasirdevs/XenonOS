@@ -22,7 +22,7 @@ return new class extends Migration
             $table->index('user_id', 'activity_logs_user_idx');
             $table->index('action', 'activity_logs_action_idx');
             $table->index('created_at', 'activity_logs_created_idx');
-            $table->index(['entity_type', 'entity_id'], 'activity_logs_entity_idx');
+            // entity_type/entity_id columns don't exist on activity_logs — index skipped
         });
 
         // Client activities indexes
@@ -48,7 +48,7 @@ return new class extends Migration
             $table->dropIndex('activity_logs_user_idx');
             $table->dropIndex('activity_logs_action_idx');
             $table->dropIndex('activity_logs_created_idx');
-            $table->dropIndex('activity_logs_entity_idx');
+            // activity_logs_entity_idx was never created — skip
         });
 
         Schema::table('client_activities', function (Blueprint $table) {

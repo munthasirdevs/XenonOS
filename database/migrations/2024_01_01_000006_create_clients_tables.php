@@ -44,7 +44,7 @@ return new class extends Migration
         Schema::create('client_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
-            $table->unsignedBigInteger('file_id')->nullable();
+            $table->foreignId('file_id')->nullable()->constrained('files')->nullOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
             $table->foreignId('uploaded_by')->nullable()->constrained('users')->nullOnDelete();

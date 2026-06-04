@@ -1,17 +1,22 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('ALTER TABLE client_invites MODIFY code VARCHAR(20)');
+        Schema::table('client_invites', function (Blueprint $table) {
+            $table->string('code', 20)->change();
+        });
     }
 
     public function down(): void
     {
-        DB::statement('ALTER TABLE client_invites MODIFY code VARCHAR(6)');
+        Schema::table('client_invites', function (Blueprint $table) {
+            $table->string('code', 6)->change();
+        });
     }
 };

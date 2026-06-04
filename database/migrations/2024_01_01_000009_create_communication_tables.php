@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
             $table->enum('type', ['private', 'group', 'project'])->default('private');
+            $table->string('name')->nullable();
             $table->foreignId('project_id')->nullable()->constrained('projects')->nullOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
@@ -40,11 +41,13 @@ return new class extends Migration
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
             $table->text('message');
             $table->enum('type', ['text', 'file', 'image'])->default('text');
-            $table->unsignedBigInteger('file_id')->nullable();
+            $table->foreignId('file_id')->nullable()->constrained('files')->nullOnDelete();
+            $table->boolean('is_flagged')->default(false);
             $table->timestamps();
             
             $table->index('chat_id');
             $table->index('sender_id');
+            $table->index('is_flagged');
             $table->index('created_at');
         });
 
@@ -71,6 +74,7 @@ return new class extends Migration
             
             $table->index('related_type', 'notes_related_type_index');
             $table->index('related_id');
+            $table->index(['related_type', 'related_id'], 'notes_related_type_id_idx');
             $table->index('created_by');
         });
     }
