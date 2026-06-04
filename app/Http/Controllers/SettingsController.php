@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
+use PragmaRX\Google2FA\Google2FA;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 
 class SettingsController extends Controller
 {
@@ -28,7 +33,7 @@ class SettingsController extends Controller
         });
         
         $userPreferences = (object)[
-            'timezone' => $user->timezone ?? 'London',
+            'timezone' => $user->timezone ?? 'Europe/London',
             'date_format' => $user->date_format ?? 'dd-mm-yyyy',
             'email_notifications' => $user->email_notifications ?? true,
             'push_notifications' => $user->push_notifications ?? true,
@@ -36,7 +41,27 @@ class SettingsController extends Controller
             'survey_invites' => $user->survey_invites ?? false,
         ];
         
-        return view('settings', compact('user', 'sessions', 'securityLogs', 'userPreferences'));
+        $qrCode = null;
+        if ($user->two_factor_secret) {
+            try {
+                $google2fa = new Google2FA();
+                $qrCodeUrl = $google2fa->getQRCodeUrl(
+                    config('app.name', 'XenonOS'),
+                    $user->email,
+                    $user->two_factor_secret
+                );
+                $renderer = new ImageRenderer(
+                    new RendererStyle(200),
+                    new \BaconQrCode\Renderer\Image\PngImageBackEnd()
+                );
+                $writer = new Writer($renderer);
+                $qrCode = base64_encode($writer->writeString($qrCodeUrl));
+            } catch (\Exception $e) {
+                $qrCode = null;
+            }
+        }
+        
+        return view('settings', compact('user', 'sessions', 'securityLogs', 'userPreferences', 'qrCode'));
     }
 
     public function updatePassword(Request $request)
@@ -48,11 +73,11 @@ class SettingsController extends Controller
 
         $user = Auth::user();
         
-        if (!password_verify($request->current_password, $user->password)) {
+        if (!Hash::check($request->current_password, $user->password)) {
             return back()->with('error', 'Current password is incorrect.');
         }
 
-        $user->update(['password' => bcrypt($request->new_password)]);
+        $user->update(['password' => Hash::make($request->new_password)]);
         
         return back()->with('success', 'Password updated successfully.');
     }
@@ -60,8 +85,14 @@ class SettingsController extends Controller
     public function updatePreferences(Request $request)
     {
         $request->validate([
-            'timezone' => 'nullable|string|max:50',
+            'timezone' => 'nullable|string|timezone',
             'date_format' => 'nullable|in:dd-mm-yyyy,mm-dd-yyyy',
+            'email_notifications' => 'nullable|boolean',
+            'push_notifications' => 'nullable|boolean',
+            'marketing_emails' => 'nullable|boolean',
+            'survey_invites' => 'nullable|boolean',
+            'quiet_hours_start' => 'nullable|date_format:H:i',
+            'quiet_hours_end' => 'nullable|date_format:H:i',
         ]);
 
         $user = Auth::user();
@@ -162,17 +193,36 @@ class SettingsController extends Controller
         $enable = $request->get('enable', false);
         
         if ($enable && !$user->two_factor_secret) {
-            $secret = bin2hex(random_bytes(20));
+            $google2fa = new Google2FA();
+            $secret = $google2fa->generateSecretKey();
+            
+            $qrCodeUrl = $google2fa->getQRCodeUrl(
+                config('app.name', 'XenonOS'),
+                $user->email,
+                $secret
+            );
+            
+            $renderer = new ImageRenderer(
+                new RendererStyle(200),
+                new \BaconQrCode\Renderer\Image\PngImageBackEnd()
+            );
+            $writer = new Writer($renderer);
+            $qrCodeBase64 = base64_encode($writer->writeString($qrCodeUrl));
+            
             $user->update(['two_factor_secret' => $secret]);
-            $message = '2FA has been enabled.';
+            
+            return back()->with([
+                'success' => '2FA has been enabled. Scan the QR code with your authenticator app.',
+                'qr_code' => $qrCodeBase64,
+                'secret_text' => $secret,
+            ]);
         } elseif (!$enable && $user->two_factor_secret) {
             $user->update(['two_factor_secret' => null]);
-            $message = '2FA has been disabled.';
-        } else {
-            $message = 'No changes made.';
+            
+            return back()->with('success', '2FA has been disabled.');
         }
         
-        return back()->with('success', $message);
+        return back()->with('success', 'No changes made.');
     }
 
     public function toggleChatChannel(Request $request)
@@ -180,7 +230,7 @@ class SettingsController extends Controller
         $user = Auth::user();
         $channel = $request->get('channel');
         
-        $channels = json_decode($user->chat_channels ?? '[]', true);
+        $channels = $user->chat_channels ?? [];
         
         if (in_array($channel, $channels)) {
             $channels = array_diff($channels, [$channel]);
@@ -188,7 +238,7 @@ class SettingsController extends Controller
             $channels[] = $channel;
         }
         
-        $user->update(['chat_channels' => json_encode(array_values($channels))]);
+        $user->update(['chat_channels' => array_values($channels)]);
         
         return response()->json(['success' => true, 'channels' => $channels]);
     }
@@ -210,9 +260,9 @@ class SettingsController extends Controller
             return response()->json(['error' => 'Invalid setting'], 422);
         }
         
-        $matrix = json_decode($user->notification_matrix ?? '{}', true);
+        $matrix = $user->notification_matrix ?? [];
         $matrix[$setting] = (bool) $value;
-        $user->update(['notification_matrix' => json_encode($matrix)]);
+        $user->update(['notification_matrix' => $matrix]);
         
         return response()->json(['success' => true]);
     }
@@ -235,11 +285,11 @@ class SettingsController extends Controller
         $rule = $request->get('rule');
         $enabled = $request->get('enabled', false);
         
-        $rules = json_decode($user->auth_rules ?? '{"complex_passwords":true,"2fa_enforcement":false,"sensitive_reauth":false}', true);
+        $rules = $user->auth_rules ?? ['complex_passwords' => true, '2fa_enforcement' => false, 'sensitive_reauth' => false];
         
         if (in_array($rule, ['complex_passwords', '2fa_enforcement', 'sensitive_reauth'])) {
             $rules[$rule] = (bool) $enabled;
-            $user->update(['auth_rules' => json_encode($rules)]);
+            $user->update(['auth_rules' => $rules]);
         }
         
         return response()->json(['success' => true]);

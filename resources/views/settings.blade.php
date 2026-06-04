@@ -127,6 +127,24 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                                     </button>
                                 </form>
                             </div>
+                            @if(session('qr_code'))
+                                <div class="p-4 sm:p-5 bg-surface-container rounded-xl sm:rounded-2xl text-center">
+                                    <p class="text-xs font-semibold mb-3">Scan this QR code with your authenticator app:</p>
+                                    <img src="data:image/png;base64,{{ session('qr_code') }}" alt="2FA QR Code" class="mx-auto rounded-lg" width="200" height="200">
+                                    @if(session('secret_text'))
+                                        <p class="text-[10px] text-on-surface-variant mt-2 break-all font-mono">Or enter manually: {{ session('secret_text') }}</p>
+                                    @endif
+                                </div>
+                            @elseif($user->two_factor_secret && $qrCode)
+                                <div class="p-4 sm:p-5 bg-surface-container rounded-xl sm:rounded-2xl text-center">
+                                    <p class="text-xs font-semibold mb-1">2FA is active</p>
+                                    <p class="text-[10px] text-on-surface-variant mb-3">Your authenticator app is configured.</p>
+                                    <details class="text-left">
+                                        <summary class="text-[10px] text-primary font-bold uppercase tracking-widest cursor-pointer">Show QR Code</summary>
+                                        <img src="data:image/png;base64,{{ $qrCode }}" alt="2FA QR Code" class="mx-auto rounded-lg mt-3" width="200" height="200">
+                                    </details>
+                                </div>
+                            @endif
                             <div class="p-4 sm:p-5 bg-surface-container-low rounded-xl sm:rounded-2xl flex items-center justify-between gap-3 opacity-70">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface-variant">
@@ -440,13 +458,13 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
                             <label for="timezone" class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest pl-1 block">Time Zone</label>
                             <div class="relative group">
                                 <select id="timezone" name="timezone" class="w-full bg-surface-container-low border border-white/5 rounded-xl px-4 py-3 text-sm appearance-none focus:outline-none focus:ring-1 focus:ring-primary/40 transition-all cursor-pointer min-h-[44px]">
-                                    <option value="London" {{ $timezone == 'London' ? 'selected' : '' }}>London (UTC+00:00)</option>
-                                    <option value="NewYork" {{ $timezone == 'NewYork' ? 'selected' : '' }}>New York (UTC-5)</option>
-                                    <option value="Paris" {{ $timezone == 'Paris' ? 'selected' : '' }}>Paris (UTC+01:00)</option>
-                                    <option value="Japan" {{ $timezone == 'Japan' ? 'selected' : '' }}>Japan (UTC+09:00)</option>
-                                    <option value="Beijing" {{ $timezone == 'Beijing' ? 'selected' : '' }}>Beijing (UTC+08:00)</option>
-                                    <option value="India" {{ $timezone == 'India' ? 'selected' : '' }}>India (UTC+05:30)</option>
-                                    <option value="Bangladesh" {{ $timezone == 'Bangladesh' ? 'selected' : '' }}>Bangladesh (UTC+06:00)</option>
+                                    <option value="Europe/London" {{ $timezone == 'Europe/London' ? 'selected' : '' }}>London (UTC+00:00)</option>
+                                    <option value="America/New_York" {{ $timezone == 'America/New_York' ? 'selected' : '' }}>New York (UTC-5)</option>
+                                    <option value="Europe/Paris" {{ $timezone == 'Europe/Paris' ? 'selected' : '' }}>Paris (UTC+01:00)</option>
+                                    <option value="Asia/Tokyo" {{ $timezone == 'Asia/Tokyo' ? 'selected' : '' }}>Japan (UTC+09:00)</option>
+                                    <option value="Asia/Shanghai" {{ $timezone == 'Asia/Shanghai' ? 'selected' : '' }}>Beijing (UTC+08:00)</option>
+                                    <option value="Asia/Kolkata" {{ $timezone == 'Asia/Kolkata' ? 'selected' : '' }}>India (UTC+05:30)</option>
+                                    <option value="Asia/Dhaka" {{ $timezone == 'Asia/Dhaka' ? 'selected' : '' }}>Bangladesh (UTC+06:00)</option>
                                 </select>
                                 <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
                             </div>
@@ -678,92 +696,4 @@ $quietHoursEnd = $user->quiet_hours_end ?? '08:00';
 @push('scripts')
 <script src="{{ asset('js/settings.js') }}"></script>
 @endpush
-    let strength = 0;
-    let text = 'Weak';
-    let colorClass = 'text-rose-400';
-    let barColor = 'bg-rose-400';
-    
-    if (password.length >= 8) strength += 25;
-    if (password.length >= 12) strength += 10;
-    if (/[a-z]/.test(password)) strength += 15;
-    if (/[A-Z]/.test(password)) strength += 15;
-    if (/[0-9]/.test(password)) strength += 15;
-    if (/[^a-zA-Z0-9]/.test(password)) strength += 20;
-    
-    if (strength >= 80) { text = 'Very Strong'; colorClass = 'text-emerald-400'; barColor = 'bg-emerald-400'; }
-    else if (strength >= 60) { text = 'Strong'; colorClass = 'text-emerald-400'; barColor = 'bg-emerald-400'; }
-    else if (strength >= 40) { text = 'Medium'; colorClass = 'text-amber-400'; barColor = 'bg-amber-400'; }
-    else if (strength >= 20) { text = 'Weak'; colorClass = 'text-rose-400'; barColor = 'bg-rose-400'; }
-    
-    const container = document.getElementById('password-strength-container');
-    const bar = document.getElementById('password-strength-bar');
-    const textEl = document.getElementById('password-strength-text');
-    const percentEl = document.getElementById('password-strength-percent');
-    
-    if (password.length > 0) {
-        container.style.display = 'block';
-        bar.style.width = strength + '%';
-        bar.className = 'h-full transition-all duration-300 shadow-[0_0_8px_rgba(192,193,255,0.4)] ' + barColor;
-        textEl.className = colorClass + ' text-[11px]';
-        textEl.textContent = text;
-        percentEl.textContent = strength + '%';
-    } else {
-        container.style.display = 'none';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.toggle-channel-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            fetch('{{ route("settings.toggleChatChannel") }}', {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: formData
-            }).then(() => this.submit());
-        });
-    });
-
-    document.querySelectorAll('.notification-toggle').forEach(toggle => {
-        toggle.addEventListener('change', function() {
-            const setting = this.dataset.setting;
-            const value = this.checked ? 1 : 0;
-            fetch('{{ route("settings.notificationSetting") }}', {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' },
-                body: JSON.stringify({ setting: setting, value: value })
-            });
-        });
-    });
-
-    const quietHoursForm = document.getElementById('quiet-hours-form');
-    if (quietHoursForm) {
-        quietHoursForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            fetch('{{ route("settings.quietHours") }}', {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: formData
-            }).then(() => window.location.reload());
-        });
-    }
-
-    const exportJsonBtn = document.getElementById('export-json');
-    if (exportJsonBtn) {
-        exportJsonBtn.addEventListener('click', function() {
-            window.location.href = '{{ route("settings.export") }}';
-        });
-    }
-
-    const deleteAccountBtn = document.getElementById('delete-account-btn');
-    const deleteAccountModal = document.getElementById('delete-account-modal');
-    const deleteConfirmInput = document.getElementById('delete-confirm-input');
-    if (deleteAccountBtn && deleteAccountModal) {
-        deleteAccountBtn.addEventListener('click', () => deleteAccountModal.classList.remove('hidden'));
-        document.getElementById('cancel-delete')?.addEventListener('click', () => deleteAccountModal.classList.add('hidden'));
-    }
-});
-</script>
 @endsection
