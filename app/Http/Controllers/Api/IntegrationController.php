@@ -36,8 +36,15 @@ class IntegrationController extends Controller
             'status' => 'nullable|boolean',
         ]);
 
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:' . implode(',', Integration::types()),
+            'config' => 'required|array',
+            'status' => 'nullable|boolean',
+        ]);
+
         $integration = Integration::create([
-            ...$request->all(),
+            ...$validated,
             'status' => $request->status ?? true,
             'created_by' => $request->user()->id,
         ]);

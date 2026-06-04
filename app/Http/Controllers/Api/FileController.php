@@ -10,6 +10,7 @@ use App\Models\Tag;
 use App\Models\FileShare;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
@@ -43,19 +44,23 @@ class FileController extends Controller
         $uploadedFile = $request->file('file');
         $path = $uploadedFile->store('files/' . date('Y/m'), 'public');
 
-        $file = File::create([
-            'name' => $request->name ?? $uploadedFile->getClientOriginalName(),
-            'path' => $path,
-            'size' => $uploadedFile->getSize(),
-            'mime_type' => $uploadedFile->getMimeType(),
-            'uploaded_by' => $request->user()->id,
-        ]);
+        $file = DB::transaction(function () use ($request, $path, $uploadedFile) {
+            $file = File::create([
+                'name' => $request->name ?? $uploadedFile->getClientOriginalName(),
+                'path' => $path,
+                'size' => $uploadedFile->getSize(),
+                'mime_type' => $uploadedFile->getMimeType(),
+                'uploaded_by' => $request->user()->id,
+            ]);
 
-        FileLog::create([
-            'file_id' => $file->id,
-            'action' => 'uploaded',
-            'user_id' => $request->user()->id,
-        ]);
+            FileLog::create([
+                'file_id' => $file->id,
+                'action' => 'uploaded',
+                'user_id' => $request->user()->id,
+            ]);
+
+            return $file;
+        });
 
         return $this->success($file->load('uploader'), 'File uploaded successfully', 201);
     }
@@ -79,13 +84,15 @@ class FileController extends Controller
             Storage::disk('public')->delete($file->path);
         }
 
-        FileLog::create([
-            'file_id' => $file->id,
-            'action' => 'deleted',
-            'user_id' => $request->user()->id,
-        ]);
+        DB::transaction(function () use ($file, $request) {
+            FileLog::create([
+                'file_id' => $file->id,
+                'action' => 'deleted',
+                'user_id' => $request->user()->id,
+            ]);
 
-        $file->delete();
+            $file->delete();
+        });
 
         return $this->success(null, 'File deleted successfully');
     }
@@ -116,12 +123,12 @@ class FileController extends Controller
 
     public function storeCategory(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255|unique:file_categories,name',
             'description' => 'nullable|string',
         ]);
 
-        $category = FileCategory::create($request->all());
+        $category = FileCategory::create($validated);
         return $this->success($category, 'Category created', 201);
     }
 

@@ -111,7 +111,7 @@ class TaskController extends Controller
             'due_date' => 'nullable|date',
         ]);
 
-        $task->update($request->all());
+        $task->update($request->only(['title', 'description', 'status', 'priority', 'due_date']));
 
         return redirect()->back()->with('success', 'Task updated successfully');
     }

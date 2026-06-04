@@ -25,7 +25,7 @@ class AlertRuleController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'trigger_type' => 'required|in:' . implode(',', AlertRule::triggerTypes()),
             'condition' => 'required|array',
@@ -35,7 +35,7 @@ class AlertRuleController extends Controller
         ]);
 
         $rule = AlertRule::create([
-            ...$request->all(),
+            ...$validated,
             'is_active' => $request->is_active ?? true,
             'created_by' => $request->user()->id,
         ]);
@@ -50,7 +50,7 @@ class AlertRuleController extends Controller
 
     public function update(Request $request, AlertRule $alertRule)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'sometimes|string',
             'trigger_type' => 'sometimes|in:' . implode(',', AlertRule::triggerTypes()),
             'condition' => 'sometimes|array',
@@ -59,7 +59,7 @@ class AlertRuleController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        $alertRule->update($request->all());
+        $alertRule->update($validated);
         return $this->success($alertRule, 'Alert rule updated');
     }
 

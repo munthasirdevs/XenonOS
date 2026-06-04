@@ -34,7 +34,7 @@ class SettingsController extends Controller
             return $this->error('Unauthorized. Admin role required.', 403);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'key' => 'required|string|unique:settings,key',
             'value' => 'required',
             'type' => 'nullable|in:string,integer,boolean,json',
@@ -42,7 +42,7 @@ class SettingsController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $setting = Setting::create($request->all());
+        $setting = Setting::create($validated);
         return $this->success($setting, 'Setting created', 201);
     }
 
@@ -52,12 +52,12 @@ class SettingsController extends Controller
             return $this->error('Unauthorized. Admin role required.', 403);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'value' => 'required',
             'description' => 'nullable|string',
         ]);
 
-        $setting->update($request->only(['value', 'description']));
+        $setting->update($validated);
         return $this->success($setting, 'Setting updated');
     }
 

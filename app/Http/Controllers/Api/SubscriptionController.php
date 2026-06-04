@@ -29,7 +29,7 @@ class SubscriptionController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'plan_name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
@@ -40,7 +40,7 @@ class SubscriptionController extends Controller
         ]);
 
         $subscription = Subscription::create([
-            ...$request->all(),
+            ...$validated,
             'status' => 'active',
             'end_date' => $request->end_date ?? ($request->billing_cycle === 'monthly' 
                 ? now()->addMonth() 
